@@ -6,9 +6,9 @@ import shlex
 import subprocess
 import time
 
-import constants
-from utils import game_util
-from utils import py_util
+from tars.alfred.gen import constants
+from tars.alfred.gen.utils import game_util
+from tars.alfred.gen.utils import py_util
 
 DEBUG = False
 

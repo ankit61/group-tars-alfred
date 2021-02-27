@@ -14,12 +14,12 @@ import pandas as pd
 from collections import OrderedDict
 from datetime import datetime
 
-import constants
-from agents.deterministic_planner_agent import DeterministicPlannerAgent
-from env.thor_env import ThorEnv
-from game_states.task_game_state_full_knowledge import TaskGameStateFullKnowledge
-from utils.video_util import VideoSaver
-from utils.dataset_management_util import load_successes_from_disk, load_fails_from_disk
+from tars.alfred.gen import constants
+from tars.alfred.gen.agents.deterministic_planner_agent import DeterministicPlannerAgent
+from tars.alfred.env.thor_env import ThorEnv
+from tars.alfred.gen.game_states.task_game_state_full_knowledge import TaskGameStateFullKnowledge
+from tars.alfred.gen.utils.video_util import VideoSaver
+from tars.alfred.gen.utils.dataset_management_util import load_successes_from_disk, load_fails_from_disk
 
 # params
 RAW_IMAGES_FOLDER = 'raw_images/'

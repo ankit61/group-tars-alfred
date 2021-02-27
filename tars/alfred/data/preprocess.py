@@ -5,9 +5,9 @@ import torch
 import copy
 import progressbar
 from vocab import Vocab
-from model.seq2seq import Module as model
-from gen.utils.py_util import remove_spaces_and_lower
-from gen.utils.game_util import sample_templated_task_desc_from_traj_data
+from tars.alfred.models.model.seq2seq import Module as model
+from tars.alfred.gen.utils.py_util import remove_spaces_and_lower
+from tars.alfred.gen.utils.game_util import sample_templated_task_desc_from_traj_data
 
 class Dataset(object):
 

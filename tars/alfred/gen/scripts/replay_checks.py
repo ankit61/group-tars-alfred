@@ -8,8 +8,8 @@ import json
 import numpy as np
 import shutil
 import time
-from env.thor_env import ThorEnv
-from utils.replay_json import replay_json
+from tars.alfred.env.thor_env import ThorEnv
+from tars.alfred.gen.utils.replay_json import replay_json
 
 
 JSON_FILENAME = "traj_data.json"

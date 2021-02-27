@@ -1,11 +1,11 @@
 import copy
 import json
 import os
-import constants
-from game_states.game_state_base import GameStateBase
-from planner import ff_planner_handler
-from utils import game_util
-from utils import py_util
+import tars.alfred.gen.constants as constants
+from tars.alfred.gen.game_states.game_state_base import GameStateBase
+from tars.alfred.gen.planner import ff_planner_handler
+from tars.alfred.gen.utils import game_util
+from tars.alfred.gen.utils import py_util
 from abc import ABC
 
 

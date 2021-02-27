@@ -1,5 +1,5 @@
 import subprocess
-import constants
+from tars.alfred import constants
 
 class VideoSaver(object):
 

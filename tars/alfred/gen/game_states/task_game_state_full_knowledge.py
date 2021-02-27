@@ -1,12 +1,12 @@
 import copy
 import sys
-import constants
+import tars.alfred.gen.constants as constants
 import numpy as np
-from game_states.game_state_base import GameStateBase
-from game_states.planned_game_state import PlannedGameState
-from game_states.task_game_state import TaskGameState
-from utils import bb_util
-from utils import game_util
+from tars.alfred.gen.game_states.game_state_base import GameStateBase
+from tars.alfred.gen.game_states.planned_game_state import PlannedGameState
+from tars.alfred.gen.game_states.task_game_state import TaskGameState
+from tars.alfred.gen.utils import bb_util
+from tars.alfred.gen.utils import game_util
 
 
 class TaskGameStateFullKnowledge(TaskGameState):

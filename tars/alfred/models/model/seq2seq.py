@@ -6,7 +6,7 @@ import pprint
 import collections
 import numpy as np
 from torch import nn
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from tqdm import trange
 
 class Module(nn.Module):

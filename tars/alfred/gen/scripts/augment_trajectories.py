@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.environ['ALFRED_ROOT'], 'gen'))
 import json
 import glob
 import os
-import constants
+from tars.alfred.gen import constants
 import cv2
 import shutil
 import numpy as np
@@ -15,9 +15,9 @@ import threading
 import time
 import copy
 import random
-from utils.video_util import VideoSaver
-from utils.py_util import walklevel
-from env.thor_env import ThorEnv
+from tars.alfred.gen.utils.video_util import VideoSaver
+from tars.alfred.gen.utils.py_util import walklevel
+from tars.alfred.env.thor_env import ThorEnv
 
 
 TRAJ_DATA_JSON_FILENAME = "traj_data.json"
