@@ -58,7 +58,7 @@ class AlfredEnv(Env):
         reward = 0 if done else self.conf.failure_reward
 
         if not done:
-            success, event, _, err, _ = self.env.va_interact(action, interact_mask, debug=True)
+            success, event, _, err, _ = self.env.va_interact(action, interact_mask, smooth_nav=False)
 
             if success:
                 next_obs = self.get_obs(event)
