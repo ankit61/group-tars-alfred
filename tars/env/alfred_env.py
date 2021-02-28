@@ -62,7 +62,8 @@ class AlfredEnv(Env):
 
             if success:
                 next_obs = self._get_obs(event)
-                reward = self.env.get_transition_reward() # FIXME: reward does not work
+                reward, d = self.env.get_transition_reward()
+                done = done or d
 
         return next_obs, reward, done, None
 
