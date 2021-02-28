@@ -1,8 +1,6 @@
 import json
 import os
 import sys
-sys.path.append(os.path.join(os.environ['ALFRED_ROOT']))
-sys.path.append(os.path.join(os.environ['ALFRED_ROOT'], 'gen'))
 
 import threading
 import time
@@ -10,8 +8,8 @@ import time
 import cv2
 import numpy as np
 
-import gen.constants as constants
-from env.thor_env import ThorEnv
+import tars.alfred.gen.constants as constants
+from tars.alfred.env.thor_env import ThorEnv
 
 N_PROCS = 40
 

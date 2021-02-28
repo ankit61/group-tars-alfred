@@ -1,16 +1,12 @@
 import os
-import sys
-sys.path.append(os.path.join(os.environ['ALFRED_ROOT']))
-sys.path.append(os.path.join(os.environ['ALFRED_ROOT'], 'gen'))
-sys.path.append(os.path.join(os.environ['ALFRED_ROOT'], 'models'))
 
 import json
 import argparse
 import numpy as np
 from PIL import Image
 from datetime import datetime
-from eval_task import EvalTask
-from env.thor_env import ThorEnv
+from tars.alfred.models.eval.eval_task import EvalTask
+from tars.alfred.env.thor_env import ThorEnv
 import torch.multiprocessing as mp
 
 

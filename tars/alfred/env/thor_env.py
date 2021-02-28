@@ -27,6 +27,7 @@ class ThorEnv(Controller):
                  build_path=constants.BUILD_PATH):
 
         super().__init__(quality=quality)
+        self.img_shape = (player_screen_height, player_screen_width, 3)
         self.local_executable_path = build_path
         self.start(x_display=x_display,
                    player_screen_height=player_screen_height,
