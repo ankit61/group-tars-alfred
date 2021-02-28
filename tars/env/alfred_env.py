@@ -38,7 +38,7 @@ class AlfredEnv(Env):
 
         super(AlfredEnv, self).__init__(obs_space, ac_space)
 
-    def _get_obs(self, state):
+    def get_obs(self, state):
         return state.frame
 
     def reset(self):
@@ -46,7 +46,7 @@ class AlfredEnv(Env):
         self.env.restore_scene(self.object_poses, self.object_toggles, self.dirty_and_empty)
 
         state = self.env.step(dict(self.traj_data['scene']['init_action']))
-        return self._get_obs(state)
+        return self.get_obs(state)
 
     def step(self, action):
         action_idx, interact_mask = action
@@ -54,15 +54,16 @@ class AlfredEnv(Env):
         interact_mask = interact_mask if action in self.conf.interact_actions else None
 
         done = (action == self.conf.stop_action)
-        next_obs = self._get_obs(self.env.last_event)
+        next_obs = self.get_obs(self.env.last_event)
         reward = 0 if done else self.conf.failure_reward
 
         if not done:
-            success, event, _, err, _ = self.env.va_interact(action, interact_mask, debug=True)
+            success, event, _, err, _ = self.env.va_interact(action, interact_mask, smooth_nav=False)
 
             if success:
-                next_obs = self._get_obs(event)
-                reward = self.env.get_transition_reward() # FIXME: reward does not work
+                next_obs = self.get_obs(event)
+                reward, d = self.env.get_transition_reward()
+                done = done or d
 
         return next_obs, reward, done, None
 
@@ -73,9 +74,11 @@ class AlfredEnv(Env):
         for action in self.traj_data['plan']['low_actions']:
             yield action['api_action']
 
-    def run_expert_traj(self):
+    def run_expert_traj(self, step_by_step=False):
         for action in self.get_expert_traj():
             self.env.step(action)
+            if step_by_step:
+                yield action
 
     def cache(self):
         # saves images, etc for supervised learning setup

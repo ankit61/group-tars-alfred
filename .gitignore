@@ -2,3 +2,4 @@
 *.log
 *.out
 .vscode/*
+*egg-info
