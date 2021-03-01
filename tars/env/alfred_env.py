@@ -7,7 +7,7 @@ from tars.base.env import Env
 
 
 class AlfredEnv(Env):
-    def __init__(self, json_file, lang_idx, reward_type='dense', viz=False):
+    def __init__(self, json_file, lang_idx, reward_type='dense', viz=True):
         self.reward_type = reward_type
         self.viz = viz
         self.lang_idx = lang_idx
@@ -74,11 +74,9 @@ class AlfredEnv(Env):
         for action in self.traj_data['plan']['low_actions']:
             yield action['api_action']
 
-    def run_expert_traj(self, step_by_step=False):
+    def run_expert_traj(self):
         for action in self.get_expert_traj():
             self.env.step(action)
-            if step_by_step:
-                yield action
 
     def cache(self):
         # saves images, etc for supervised learning setup
