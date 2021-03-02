@@ -13,3 +13,4 @@ torchvision
 ai2thor==2.1.0
 nltk
 seaborn
+transformers
