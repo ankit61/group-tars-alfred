@@ -20,17 +20,24 @@ class Configurable(object):
 
     def __get_config(self):
         # this function should never be externally called
-        caller_file = inspect.getfile(self.__class__)
-        base_dir = str(Path(__file__).parent.parent.absolute())
+        cur_cls = self.__class__
+        done = False
+        while (not done) and cur_cls != Configurable:
+            class_file = inspect.getfile(cur_cls)
+            base_dir = str(Path(__file__).parent.parent.absolute())
 
-        assert caller_file.startswith(base_dir), f'A config can be linked only with classes inside {base_dir}'
+            assert class_file.startswith(base_dir), f'A config can be linked only with classes inside {base_dir}'
 
-        conf_class = self.__class__.__name__ + 'Config'
-        conf_file = os.path.join(
-                        base_dir, 'config',
-                        os.path.splitext(caller_file[len(base_dir):])[0].strip('/') + '_config.py'
-                    )
-        if not os.path.exists(conf_file):
+            conf_class = cur_cls.__name__ + 'Config'
+            conf_file = os.path.join(
+                            base_dir, 'config',
+                            os.path.splitext(class_file[len(base_dir):])[0].strip('/') + '_config.py'
+                        )
+            done = os.path.exists(conf_file)
+            if not done:
+                cur_cls = cur_cls.__bases__[0]
+
+        if not done:
             return Config()
 
         module_name = os.path.splitext(os.path.basename(conf_file))[0]
