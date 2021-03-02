@@ -11,6 +11,7 @@ import threading
 import time
 import copy
 import random
+from pathlib import Path
 from tars.alfred.gen.utils.video_util import VideoSaver
 from tars.alfred.gen.utils.py_util import walklevel
 from tars.alfred.env.thor_env import ThorEnv
@@ -118,7 +119,7 @@ def augment_traj(env, json_file):
     env.restore_scene(object_poses, object_toggles, dirty_and_empty)
 
     env.step(dict(traj_data['scene']['init_action']))
-    print("Task: %s" % (traj_data['template']['task_desc']))
+    print("Task: %s" % (traj_data['task_id']))
 
     # setup task
     env.set_task(traj_data, args, reward_type='dense')
@@ -227,9 +228,10 @@ def augment_traj(env, json_file):
         json.dump(augmented_traj_data, aj, sort_keys=True, indent=4)
 
     # save video
-    images_path = os.path.join(high_res_images_dir, '*.png')
-    video_save_path = os.path.join(high_res_images_dir, 'high_res_video.mp4')
-    video_saver.save(images_path, video_save_path)
+    if args.generate_video:
+        images_path = os.path.join(high_res_images_dir, '*.png')
+        video_save_path = os.path.join(high_res_images_dir, 'high_res_video.mp4')
+        video_saver.save(images_path, video_save_path)
 
     # check if number of new images is the same as the number of original images
     if args.smooth_nav and args.time_delays:
@@ -279,16 +281,18 @@ lock = threading.Lock()
 
 # parse arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_path', type=str, default="data/2.1.0")
+parser.add_argument('--data_path', type=str, default=os.path.join(Path(__file__).absolute().parents[2], "data/json_2.1.0/"))
 parser.add_argument('--smooth_nav', dest='smooth_nav', action='store_true')
 parser.add_argument('--time_delays', dest='time_delays', action='store_true')
 parser.add_argument('--shuffle', dest='shuffle', action='store_true')
 parser.add_argument('--num_threads', type=int, default=1)
-parser.add_argument('--reward_config', type=str, default='../models/config/rewards.json')
+parser.add_argument('--reward_config', type=str, default=os.path.join(Path(__file__).absolute().parents[2], "models/config/rewards.json"))
+parser.add_argument('--split_type', type=str, default='train')
+parser.add_argument('--generate_video', action='store_true')
 args = parser.parse_args()
 
 # make a list of all the traj_data json files
-for dir_name, subdir_list, file_list in walklevel(args.data_path, level=2):
+for dir_name, subdir_list, file_list in walklevel(os.path.join(args.data_path, args.split_type), level=2):
     if "trial_" in dir_name:
         json_file = os.path.join(dir_name, TRAJ_DATA_JSON_FILENAME)
         if not os.path.isfile(json_file):
