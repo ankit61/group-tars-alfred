@@ -1,0 +1,5 @@
+- Implemented a pretrained resnet-101 model to perform object detection on images on the dataset,
+    but could not run the model because 1) we did not have GCP credits in time 2) chose not to waste credits
+    on data analysis
+- Worked on textual analysis portion of data analysis (specifically looking at objects in scene)
+- Contributed to writing the report
