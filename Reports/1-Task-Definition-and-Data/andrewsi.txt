@@ -1,0 +1,4 @@
+- Created the statistics notebook, implemented the code that extracts metadata from the dataset and builds the metadata table
+- Implemented plotting code and added metadata plots
+- Wrote the analysis of the metadata averages (Table 1) in the report along with descriptions of the table's fields in the appendix
+- Wrote metrics section of the report
