@@ -1,0 +1,3 @@
+I worked on most of the textual and visual analysis part. I also wrote the task description, most of textual analysis, visual analysis and the qualitative analysis section. I was also involved in overall planning and making final revisions to the document. 
+
+I also started writing a pipeline with strong software engineering practices to help with the project. Currently, the pipeline creates an RL environment for the ALFRED dataset so RL can be applied and also has an interface to do supervised learning if needed (instead of RL). It also has an elaborate method to deal with config/constants to keep the code quite clean.
