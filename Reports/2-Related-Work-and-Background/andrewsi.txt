@@ -1,0 +1,3 @@
+- Performed literature search and wrote related work section on existing approaches to ALFRED
+- Performed literature search and wrote related work section on Embodied Question Answering
+- Reviewed and made minor suggestions to other sections
