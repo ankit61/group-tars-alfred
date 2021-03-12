@@ -1,0 +1,3 @@
+Did background reading on VLN tasks, multimodal alignment and generalizability (as well as vision and memory aspects which we did not include because we did not find enough evidence we will need it). 
+
+I also worked on VLN, multimodal alignment, and multimodal generalizability sections.
