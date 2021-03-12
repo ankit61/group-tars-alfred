@@ -1,0 +1,3 @@
+- read 14 research papers
+- wrote the VLN section and RL + IL section
+- helped review other parts and made small contributions to some other sections
