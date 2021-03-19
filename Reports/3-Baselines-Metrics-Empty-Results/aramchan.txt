@@ -1,0 +1,3 @@
+- helped propose ideas on ablations and metrics
+- contributed in overall writing, editing and reviewing
+- mostly focused on writing metrics 
