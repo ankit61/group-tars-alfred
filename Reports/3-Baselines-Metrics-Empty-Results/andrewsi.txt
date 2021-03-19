@@ -1,0 +1,3 @@
+- Reviewed all existing ALFRED approaches and determined which were evaluated on the official task
+- Created results tables and wrote corresponding summary
+- Helped propose ideas for intrinsic metrics and missing baselines
