@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from tars.base.config import Config
 from vocab import Vocab
 
@@ -24,5 +26,7 @@ class AlfredEnvConfig(Config):
                             list(self.interact_actions) +
                             [self.stop_action]
                         )
+
+        self.reward_config = os.path.join(str(Path(__file__).parents[2]), 'alfred/models/config/rewards.json')
 
         self.failure_reward = -10

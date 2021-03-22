@@ -25,7 +25,7 @@ class AlfredEnv(Env):
 
         # reset
         args = argparse.Namespace()
-        args.reward_config = '/home/ankit/Code/group-tars-alfred/tars/alfred/models/config/rewards.json'
+        args.reward_config = self.conf.reward_config
         self.env.set_task(self.traj_data, args, reward_type=self.reward_type)
         self.reset()
 
