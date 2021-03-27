@@ -2,15 +2,20 @@ import json
 import argparse
 import numpy as np
 from gym import spaces
+from torchvision.transforms import Compose
 from tars.alfred.env.thor_env import ThorEnv
 from tars.base.env import Env
 
 
 class AlfredEnv(Env):
-    def __init__(self, json_file, lang_idx, reward_type='dense', viz=True):
+    def __init__(
+        self, json_file, lang_idx, transforms=Compose([]),
+        reward_type='dense', viz=True
+    ):
         self.reward_type = reward_type
         self.viz = viz
         self.lang_idx = lang_idx
+        self.transforms = transforms
 
         self.env = ThorEnv()  # FIXME: use self.viz
 
@@ -39,7 +44,7 @@ class AlfredEnv(Env):
         super(AlfredEnv, self).__init__(obs_space, ac_space)
 
     def get_obs(self, state):
-        return state.frame
+        return self.transforms(state.frame)
 
     def reset(self):
         self.env.reset(self.scene_name)
