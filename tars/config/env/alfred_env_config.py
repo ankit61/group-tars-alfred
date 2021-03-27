@@ -5,28 +5,25 @@ from vocab import Vocab
 
 
 class AlfredEnvConfig(Config):
-    def __init__(self):
-        super(AlfredEnvConfig, self).__init__()
+    nav_actions = set([
+                        'MoveAhead', 'RotateRight', 'RotateLeft',
+                        'LookUp', 'LookDown'
+                    ])
 
-        self.nav_actions = set([
-                            'MoveAhead', 'RotateRight', 'RotateLeft',
-                            'LookUp', 'LookDown'
+    interact_actions = set([
+                            'PickupObject', 'PutObject', 'OpenObject',
+                            'CloseObject', 'ToggleObjectOn', 'ToggleObjectOff',
+                            'SliceObject'
                         ])
 
-        self.interact_actions = set([
-                                'PickupObject', 'PutObject', 'OpenObject',
-                                'CloseObject', 'ToggleObjectOn', 'ToggleObjectOff',
-                                'SliceObject'
-                            ])
+    stop_action = '<<Stop>>'
 
-        self.stop_action = '<<Stop>>'
+    actions = Vocab(
+                    list(nav_actions) +
+                    list(interact_actions) +
+                    [stop_action]
+                )
 
-        self.actions = Vocab(
-                            list(self.nav_actions) +
-                            list(self.interact_actions) +
-                            [self.stop_action]
-                        )
+    reward_config = os.path.join(str(Path(__file__).parents[2]), 'alfred/models/config/rewards.json')
 
-        self.reward_config = os.path.join(str(Path(__file__).parents[2]), 'alfred/models/config/rewards.json')
-
-        self.failure_reward = -10
+    failure_reward = -10
