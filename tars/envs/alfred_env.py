@@ -1,6 +1,7 @@
 import json
 import argparse
 import numpy as np
+from PIL import Image
 from gym import spaces
 from torchvision.transforms import Compose
 from tars.alfred.env.thor_env import ThorEnv
@@ -38,13 +39,13 @@ class AlfredEnv(Env):
         obs_space = spaces.Box(low=0, high=255, shape=self.env.img_shape, dtype=np.int32) # image
         ac_space = spaces.Tuple([
                         spaces.Discrete(len(self.conf.actions)),
-                        spaces.Box(low=0, high=1, shape=self.env.img_shape, dtype=np.int32)
+                        spaces.Box(low=0, high=1, shape=self.env.img_shape[:2], dtype=np.int32)
                     ])  # action, segmentation mask
 
         super(AlfredEnv, self).__init__(obs_space, ac_space)
 
     def get_obs(self, state):
-        return self.transforms(state.frame)
+        return self.transforms(Image.fromarray(state.frame))
 
     def reset(self):
         self.env.reset(self.scene_name)
@@ -92,6 +93,11 @@ class AlfredEnv(Env):
         return self.env.last_event
 
     @property
-    def lang_insts(self):
+    def goal_inst(self):
         lang_insts = self.traj_data['turk_annotations']['anns'][self.lang_idx]
-        return lang_insts['task_desc'], lang_insts['high_descs']
+        return lang_insts['task_desc']
+
+    @property
+    def low_level_insts(self):
+        lang_insts = self.traj_data['turk_annotations']['anns'][self.lang_idx]
+        return lang_insts['high_descs']
