@@ -290,7 +290,9 @@ parser.add_argument('--reward_config', type=str, default=os.path.join(Path(__fil
 parser.add_argument('--split_type', type=str, default='train')
 parser.add_argument('--generate_video', action='store_true')
 args = parser.parse_args()
-
+print(args.data_path)
+print(args.split_type)
+print(os.path.join(args.data_path, args.split_type))
 # make a list of all the traj_data json files
 for dir_name, subdir_list, file_list in walklevel(os.path.join(args.data_path, args.split_type), level=2):
     if "trial_" in dir_name:

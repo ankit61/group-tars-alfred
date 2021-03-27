@@ -7,3 +7,4 @@ depth_images
 high_res_images
 instance_masks
 augmented_traj_data.json
+ROUGH.py

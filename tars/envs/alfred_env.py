@@ -28,6 +28,7 @@ class AlfredEnv(Env):
         self.object_poses = self.traj_data['scene']['object_poses']
         self.object_toggles = self.traj_data['scene']['object_toggles']
         self.dirty_and_empty = self.traj_data['scene']['dirty_and_empty']
+        self.pddl_params = self.traj_data['pddl_params']
 
         # reset
         args = argparse.Namespace()
