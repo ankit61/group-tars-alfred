@@ -29,7 +29,7 @@ class Eval(object):
         print("Loading: ", self.args.model_path)
         print("Importing model: {}".format(self.args.model))
         M = import_module("tars.alfred." + self.args.model)
-        self.model, optimizer = M.Module.load(self.args.model_path)
+        self.model, optimizer = M.Module.load(self.args.model_path, device=torch.device('cuda' if self.args.gpu else 'cpu'))
         self.model.share_memory()
         self.model.eval()
         self.model.test_mode = True
@@ -37,6 +37,7 @@ class Eval(object):
         # updated args
         self.model.args.dout = self.args.model_path.replace(self.args.model_path.split('/')[-1], '')
         self.model.args.data = self.args.data if self.args.data else self.model.args.data
+        self.model.args.gpu = self.args.gpu
 
         # preprocess and save
         if args.preprocess:
