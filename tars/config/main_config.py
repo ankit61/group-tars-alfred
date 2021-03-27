@@ -1,12 +1,15 @@
 import torch
+import os
+from pathlib import Path
 from tars.base.config import Config
 
 
 class MainConfig(Config):
-    def __init__(self):
-        super(MainConfig, self).__init__()
 
-        # gpu use
-        self.use_gpu = torch.cuda.is_available()
-        self.gpu_id = 0
-        self.device = torch.device(f'cuda:{self.gpu_id}' if self.use_gpu else 'cpu')
+    # gpu use
+    use_gpu = torch.cuda.is_available()
+    gpu_id = 0
+    device = torch.device(f'cuda:{gpu_id}' if use_gpu else 'cpu')
+
+    # basic dirs
+    alfred_dir = os.path.join(Path(__file__).parents[1], 'alfred/')
