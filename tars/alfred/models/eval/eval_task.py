@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from datetime import datetime
 from eval import Eval
-from env.thor_env import ThorEnv
+from tars.alfred.env.thor_env import ThorEnv
 
 class EvalTask(Eval):
     '''

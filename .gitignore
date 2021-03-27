@@ -7,3 +7,6 @@ depth_images
 high_res_images
 instance_masks
 augmented_traj_data.json
+tars/alfred/data/json_feat_2.1.0/*
+tars/alfred/exp/*
+commands.txt
