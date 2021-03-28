@@ -20,7 +20,7 @@ class MetricsEvaluator(Evaluator):
         # Navigation Performance (NP) Metric
         object_to_navigate_to = MetricsEvaluator.get_object_to_navigate_to(env) # FIXME: see first TODO
         np = self.navigation_performance_metric(env, object_to_navigate_to)
-        self.episode_metrics["np"] = np # for the whole episode (i.e. navigated to the first object it has to interact with
+        self.episode_metrics["np"] = 1 if np else 0 # for the whole episode (i.e. navigated to the first object it has to interact with
 
         # Interaction Action Prediction Performance (IAPP) Metric
         expert_interact_objects, expert_interact_objects_action = MetricsEvaluator.find_objects_to_interact_with(env) # FIXME: see first TODO
