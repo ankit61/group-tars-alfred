@@ -18,7 +18,7 @@ MOCA addresses long-horizon instruction following tasks based on egocentric RGB 
 ### Clone repository
 ```
 $ git clone https://github.com/gistvision/moca.git moca
-$ export ALFRED_ROOT=$(pwd)/moca
+$ export MOCA_ROOT=$(pwd)/moca
 ```
 
 ### Install requirements
@@ -26,7 +26,7 @@ $ export ALFRED_ROOT=$(pwd)/moca
 $ virtualenv -p $(which python3) --system-site-packages moca_env
 $ source moca_env/bin/activate
 
-$ cd $ALFRED_ROOT
+$ cd $MOCA_ROOT
 $ pip install --upgrade pip
 $ pip install -r requirements.txt
 ```
@@ -37,7 +37,7 @@ $ pip install -r requirements.txt
 Dataset includes visual features extracted by ResNet-18 with natural language annotations (~135.5GB after unzipping).
 For details of the ALFRED dataset, see the repository of <a href="https://github.com/askforalfred/alfred">ALFRED</a>.
 ```
-$ cd $ALFRED_ROOT/data
+$ cd $MOCA_ROOT/data
 $ sh download_data.sh
 ```
 **Note**: The downloaded data includes expert trajectories with both original and color-swapped frames.
@@ -46,7 +46,7 @@ $ sh download_data.sh
 We provide our pretrained weight used for the experiments in the paper and the leaderboard submission.
 To download the pretrained weight of MOCA, use the command below.
 ```
-$ cd $ALFRED_ROOT
+$ cd $MOCA_ROOT
 $ sh download_model.sh
 ```
 

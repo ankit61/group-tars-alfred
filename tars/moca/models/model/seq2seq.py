@@ -49,6 +49,9 @@ class Module(nn.Module):
 
         # summary self.writer
         self.summary_writer = None
+        
+        # make sure CUDA is available if GPU arg is true
+        self.args.gpu = args.gpu and torch.cuda.is_available()
 
     def run_train(self, splits, args=None, optimizer=None):
         '''
@@ -330,11 +333,11 @@ class Module(nn.Module):
             param_group['lr'] = lr
 
     @classmethod
-    def load(cls, fsave):
+    def load(cls, fsave, device=None):
         '''
         load pth model from disk
         '''
-        save = torch.load(fsave)
+        save = torch.load(fsave, map_location=device)
         model = cls(save['args'], save['vocab'])
         model.load_state_dict(save['model'])
         optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)

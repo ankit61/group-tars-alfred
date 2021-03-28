@@ -1,8 +1,8 @@
 import os
 import sys
-sys.path.append(os.path.join(os.environ['ALFRED_ROOT']))
-sys.path.append(os.path.join(os.environ['ALFRED_ROOT'], 'gen'))
-sys.path.append(os.path.join(os.environ['ALFRED_ROOT'], 'models'))
+sys.path.append(os.path.join(os.environ['MOCA_ROOT']))
+sys.path.append(os.path.join(os.environ['MOCA_ROOT'], 'gen'))
+sys.path.append(os.path.join(os.environ['MOCA_ROOT'], 'models'))
 
 import json
 import argparse
@@ -72,7 +72,7 @@ class Leaderboard(EvalTask):
         maskrcnn = maskrcnn_resnet50_fpn(num_classes=119)
         maskrcnn.eval()
         maskrcnn.load_state_dict(torch.load('weight_maskrcnn.pt'))
-        maskrcnn = maskrcnn.cuda()
+        maskrcnn = maskrcnn.to('cuda' if args.gpu else 'cpu')
 
         prev_image = None
         prev_action = None
@@ -118,7 +118,7 @@ class Leaderboard(EvalTask):
                 pred_class = np.argmax(class_dist)
 
                 with torch.no_grad():
-                    out = maskrcnn([to_tensor(curr_image).cuda()])[0]
+                    out = maskrcnn([to_tensor(curr_image).to('cuda' if args.gpu else 'cpu')])[0]
                     for k in out:
                         out[k] = out[k].detach().cpu()
 

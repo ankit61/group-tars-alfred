@@ -91,4 +91,4 @@ ENV NVIDIA_DRIVER_CAPABILITIES \
 RUN mkdir /home/$USER_NAME/alfred
 RUN cd ${USER_HOME_DIR} && echo $(pwd) && chown $USER_NAME:$USER_NAME -R .
 
-ENTRYPOINT bash -c "export ALFRED_ROOT=~/alfred && /bin/bash"
+ENTRYPOINT bash -c "export MOCA_ROOT=~/alfred && /bin/bash"
