@@ -55,7 +55,7 @@ class BaselinePolicy(Policy):
                 if new_action in old_vocab:
                     out[..., i] = old_pred[..., old_vocab.index(new_action)]
                 actions.add(new_action)
-            
+
             assert len(actions) == self.num_actions
             return out
 
@@ -78,9 +78,11 @@ class BaselinePolicy(Policy):
             # run model
             m_out = self.model.step(feat)
             action, mask = m_out['out_action_low'], m_out['out_action_low_mask']
-            assert img.shape[0] == 1 and len(goal_inst) == 1 and len(low_insts)
+
+            # FIXME: depends on above assert
             action, mask = remap_vocab(action.squeeze()), torch.sigmoid(mask.squeeze())
 
+            # FIXME: depends on above assert
             return action.unsqueeze(0), mask.unsqueeze(0).unsqueeze(0)
 
     @staticmethod
