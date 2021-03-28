@@ -257,7 +257,7 @@ class Module(Base):
         '''
         pred = {}
         if batch is None:
-            batch = [None] * feat['out_action_low'].max(2)[1].tolist()
+            batch = [None] * len(feat['out_action_low'].max(2)[1].tolist())
         for i, (ex, alow, alow_mask) in enumerate(zip(batch, feat['out_action_low'].max(2)[1].tolist(), feat['out_action_low_mask'])):
             # remove padding tokens
             if self.pad in alow:
@@ -279,7 +279,7 @@ class Module(Base):
             alow_mask = F.sigmoid(alow_mask)
             p_mask = [(alow_mask[t] > 0.5).cpu().numpy() for t in range(alow_mask.shape[0])]
 
-            if ex is None:
+            if ex is not None:
                 task_id_ann = self.get_task_and_ann_id(ex)
             else:
                 task_id_ann = i
