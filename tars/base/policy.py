@@ -3,7 +3,6 @@ from torch.nn import Module
 import torch.nn.functional as F
 from torchvision import transforms
 from tars.base.configurable import Configurable
-from tars.envs.alfred_env import AlfredEnv
 from tars.config.envs.alfred_env_config import AlfredEnvConfig
 from tars.alfred.gen import constants
 
@@ -16,7 +15,16 @@ class Policy(Configurable, Module):
         self.int_mask_size = [constants.DETECTION_SCREEN_HEIGHT, constants.DETECTION_SCREEN_WIDTH]
 
     def clean_preds(self, action, int_mask):
-        return action.argmax(1), F.interpolate(int_mask.round(), self.int_mask_size).squeeze(1)
+        return action.argmax(1).cpu().numpy(), \
+            F.interpolate(int_mask.round(), self.int_mask_size).round().squeeze(1).bool().cpu().numpy()
+
+    @classmethod
+    def get_action_str(cls, clean_action):
+        '''
+            Args:
+                clean_action: tensor of shape [N] containing action indexes
+        '''
+        return AlfredEnvConfig.actions.index2word(list(map(lambda x: x.item(), clean_action)))
 
     def forward(self, img, goal_inst, low_insts):
         '''
