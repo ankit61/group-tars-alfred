@@ -29,6 +29,8 @@ class AlfredEnv(Env):
         self.object_toggles = self.traj_data['scene']['object_toggles']
         self.dirty_and_empty = self.traj_data['scene']['dirty_and_empty']
         self.pddl_params = self.traj_data['pddl_params']
+        self.high_level_actions = self.traj_data['plan']['high_pddl']
+        self.low_level_actions = self.traj_data['plan']['low_actions']
 
         # reset
         args = argparse.Namespace()
@@ -83,7 +85,7 @@ class AlfredEnv(Env):
 
     def run_expert_traj(self):
         for action in self.get_expert_traj():
-            self.env.step(action)
+            self.env.step(action, smooth_nav=True)
 
     def cache(self):
         # saves images, etc for supervised learning setup
