@@ -22,8 +22,8 @@ class Policy(Configurable, Module):
         '''
             Args:
                 img: [N, C, H, W] tensor (transformed by get_img_transforms)
-                goal_inst: [N, M] (transformed by get_text_transforms)
-                low_insts: [N, M, ML] (transformed by get_text_transforms)
+                goal_inst: list of shape [N, 1, M] (transformed by get_text_transforms)
+                low_insts: list of shape [N, M, ML] (transformed by get_text_transforms)
             Returns:
                 action: [N, A]
                 interaction_mask: [N, 1, H, W]
@@ -31,9 +31,8 @@ class Policy(Configurable, Module):
             Legend:
                 N: batch size
                 C, H, W: channels, height, width
-                M: max sentence length
-                ML: max number of low level instructions
-                V: vocabulary size
+                M: sentence lengths (varies per sentence, but for ease of notation displayed as one variable)
+                ML: number of low level instructions (varies per env, but for ease of notation displayed as one variable)
                 A: number of actions
         '''
         raise NotImplementedError
@@ -46,8 +45,7 @@ class Policy(Configurable, Module):
         '''
         raise NotImplementedError
 
-    @staticmethod
-    def get_text_transforms():
+    def get_text_transforms(self):
         '''
             Returns a function that takes in a list of sentences and returns
             a list where each element of the list is a another list of
