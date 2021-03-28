@@ -15,8 +15,8 @@ class Evaluator(Configurable):
         self.at_start(env, img)
 
         text_transform = self.policy.get_text_transforms()
-        goal_inst = text_transform([env.goal_inst])
-        low_level_insts = text_transform(env.low_level_insts)
+        goal_inst = text_transform([env.goal_inst], is_goal=True)
+        low_level_insts = text_transform([env.low_level_insts], is_goal=False)
 
         done = False
         tot_reward = 0

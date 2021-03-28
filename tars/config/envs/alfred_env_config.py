@@ -16,7 +16,7 @@ class AlfredEnvConfig(Config):
                             'SliceObject'
                         ])
 
-    stop_action = '<<Stop>>'
+    stop_action = '<<stop>>'
 
     actions = Vocab(
                     list(nav_actions) +

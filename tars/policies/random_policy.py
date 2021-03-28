@@ -16,6 +16,5 @@ class RandomPolicy(Policy):
     def get_img_transforms():
         return transforms.ToTensor()
 
-    @staticmethod
-    def get_text_transforms():
+    def get_text_transforms(self):
         return lambda x: x
