@@ -2,6 +2,8 @@
 *.log
 *.out
 .vscode/*
+*.DS_Store*
+*__pycache__*
 *egg-info
 depth_images
 high_res_images
