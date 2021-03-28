@@ -59,7 +59,8 @@ class AlfredEnv(Env):
 
     def step(self, action):
         action_idx, interact_mask = action
-        action = self.conf.actions.index2word(action_idx),
+
+        action = self.conf.actions.index2word(action_idx)
         interact_mask = interact_mask if action in self.conf.interact_actions else None
 
         done = (action == self.conf.stop_action)
