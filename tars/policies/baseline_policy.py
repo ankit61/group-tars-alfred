@@ -7,30 +7,19 @@ import revtok
 import torch
 from torchvision import transforms
 from torch.nn.utils.rnn import pad_sequence, pack_padded_sequence, pad_packed_sequence
-from tars.base.policy import Policy
+from tars.policies.seq2seq_policy import Seq2SeqPolicy
 from tars.alfred.models.model.seq2seq_im_mask import Module as BaselineModel
 from tars.alfred.models.nn.resnet import Resnet
 from tars.config.envs.alfred_env_config import AlfredEnvConfig
 from tars.alfred.gen.utils.py_util import remove_spaces_and_lower
 
 
-class BaselinePolicy(Policy):
+class BaselinePolicy(Seq2SeqPolicy):
     def __init__(self, model_load_path=None):
-        super().__init__()
         model_load_path = self.conf.saved_model_path if model_load_path is None else model_load_path
 
-        self.model, _ = BaselineModel.load(model_load_path, self.conf.main.device)
-        self.model.share_memory()
-        self.model.eval()
-        self.model.test_mode = True # only to be used for testing
-
-        args = Namespace()
-        args.gpu = self.conf.main.use_gpu
-        args.visual_model = 'resnet18'
-        self.resnet = Resnet(args, eval=True, share_memory=True, use_conv_feat=True)
-
-    def reset(self):
-        self.model.reset()
+        model, _ = BaselineModel.load(model_load_path, self.conf.main.device)
+        super().__init__(model)
 
     def forward(self, img, goal_inst, low_insts):
         # use batch size 1 for now because higher num needs testing
@@ -45,56 +34,28 @@ class BaselinePolicy(Policy):
 
             return out
 
-        def remap_actions(old_pred):
-            out = torch.zeros(*(list(old_pred.shape[:-1]) + [self.num_actions]))
-            old_vocab = list(map(lambda x: x.split('_')[0], self.model.vocab['action_low'].to_dict()['index2word']))
-
-            actions = set()
-            for i in range(len(AlfredEnvConfig.actions)):
-                new_action = AlfredEnvConfig.actions.index2word(i)
-                if new_action in old_vocab:
-                    out[..., i] = old_pred[..., old_vocab.index(new_action)]
-                actions.add(new_action)
-
-            assert len(actions) == self.num_actions
-            return out
-
         with torch.no_grad():
+            feat = defaultdict(list)
+
             # get img features
-            img_features = self.resnet.resnet_model.extract(img)
+            feat['frames'] = self.get_img_features(img)
 
             # get language embeddings
             merged_lang = merge_insts(goal_inst, low_insts)
             pad_seq = pad_sequence(merged_lang, batch_first=True, padding_value=self.model.pad)
             seq_lengths = np.array(list(map(len, merged_lang)))
             embed_seq = self.model.emb_word(pad_seq)
-            packed_lang = pack_padded_sequence(embed_seq, seq_lengths, batch_first=True, enforce_sorted=False)
-
-            # add everything as feat
-            feat = defaultdict(list)
-            feat['frames'] = img_features.unsqueeze(0)
-            feat['lang_goal_instr'] = packed_lang
+            feat['lang_goal_instr'] = pack_padded_sequence(embed_seq, seq_lengths, batch_first=True, enforce_sorted=False)
 
             # run model
             m_out = self.model.step(feat)
             action, mask = m_out['out_action_low'], m_out['out_action_low_mask']
 
             # FIXME: depends on above assert
-            action, mask = remap_actions(action.squeeze()), torch.sigmoid(mask.squeeze())
+            action, mask = self.remap_actions(action.squeeze()), torch.sigmoid(mask.squeeze())
 
             # FIXME: depends on above assert
             return action.unsqueeze(0), mask.unsqueeze(0).unsqueeze(0)
-
-    @staticmethod
-    def get_img_transforms():
-        return transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225],
-            )
-        ])
 
     def get_text_transforms(self):
         def transform(langs: Union[List[List[str]], List[str]], is_goal: bool) -> List[List[List]]:
