@@ -39,6 +39,9 @@ class Module(nn.Module):
         # summary self.writer
         self.summary_writer = None
 
+        # make sure CUDA is available if GPU arg is true
+        self.args.gpu = args.gpu and torch.cuda.is_available()
+
     def run_train(self, splits, args=None, optimizer=None):
         '''
         training loop

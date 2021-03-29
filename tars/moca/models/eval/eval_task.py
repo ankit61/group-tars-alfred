@@ -69,8 +69,9 @@ class EvalTask(Eval):
 
         maskrcnn = maskrcnn_resnet50_fpn(num_classes=119)
         maskrcnn.eval()
-        maskrcnn.load_state_dict(torch.load('weight_maskrcnn.pt'))
-        maskrcnn = maskrcnn.cuda()
+        # print("\n\n\nARGS\n\n\n: {}".format(args))
+        maskrcnn.load_state_dict(torch.load('weight_maskrcnn.pt', map_location=torch.device('cuda' if args.gpu else 'cpu')))
+        maskrcnn = maskrcnn.to('cuda' if args.gpu else 'cpu')
 
         prev_image = None
         prev_action = None
@@ -117,7 +118,7 @@ class EvalTask(Eval):
 
                 # mask generation
                 with torch.no_grad():
-                    out = maskrcnn([to_tensor(curr_image).cuda()])[0]
+                    out = maskrcnn([to_tensor(curr_image).to('cuda' if args.gpu else 'cpu')])[0]
                     for k in out:
                         out[k] = out[k].detach().cpu()
 

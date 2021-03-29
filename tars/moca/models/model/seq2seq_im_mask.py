@@ -72,6 +72,7 @@ class Module(Base):
         self.reset()
 
         args.visual_model = 'resnet18'
+        args.gpu = torch.cuda.is_available()
         self.resnet = Resnet(args)
 
     def featurize(self, batch, load_mask=True, load_frames=True):

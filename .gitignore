@@ -1,7 +1,10 @@
 *.aux
 *.log
 *.out
-.vscode/*
+*.pt
+*.vscode*
+*.DS_Store*
+*__pycache__*
 *egg-info
 depth_images
 high_res_images

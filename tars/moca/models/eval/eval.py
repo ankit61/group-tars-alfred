@@ -4,8 +4,8 @@ import random
 import time
 import torch
 import torch.multiprocessing as mp
-from models.nn.resnet import Resnet
-from data.preprocess import Dataset
+from tars.alfred.models.nn.resnet import Resnet
+from tars.alfred.data.preprocess import Dataset
 from importlib import import_module
 
 class Eval(object):
@@ -27,8 +27,9 @@ class Eval(object):
 
         # load model
         print("Loading: ", self.args.model_path)
+        print("Importing model: {}".format(self.args.model))
         M = import_module(self.args.model)
-        self.model, optimizer = M.Module.load(self.args.model_path)
+        self.model, optimizer = M.Module.load(self.args.model_path, device=torch.device('cuda' if self.args.gpu else 'cpu'))
         self.model.share_memory()
         self.model.eval()
         self.model.test_mode = True
