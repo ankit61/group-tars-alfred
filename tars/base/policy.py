@@ -1,3 +1,4 @@
+from typing import Union, List
 import torch
 from torch.nn import Module
 import torch.nn.functional as F
@@ -65,5 +66,17 @@ class Policy(Configurable, Module):
             a list where each element of the list is a another list of
             size [sentence length]. Each element in the inner list is an integer
             denoting word number in a vocab
+        '''
+        return self.text_transform
+
+    def text_transform(self, langs: Union[List[List[str]], List[str]], is_goal: bool) -> List[List[List]]:
+        '''
+            Args:
+                langs: list of sentences
+                is_goal: boolean denoting whether passed sentences are goals
+                            or low level descs
+            Returns:
+                out: langs converted to integer indices as per
+                        model's vocab
         '''
         raise NotImplementedError
