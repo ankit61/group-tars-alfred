@@ -1,13 +1,13 @@
 import cv2
 import copy
-import gen.constants as constants
+import tars.moca.gen.constants as constants
 import numpy as np
 from collections import Counter, OrderedDict
-from env.tasks import get_task
+from tars.moca.env.tasks import get_task
 from ai2thor.controller import Controller
-import gen.utils.image_util as image_util
-from gen.utils import game_util
-from gen.utils.game_util import get_objects_of_type, get_obj_of_type_closest_to_obj
+import tars.moca.gen.utils.image_util as image_util
+from tars.moca.gen.utils import game_util
+from tars.moca.gen.utils.game_util import get_objects_of_type, get_obj_of_type_closest_to_obj
 
 
 DEFAULT_RENDER_SETTINGS = {'renderImage': True,

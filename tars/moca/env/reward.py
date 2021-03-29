@@ -1,4 +1,4 @@
-from gen.utils.game_util import get_object
+from tars.moca.gen.utils.game_util import get_object
 
 class BaseAction(object):
     '''

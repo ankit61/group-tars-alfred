@@ -4,11 +4,12 @@ import json
 import numpy as np
 from PIL import Image
 from datetime import datetime
-from env.thor_env import ThorEnv
-from eval import Eval
+from tars.moca.env.thor_env import ThorEnv
+from tars.moca.models.eval.eval import Eval
+from tars.moca.models.eval.eval import Eval
 
 import torch
-import constants
+import tars.moca.gen.constants as constants
 import torch.nn.functional as F
 from torchvision.utils import save_image
 from torchvision.transforms.functional import to_tensor
