@@ -3,31 +3,20 @@ from tars.envs.alfred_env import AlfredEnv
 import numpy as np
 
 
-# TODO: don't want to evaluate the static methods everytime. Only once at start, but then might have to change signature of methods
-# TODO: let's have a dictionary of the metrics (for episode and for all episodes)? Maybe instantiate the global one in the parent Evaluator
 class MetricsEvaluator(Evaluator):
     def __init__(self, policy):
         super().__init__(policy)
-        self.episode_metrics = dict()  # FIXME: see second TODO. This is the metrics for one episode
+        self.episode_metrics = dict()
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
+        self.object_to_navigate_to = "" # used by the NP metric
+        self.expert_interact_objects, self.expert_interact_objects_action = [], [] # used by IAPP metric
 
     def at_step_begin(self, env):
         '''
             Args:
                 env: current environment
         '''
-
-        # Navigation Performance (NP) Metric
-        object_to_navigate_to = MetricsEvaluator.get_object_to_navigate_to(env) # FIXME: see first TODO
-        np = self.navigation_performance_metric(env, object_to_navigate_to)
-        self.episode_metrics["np"] = 1 if np else 0 # for the whole episode (i.e. navigated to the first object it has to interact with
-
-        # Interaction Action Prediction Performance (IAPP) Metric
-        expert_interact_objects, expert_interact_objects_action = MetricsEvaluator.find_objects_to_interact_with(env) # FIXME: see first TODO
-        predicted_action, predicted_mask = "", "" # FIXME pass these from the model
-        iapp = self.iapp_metric(env, expert_interact_objects, expert_interact_objects_action, predicted_action,
-                                          predicted_mask)
-        self.episode_metrics["iapp"] += iapp / len(expert_interact_objects) # percentage of correct actions predicted correctly
+        pass
 
 
     def at_step_end(self, env, policy_in, policy_out, nrd):
@@ -39,21 +28,44 @@ class MetricsEvaluator(Evaluator):
                 nrd: tuple of (next state, reward, done) after taking executing
                     policy_out
         '''
-        pass
+        predicted_action, predicted_mask = policy_out
+
+        # Navigation Performance (NP) Metric
+        np = self.navigation_performance_metric(env, self.object_to_navigate_to)
+        self.episode_metrics[
+            "np"] = 1 if np else 0  # for the whole episode (i.e. navigated to the first object it has to interact with
+
+        # Interaction Action Prediction Performance (IAPP) Metric
+        iapp = self.iapp_metric(env, self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
+                                predicted_mask)
+        self.episode_metrics["iapp"] += iapp / len(
+            self.expert_interact_objects)  # percentage of correct actions predicted correctly
+
 
     def at_start(self, env, start_state):
         '''
             Args:
                 env: current environment
         '''
+        # reset
+        self.episode_metrics = dict()
+        self.objects_already_interacted_with = []
+        self.object_to_navigate_to = ""
+        self.expert_interact_objects, self.expert_interact_objects_action = [], []  # used by IAPP metric
+
+        self.object_to_navigate_to = MetricsEvaluator.get_object_to_navigate_to(env)
+        self.expert_interact_objects, self.expert_interact_objects_action = MetricsEvaluator.find_objects_to_interact_with(
+            env)
         pass
 
-    def at_end(self, env):
+
+    def at_end(self, env : AlfredEnv):
         '''
             Args:
                 env: current environment
         '''
-        pass
+        return self.episode_metrics
+
 
     # Note: object_to_navigate_to is an argument so it is not computed every time
     def navigation_performance_metric(self, env: AlfredEnv, object_to_navigate_to):
