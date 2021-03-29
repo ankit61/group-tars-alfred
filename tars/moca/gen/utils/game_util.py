@@ -2,8 +2,8 @@ import copy
 import random
 import cv2
 import numpy as np
-import constants
-import goal_library as glib
+import tars.moca.gen.constants as constants
+import tars.moca.gen.goal_library as glib
 
 
 def get_pose(event):

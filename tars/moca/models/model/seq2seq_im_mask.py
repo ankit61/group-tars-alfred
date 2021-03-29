@@ -316,7 +316,9 @@ class Module(Base):
         output processing
         '''
         pred = {}
-        for (ex, _), alow, alow_mask in zip(batch, feat['out_action_low'].max(2)[1].tolist(), feat['out_action_low_mask']):
+        if batch is None:
+            batch = [[None, None]] * len(feat['out_action_low_mask'])
+        for i, ((ex, _), alow, alow_mask) in enumerate(zip(batch, feat['out_action_low'].max(2)[1].tolist(), feat['out_action_low_mask'])):
             # remove padding tokens
             if self.pad in alow:
                 pad_start_idx = alow.index(self.pad)
@@ -335,10 +337,16 @@ class Module(Base):
 
             p_mask = [alow_mask[t].detach().cpu().numpy() for t in range(alow_mask.shape[0])]
 
-            pred[self.get_task_and_ann_id(ex)] = {
-                'action_low': ' '.join(words),
-                'action_low_mask': p_mask,
-            }
+            if ex is None:
+                pred[i] = {
+                    'action_low': ' '.join(words),
+                    'action_low_mask': p_mask,
+                }
+            else:
+                pred[self.get_task_and_ann_id(ex)] = {
+                    'action_low': ' '.join(words),
+                    'action_low_mask': p_mask,
+                }
 
         return pred
 

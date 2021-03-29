@@ -21,7 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('--reward_config', default='models/config/rewards.json')
     parser.add_argument('--eval_split', type=str, choices=['train', 'valid_seen', 'valid_unseen'])
     parser.add_argument('--model_path', type=str, default="exp/pretrained/pretrained.pth")
-    parser.add_argument('--model', type=str, default='models.model.seq2seq_im_mask')
+    parser.add_argument('--model', type=str, default='tars.moca.models.model.seq2seq_im_mask')
     parser.add_argument('--preprocess', dest='preprocess', action='store_true')
     parser.add_argument('--shuffle', dest='shuffle', action='store_true')
     parser.add_argument('--gpu', dest='gpu', action='store_true')

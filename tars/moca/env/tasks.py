@@ -1,8 +1,8 @@
 import json
 import numpy as np
-from graph import graph_obj
-from gen.utils.game_util import get_objects_with_name_and_prop
-from env.reward import get_action
+from tars.moca.gen.graph import graph_obj
+from tars.moca.gen.utils.game_util import get_objects_with_name_and_prop
+from tars.moca.env.reward import get_action
 
 
 class BaseTask(object):
