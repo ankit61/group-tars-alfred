@@ -6,6 +6,7 @@ import numpy as np
 class MetricsEvaluator(Evaluator):
     def __init__(self, policy):
         super().__init__(policy)
+        self.json_file_metrics = dict()
         self.episode_metrics = dict()
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
         self.object_to_navigate_to = "" # used by the NP metric
@@ -56,15 +57,14 @@ class MetricsEvaluator(Evaluator):
         self.object_to_navigate_to = MetricsEvaluator.get_object_to_navigate_to(env)
         self.expert_interact_objects, self.expert_interact_objects_action = MetricsEvaluator.find_objects_to_interact_with(
             env)
-        pass
 
 
-    def at_end(self, env : AlfredEnv):
+    def at_end(self, env: AlfredEnv):
         '''
             Args:
                 env: current environment
         '''
-        return self.episode_metrics
+        self.json_file_metrics[env.json_file] = self.episode_metrics
 
 
     # Note: object_to_navigate_to is an argument so it is not computed every time

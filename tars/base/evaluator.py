@@ -7,8 +7,6 @@ class Evaluator(Configurable):
     def __init__(self, policy: Policy):
         super().__init__()
         self.policy = policy
-        self.json_file_metrics = dict()
-        self.aggregated_metrics = dict()
 
     def evaluate(self, json_file, lang_idx):
         env = AlfredEnv(json_file, lang_idx, self.policy.get_img_transforms())
@@ -45,9 +43,6 @@ class Evaluator(Configurable):
             tot_reward += reward
 
         print('Total Reward: ', tot_reward)
-        episode_metrics = self.at_end(env)
-        # set metrics evaluated to the json_file corresponding to this env
-        self.json_file_metrics[env.json_file] = episode_metrics
 
     def at_step_begin(self, env):
         '''
