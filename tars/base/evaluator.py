@@ -12,6 +12,7 @@ class Evaluator(Configurable):
         env = AlfredEnv(json_file, lang_idx, self.policy.get_img_transforms())
 
         img = env.reset()
+        self.policy.reset()
         self.at_start(env, img)
 
         text_transform = self.policy.get_text_transforms()
@@ -41,8 +42,9 @@ class Evaluator(Configurable):
             )
             tot_reward += reward
 
-        print('Total Reward: ', tot_reward)
         self.at_end(env)
+        print('Total Reward: ', tot_reward)
+        
 
     def at_step_begin(self, env):
         '''

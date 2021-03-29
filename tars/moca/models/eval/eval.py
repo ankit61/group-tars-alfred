@@ -4,7 +4,7 @@ import random
 import time
 import torch
 import torch.multiprocessing as mp
-from tars.alfred.models.nn.resnet import Resnet
+from tars.moca.models.nn.resnet import Resnet
 from tars.alfred.data.preprocess import Dataset
 from importlib import import_module
 

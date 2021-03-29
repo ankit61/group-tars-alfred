@@ -13,10 +13,11 @@ class AlfredEnv(Env):
         self, json_file, lang_idx, transforms=Compose([]),
         reward_type='dense', viz=True
     ):
-        self.reward_type = reward_type
-        self.viz = viz
+        self.json_file = json_file
         self.lang_idx = lang_idx
         self.transforms = transforms
+        self.reward_type = reward_type
+        self.viz = viz
 
         self.env = ThorEnv()  # FIXME: use self.viz
 
@@ -93,7 +94,7 @@ class AlfredEnv(Env):
         raise NotImplementedError
 
     @property
-    def privelged_state(self):
+    def full_state(self):
         return self.env.last_event
 
     @property

@@ -3,21 +3,20 @@ from tars.envs.alfred_env import AlfredEnv
 import numpy as np
 
 
-# TODO: don't want to evaluate the static methods everytime. Only once at start, but then might have to change signature of methods
-# TODO: let's have a dictionary of the metrics (for episode and for all episodes)? Maybe instantiate the global one in the parent Evaluator
 class MetricsEvaluator(Evaluator):
     def __init__(self, policy):
         super().__init__(policy)
-        self.episode_metrics = dict()  # FIXME: see second TODO. This is the metrics for one episode
-        self.objects_already_interacted_with = [] # prevent double counting for IAPP
+        self.json_file_metrics = dict()
+        self.episode_metrics = dict()
+        self.np_obj_id = None # used by the NP metric
+        # self.objects_already_interacted_with = [] # prevent double counting for IAPP
+        # self.expert_interact_objects, self.expert_interact_objects_action = [], [] # used by IAPP metric
 
     def at_step_begin(self, env):
         '''
             Args:
                 env: current environment
         '''
-
-        
 
 
     def at_step_end(self, env, policy_in, policy_out, nrd):
@@ -29,31 +28,49 @@ class MetricsEvaluator(Evaluator):
                 nrd: tuple of (next state, reward, done) after taking executing
                     policy_out
         '''
-        # Navigation Performance (NP) Metric
-        if self.episode_metrics['np'] != 1:
-            self.episode_metrics['np'] = int(self.np_metric(env, self.get_np_obj_id(env)))
 
-        # Interaction Action Prediction Performance (IAPP) Metric
-        attempted_interactions = self.get_attempted_interactions(env) # FIXME: see first TODO
-        predicted_action, predicted_mask = "", "" # FIXME pass these from the model
-        iapp = self.iapp_metric(env, attempted_interactions, predicted_action, predicted_mask)
-        self.episode_metrics["iapp"] += iapp / len(attempted_interactions) # percentage of attempted actions predicted correctly
+        predicted_action, predicted_mask = policy_out
+
+        # Update Navigation Performance (NP) metric
+        if self.episode_metrics['np'] != 1:
+            self.episode_metrics['np'] = int(self.np_metric(env, self.np_obj_id))
+
+        # # Interaction Action Prediction Performance (IAPP) Metric
+        # attempted_interactions = self.get_attempted_interactions(env) # FIXME: see first TODO
+        # iapp = self.iapp_metric(env, attempted_interactions, predicted_action, predicted_mask)
+        # self.episode_metrics["iapp"] += iapp / len(attempted_interactions) # percentage of attempted actions predicted correctly
+        # predicted_action, predicted_mask = policy_out
+
+        # # Interaction Action Prediction Performance (IAPP) Metric
+        # iapp = self.iapp_metric(env, self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
+        #                         predicted_mask)
+        # self.episode_metrics["iapp"] += iapp / len(
+        #     self.expert_interact_objects)  # percentage of correct actions predicted correctly
+
 
     def at_start(self, env, start_state):
         '''
             Args:
                 env: current environment
         '''
-        pass
+        # reset episode metrics, prefetch per-episode values for metrics
+        self.episode_metrics = dict()
+        self.np_obj_id = self.get_np_obj_id(env)
 
-    def at_end(self, env):
+        # self.objects_already_interacted_with = []
+        # self.expert_interact_objects, self.expert_interact_objects_action = MetricsEvaluator.find_objects_to_interact_with(
+        #     env)
+
+
+    def at_end(self, env: AlfredEnv):
         '''
             Args:
                 env: current environment
         '''
-        pass
+        # save episode metrics
+        self.json_file_metrics[env.json_file] = self.episode_metrics
 
-    # Note: np_obj_id is an argument so it is not computed every time
+
     def np_metric(self, env: AlfredEnv, np_obj_id):
         '''
         Assumptions:
@@ -68,16 +85,16 @@ class MetricsEvaluator(Evaluator):
 
 
     # Note: expert_interact_objects, expert_interact_objects_action are arguments so they are not computed every time
-    def iapp_metric(self, env: AlfredEnv, expert_interact_objects, expert_interact_objects_action, predicted_action, predicted_mask):
+    # def iapp_metric(self, env: AlfredEnv, expert_interact_objects, expert_interact_objects_action, predicted_action, predicted_mask):
 
-        agent_inter_object = env.env.get_target_instance_id(predicted_mask)
+    #     agent_inter_object = env.env.get_target_instance_id(predicted_mask)
 
-        for expert_inter_object, expert_inter_object_action in zip(expert_interact_objects, expert_interact_objects_action):
-            if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
-                    and (agent_inter_object, predicted_action) not in self.objects_already_interacted_with:
-                self.objects_already_interacted_with.append((agent_inter_object, predicted_action)) # prevent double counting if agent stuck in loop, etc.
-                return True
-        return False
+    #     for expert_inter_object, expert_inter_object_action in zip(expert_interact_objects, expert_interact_objects_action):
+    #         if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
+    #                 and (agent_inter_object, predicted_action) not in self.objects_already_interacted_with:
+    #             self.objects_already_interacted_with.append((agent_inter_object, predicted_action)) # prevent double counting if agent stuck in loop, etc.
+    #             return True
+    #     return False
 
 
     @staticmethod
@@ -85,9 +102,8 @@ class MetricsEvaluator(Evaluator):
         '''
         Assumptions:
 
-        We need to define what the first object should be: the first object mentioned in the task_desc, the first object
-        expert interacts with in plan, one of the items in the pddl_params
-        Assuming the third option (i.e. object_target in pddl_params)
+        'First object' here is assumed to be the first object the expert 
+        interacts with in the low-level actions
         '''
         for action in env.low_level_actions:
             if 'objectId' in action['api_action']:
@@ -95,18 +111,18 @@ class MetricsEvaluator(Evaluator):
         return ""
 
 
-    @staticmethod
-    def get_attempted_interactions(env: AlfredEnv):
-        # interact_objects = []
-        # interact_objects_action = []
-        attempted_interactions = []
-        for action in env.low_level_actions:
-            if 'objectId' in action['api_action']:  # interactions with objects
-                objectId = action['api_action']['objectId']
-                attempted_interactions.append(action['api_action'])
-                # interact_objects.append(objectId)
-                # interact_objects_action.append()
-                # interact_objects.append(objectId[:objectId.find('|')])
-                # interact_objects_action.append(action['api_action']['action'])
+    # @staticmethod
+    # def get_attempted_interactions(env: AlfredEnv):
+    #     # interact_objects = []
+    #     # interact_objects_action = []
+    #     attempted_interactions = []
+    #     for action in env.low_level_actions:
+    #         if 'objectId' in action['api_action']:  # interactions with objects
+    #             objectId = action['api_action']['objectId']
+    #             attempted_interactions.append(action['api_action'])
+    #             # interact_objects.append(objectId)
+    #             # interact_objects_action.append()
+    #             # interact_objects.append(objectId[:objectId.find('|')])
+    #             # interact_objects_action.append(action['api_action']['action'])
 
-        return attempted_interactions
+    #     return attempted_interactions

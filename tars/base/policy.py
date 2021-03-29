@@ -26,6 +26,12 @@ class Policy(Configurable, Module):
         '''
         return AlfredEnvConfig.actions.index2word(list(map(lambda x: x.item(), clean_action)))
 
+    def reset(self):
+        '''
+            Clear any stateful info
+        '''
+        raise NotImplementedError
+
     def forward(self, img, goal_inst, low_insts):
         '''
             Args:
