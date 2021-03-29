@@ -45,7 +45,7 @@ class BaselinePolicy(Policy):
 
             return out
 
-        def remap_vocab(old_pred):
+        def remap_actions(old_pred):
             out = torch.zeros(*(list(old_pred.shape[:-1]) + [self.num_actions]))
             old_vocab = list(map(lambda x: x.split('_')[0], self.model.vocab['action_low'].to_dict()['index2word']))
 
@@ -80,7 +80,7 @@ class BaselinePolicy(Policy):
             action, mask = m_out['out_action_low'], m_out['out_action_low_mask']
 
             # FIXME: depends on above assert
-            action, mask = remap_vocab(action.squeeze()), torch.sigmoid(mask.squeeze())
+            action, mask = remap_actions(action.squeeze()), torch.sigmoid(mask.squeeze())
 
             # FIXME: depends on above assert
             return action.unsqueeze(0), mask.unsqueeze(0).unsqueeze(0)
