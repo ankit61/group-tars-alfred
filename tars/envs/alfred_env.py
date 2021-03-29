@@ -94,7 +94,7 @@ class AlfredEnv(Env):
         raise NotImplementedError
 
     @property
-    def privelged_state(self):
+    def full_state(self):
         return self.env.last_event
 
     @property
