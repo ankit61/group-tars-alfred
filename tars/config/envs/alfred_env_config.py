@@ -27,3 +27,6 @@ class AlfredEnvConfig(Config):
     reward_config = os.path.join(str(Path(__file__).parents[2]), 'alfred/models/config/rewards.json')
 
     failure_reward = -10
+
+    max_failures = 10
+    max_steps = 1000

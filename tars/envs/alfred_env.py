@@ -10,7 +10,7 @@ from tars.base.env import Env
 
 class AlfredEnv(Env):
     def __init__(
-        self, thor_env, json_file, lang_idx, transforms=Compose([]),
+        self, json_file, lang_idx, transforms=Compose([]),
         reward_type='dense', viz=True
     ):
         self.json_file = json_file
@@ -19,7 +19,7 @@ class AlfredEnv(Env):
         self.reward_type = reward_type
         self.viz = viz
 
-        self.env = thor_env  # FIXME: use self.viz
+        self.env = ThorEnv()  # FIXME: use self.viz
 
         with open(json_file) as f:
             self.traj_data = json.load(f)
@@ -46,6 +46,9 @@ class AlfredEnv(Env):
                         spaces.Box(low=0, high=1, shape=self.env.img_shape[:2], dtype=np.int32)
                     ])  # action, segmentation mask
 
+        self.num_failures = 0
+        self.episode_len = 0
+
         super(AlfredEnv, self).__init__(obs_space, ac_space)
 
     def get_obs(self, state):
@@ -56,31 +59,40 @@ class AlfredEnv(Env):
         self.env.restore_scene(self.object_poses, self.object_toggles, self.dirty_and_empty)
 
         state = self.env.step(dict(self.traj_data['scene']['init_action']))
+
+        self.num_failures = 0
+        self.episode_len = 0
+
         return self.get_obs(state)
 
     def step(self, action):
         action_idx, interact_mask = action
-        
+
         action_name = self.conf.actions.index2word(action_idx)
         interact_mask = interact_mask if action_name in self.conf.interact_actions else None
-        
-        # print("STEP: {}, {}".format(action_idx, action_name))
 
         done = (action_name == self.conf.stop_action)
         next_obs = self.get_obs(self.env.last_event)
         reward = 0 if done else self.conf.failure_reward
-        success = False
 
         if not done:
             success, event, _, err, _ = self.env.va_interact(action_name, interact_mask, smooth_nav=False)
-            # if err:
-            #     print("ERR: {}".format(err))
+
             if success:
                 next_obs = self.get_obs(event)
                 reward, d = self.env.get_transition_reward()
                 done = done or d
+            else:
+                self.num_failures += 1
+                if self.num_failures >= self.conf.max_failures:
+                    print("Interact API failed %d times" % self.num_failures)
+                    done = True
 
-        return next_obs, reward, done, success
+        self.episode_len += 1
+        if self.episode_len >= self.conf.max_steps:
+            done = True
+
+        return next_obs, reward, done, None
 
     def close(self):
         self.env.stop()

@@ -6,6 +6,11 @@ import numpy as np
 class MetricsEvaluator(Evaluator):
     def __init__(self, policy):
         super().__init__(policy)
+
+        self.successes = []
+        self.failures = []
+        self.results = {}
+
         self.json_file_metrics = dict()
         self.episode_metrics = dict()
         self.np_obj_id = None # used by the NP metric
@@ -17,6 +22,7 @@ class MetricsEvaluator(Evaluator):
             Args:
                 env: current environment
         '''
+        pass
 
 
     def at_step_end(self, env, policy_in, policy_out, nrd):
@@ -56,13 +62,126 @@ class MetricsEvaluator(Evaluator):
             env)
 
 
-    def at_end(self, env: AlfredEnv):
+    def at_end(self, env: AlfredEnv, total_reward):
         '''
             Args:
                 env: current environment
         '''
         # save episode metrics
         self.json_file_metrics[env.json_file] = self.episode_metrics
+
+        # calculate task-level metrics
+
+        # check if goal was satisfied
+        goal_satisfied = env.env.get_goal_satisfied()
+        if goal_satisfied:
+            print("Goal Reached")
+            success = True
+
+        # goal_conditions
+        pcs = env.env.get_goal_conditions_met()
+        goal_condition_success_rate = pcs[0] / float(pcs[1])
+
+        # SPL
+        path_len_weight = len(env.traj_data['plan']['low_actions'])
+        s_spl = (1 if goal_satisfied else 0) * min(1., path_len_weight / float(t))
+        pc_spl = goal_condition_success_rate * min(1., path_len_weight / float(t))
+
+        # path length weighted SPL
+        plw_s_spl = s_spl * path_len_weight
+        plw_pc_spl = pc_spl * path_len_weight
+
+        # log success/fails
+        log_entry = {'trial': env.traj_data['task_id'],
+                     'type': env.traj_data['task_type'],
+                     'repeat_idx': int(env.lang_idx),
+                     'goal_instr': env.goal_inst,
+                     'completed_goal_conditions': int(pcs[0]),
+                     'total_goal_conditions': int(pcs[1]),
+                     'goal_condition_success': float(goal_condition_success_rate),
+                     'success_spl': float(s_spl),
+                     'path_len_weighted_success_spl': float(plw_s_spl),
+                     'goal_condition_spl': float(pc_spl),
+                     'path_len_weighted_goal_condition_spl': float(plw_pc_spl),
+                     'path_len_weight': int(path_len_weight),
+                     'reward': float(total_reward)}
+        if success:
+            self.successes.append(log_entry)
+        else:
+            self.failures.append(log_entry)
+
+        # overall results
+        self.results['all'] = self.get_metrics(self.successes, self.failures)
+
+        print("-------------")
+        print("SR: %d/%d = %.3f" % (self.results['all']['success']['num_successes'],
+                                    self.results['all']['success']['num_evals'],
+                                    self.results['all']['success']['success_rate']))
+        print("GC: %d/%d = %.3f" % (self.results['all']['goal_condition_success']['completed_goal_conditions'],
+                                    self.results['all']['goal_condition_success']['total_goal_conditions'],
+                                    self.results['all']['goal_condition_success']['goal_condition_success_rate']))
+        print("PLW SR: %.3f" % (self.results['all']['path_length_weighted_success_rate']))
+        print("PLW GC: %.3f" % (self.results['all']['path_length_weighted_goal_condition_success_rate']))
+        print("-------------")
+
+        # task type specific results
+
+        for task_type in self.conf.task_types:
+            task_successes = [s for s in (list(self.successes)) if s['type'] == task_type]
+            task_failures = [f for f in (list(self.failures)) if f['type'] == task_type]
+            if len(task_successes) > 0 or len(task_failures) > 0:
+                self.results[task_type] = self.get_metrics(task_successes, task_failures)
+            else:
+                self.results[task_type] = {}
+
+
+    def get_metrics(self, successes, failures):
+        '''
+        compute overall succcess and goal_condition success rates along with path-weighted metrics
+        '''
+        # stats
+        num_successes, num_failures = len(successes), len(failures)
+        num_evals = len(successes) + len(failures)
+        total_path_len_weight = sum([entry['path_len_weight'] for entry in successes]) + \
+                                sum([entry['path_len_weight'] for entry in failures])
+        completed_goal_conditions = sum([entry['completed_goal_conditions'] for entry in successes]) + \
+                                   sum([entry['completed_goal_conditions'] for entry in failures])
+        total_goal_conditions = sum([entry['total_goal_conditions'] for entry in successes]) + \
+                               sum([entry['total_goal_conditions'] for entry in failures])
+
+        # metrics
+        sr = float(num_successes) / num_evals
+        pc = completed_goal_conditions / float(total_goal_conditions)
+        plw_sr = (float(sum([entry['path_len_weighted_success_spl'] for entry in successes]) +
+                        sum([entry['path_len_weighted_success_spl'] for entry in failures])) /
+                  total_path_len_weight)
+        plw_pc = (float(sum([entry['path_len_weighted_goal_condition_spl'] for entry in successes]) +
+                        sum([entry['path_len_weighted_goal_condition_spl'] for entry in failures])) /
+                  total_path_len_weight)
+
+        # result table
+        res = dict()
+        res['success'] = {'num_successes': num_successes,
+                          'num_evals': num_evals,
+                          'success_rate': sr}
+        res['goal_condition_success'] = {'completed_goal_conditions': completed_goal_conditions,
+                                        'total_goal_conditions': total_goal_conditions,
+                                        'goal_condition_success_rate': pc}
+        res['path_length_weighted_success_rate'] = plw_sr
+        res['path_length_weighted_goal_condition_success_rate'] = plw_pc
+
+        return res
+
+
+    def save_results(self):
+        results = {'successes': list(self.successes),
+                   'failures': list(self.failures),
+                   'results': dict(self.results)}
+
+        save_path = os.path.dirname(self.args.model_path)
+        save_path = os.path.join(save_path, 'our_code_task_results_' + self.args.eval_split + '_' + datetime.now().strftime("%Y%m%d_%H%M%S_%f") + '.json')
+        with open(save_path, 'w') as r:
+            json.dump(results, r, indent=4, sort_keys=True)
 
 
     def np_metric(self, env: AlfredEnv, np_obj_id):

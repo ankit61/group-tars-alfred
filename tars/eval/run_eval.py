@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     # parse arguments
     args = parser.parse_args()
-    
+
     # load splits
     with open(args.splits) as f:
         splits = json.load(f)
@@ -60,9 +60,3 @@ if __name__ == '__main__':
 
     # save results
     evaluator.save_results()
-
-
-
-
-
-
