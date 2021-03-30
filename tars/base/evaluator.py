@@ -17,6 +17,7 @@ class Evaluator(Configurable):
         '''
             Run evaluate on entire dataset
         '''
+        self.split_name = split.value
         self.at_start()
         data = Dataset(split)
         for i, task in enumerate(data.tasks()):

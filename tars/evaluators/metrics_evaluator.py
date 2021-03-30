@@ -1,6 +1,9 @@
 import numpy as np
 import os
 import json
+import pandas as pd
+import pickle
+from collections import defaultdict
 from tars.base.evaluator import Evaluator
 from tars.envs.alfred_env import AlfredEnv
 from datetime import datetime
@@ -12,9 +15,9 @@ class MetricsEvaluator(Evaluator):
 
         self.successes = []
         self.failures = []
-        self.results = {}
+        self.task_level_results = {}
 
-        self.intrinsic_metrics = {}
+        self.results_for_df = defaultdict(lambda: [])
         self.episode_metrics = {}
         self.np_obj_id = None # used by the NP metric
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
@@ -39,15 +42,17 @@ class MetricsEvaluator(Evaluator):
 
         predicted_action, predicted_mask = policy_out
 
-        # Update Navigation Performance (NP) metric
+        # update NP metric
         if self.episode_metrics['np'] != 1:
             self.episode_metrics['np'] = int(self.calculate_np())
 
         # Interaction Action Prediction Performance (IAPP) Metric
         iapp = self.iapp_metric(self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
                                 predicted_mask)
+        # FIXME: ran into divide by 0 error, wrapped it in a max(x, 1) for now
         self.episode_metrics["iapp"] += iapp / max(len(
             self.expert_interact_objects), 1)  # percentage of correct actions predicted correctly
+                                                
 
 
     def at_episode_start(self, start_state):
@@ -56,28 +61,22 @@ class MetricsEvaluator(Evaluator):
                 start_state: starting state of agent
         '''
         # reset episode metrics, prefetch per-episode values for metrics
-        self.episode_metrics = {}
-        self.np_obj_id = self.get_np_obj_id()
-
-        # self.objects_already_interacted_with = []
-        # self.expert_interact_objects, self.expert_interact_objects_action = self.find_objects_to_interact_with(
-        #     env)
         self.episode_metrics['np'] = 0
         self.episode_metrics['iapp'] = 0
 
+        self.np_obj_id = self.get_np_obj_id()
+
+        self.objects_already_interacted_with = []
+        self.expert_interact_objects, self.expert_interact_objects_action = self.find_objects_to_interact_with()
+        
 
     def at_episode_end(self, total_reward):
         '''
             Args:
                 tot_reward: cumulative episode reward
         '''
-        print("-------------")
-        print("Episode NP: {}".format(self.episode_metrics['np']))
-        print("Episode IAPP: {}".format(self.episode_metrics['iapp']))
-        self.intrinsic_metrics[self.env.json_file] = self.episode_metrics
-        self.update_task_level_metrics(total_reward)
+        self.update_metrics(total_reward)
         
-
 
     def at_end(self):
         super().at_end()
@@ -85,7 +84,7 @@ class MetricsEvaluator(Evaluator):
         self.save_results()
 
     
-    def update_task_level_metrics(self, total_reward):
+    def update_metrics(self, total_reward):
         # check if goal was satisfied
         goal_satisfied = self.env.thor_env.get_goal_satisfied()
         if goal_satisfied:
@@ -108,7 +107,8 @@ class MetricsEvaluator(Evaluator):
         plw_pc_spl = pc_spl * path_len_weight
 
         # log success/fails
-        log_entry = {'trial': self.env.traj_data['task_id'],
+        log_entry = {'split': self.split_name,
+                     'trial': self.env.traj_data['task_id'],
                      'type': self.env.traj_data['task_type'],
                      'repeat_idx': int(self.env.lang_idx),
                      'goal_instr': self.env.goal_inst,
@@ -120,24 +120,38 @@ class MetricsEvaluator(Evaluator):
                      'goal_condition_spl': float(pc_spl),
                      'path_len_weighted_goal_condition_spl': float(plw_pc_spl),
                      'path_len_weight': int(path_len_weight),
-                     'reward': float(total_reward)}
+                     'reward': float(total_reward),
+                     'np': float(self.episode_metrics['np']),
+                     'iapp': float(self.episode_metrics['iapp'])}
+
+        for (k, v) in log_entry.items():
+            self.results_for_df[k].append(v)
+
         if success:
             self.successes.append(log_entry)
         else:
             self.failures.append(log_entry)
 
         # overall results
-        self.results['all'] = self.get_metrics(self.successes, self.failures)
+        self.task_level_results['all'] = self.get_task_level_metrics(self.successes, self.failures)
 
+        # intrinsic metrics
         print("-------------")
-        print("SR: %d/%d = %.3f" % (self.results['all']['success']['num_successes'],
-                                    self.results['all']['success']['num_evals'],
-                                    self.results['all']['success']['success_rate']))
-        print("GC: %d/%d = %.3f" % (self.results['all']['goal_condition_success']['completed_goal_conditions'],
-                                    self.results['all']['goal_condition_success']['total_goal_conditions'],
-                                    self.results['all']['goal_condition_success']['goal_condition_success_rate']))
-        print("PLW SR: %.3f" % (self.results['all']['path_length_weighted_success_rate']))
-        print("PLW GC: %.3f" % (self.results['all']['path_length_weighted_goal_condition_success_rate']))
+        np_succs = sum(self.results_for_df['np'])
+        np_eps = len(self.results_for_df['np'])
+        print("NP Rate: %d/%d = %.3f" % (np_succs, np_eps, np_succs / np_eps))
+        print("Mean IAPP: %.3f" % np.mean(self.results_for_df['iapp']))
+
+        # task-level metrics
+        print("-------------")
+        print("SR: %d/%d = %.3f" % (self.task_level_results['all']['success']['num_successes'],
+                                    self.task_level_results['all']['success']['num_evals'],
+                                    self.task_level_results['all']['success']['success_rate']))
+        print("GC: %d/%d = %.3f" % (self.task_level_results['all']['goal_condition_success']['completed_goal_conditions'],
+                                    self.task_level_results['all']['goal_condition_success']['total_goal_conditions'],
+                                    self.task_level_results['all']['goal_condition_success']['goal_condition_success_rate']))
+        print("PLW SR: %.3f" % (self.task_level_results['all']['path_length_weighted_success_rate']))
+        print("PLW GC: %.3f" % (self.task_level_results['all']['path_length_weighted_goal_condition_success_rate']))
         print("-------------")
 
         # task type specific results
@@ -146,12 +160,12 @@ class MetricsEvaluator(Evaluator):
             task_successes = [s for s in (list(self.successes)) if s['type'] == task_type]
             task_failures = [f for f in (list(self.failures)) if f['type'] == task_type]
             if len(task_successes) > 0 or len(task_failures) > 0:
-                self.results[task_type] = self.get_metrics(task_successes, task_failures)
+                self.task_level_results[task_type] = self.get_task_level_metrics(task_successes, task_failures)
             else:
-                self.results[task_type] = {}
+                self.task_level_results[task_type] = {}
 
 
-    def get_metrics(self, successes, failures):
+    def get_task_level_metrics(self, successes, failures):
         '''
         compute overall succcess and goal_condition success rates along with path-weighted metrics
         '''
@@ -192,12 +206,16 @@ class MetricsEvaluator(Evaluator):
     def save_results(self):
         results = {'successes': list(self.successes),
                    'failures': list(self.failures),
-                   'results': dict(self.results)}
+                   'results': dict(self.task_level_results)}
 
-        save_path = os.path.dirname(self.args.model_path)
-        save_path = os.path.join(save_path, 'our_code_task_results_' + self.args.eval_split + '_' + datetime.now().strftime("%Y%m%d_%H%M%S_%f") + '.json')
+        save_path_root = os.path.dirname(self.policy.conf.saved_model_path)
+        save_path = os.path.join(save_path_root, 'our_code_task_results_' + self.split_name + '_' + datetime.now().strftime("%Y%m%d_%H%M%S_%f") + '.json')
         with open(save_path, 'w') as r:
             json.dump(results, r, indent=4, sort_keys=True)
+
+        results_df = pd.DataFrame(self.results_for_df)
+        df_save_path = os.path.join(save_path_root, 'results_df_' + self.split_name + '_' + datetime.now().strftime("%Y%m%d_%H%M%S_%f") + '.pkl')
+        results_df.to_pickle(df_save_path)
 
 
     def calculate_np(self):
@@ -218,11 +236,15 @@ class MetricsEvaluator(Evaluator):
 
         agent_inter_object = self.env.thor_env.get_target_instance_id(predicted_mask)
 
-        for expert_inter_object, expert_inter_object_action in zip(expert_interact_objects, expert_interact_objects_action):
-            if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
-                    and (agent_inter_object, predicted_action) not in self.objects_already_interacted_with:
-                self.objects_already_interacted_with.append((agent_inter_object, predicted_action)) # prevent double counting if agent stuck in loop, etc.
-                return True
+        ''' 
+        FIXME: getting error: "if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
+TypeError: 'in <string>' requires string as left operand, not tuple"
+        '''
+        # for expert_inter_object, expert_inter_object_action in zip(expert_interact_objects, expert_interact_objects_action):
+        #     if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
+        #             and (agent_inter_object, predicted_action) not in self.objects_already_interacted_with:
+        #         self.objects_already_interacted_with.append((agent_inter_object, predicted_action)) # prevent double counting if agent stuck in loop, etc.
+        #         return True
         return False
 
 

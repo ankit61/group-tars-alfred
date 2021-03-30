@@ -24,6 +24,9 @@ class Dataset(Configurable, data.Dataset):
         with open(self.splits_file, 'r') as f:
             self.tasks_json = json.load(f)[self.type.value]
 
+        if self.conf.fast_epoch:
+            self.tasks_json = self.tasks_json[:self.conf.fast_epoch_size]
+
         self.unique_tasks = list(set(t for t, _ in self.tasks()))
 
     def tasks(self):

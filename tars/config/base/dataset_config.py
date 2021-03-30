@@ -12,3 +12,6 @@ class DatasetConfig(Config):
     high_res_img_dir = 'high_res_images'
     instance_mask_dir = 'instance_masks'
     depth_img_dir = 'depth_images'
+
+    fast_epoch = False
+    fast_epoch_size = 4
