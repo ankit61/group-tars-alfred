@@ -82,6 +82,9 @@ class AlfredEnv(Env):
 
         return next_obs, reward, done, success
 
+    def close(self):
+        self.env.stop()
+
     def get_expert_traj(self):
         if 'plan' not in self.traj_data:
             raise RuntimeError('expert plan not provided')

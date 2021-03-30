@@ -1,11 +1,10 @@
-from collections import defaultdict
 from itertools import chain
 import numpy as np
 import revtok
 import torch
 from torchvision import transforms
 from torchvision.models.detection import maskrcnn_resnet50_fpn
-from tars.policies.seq2seq_policy import Seq2SeqPolicy
+from tars.policies import Seq2SeqPolicy
 from tars.moca.models.model.seq2seq_im_mask import Module as MOCA
 from tars.moca.gen.utils.py_util import remove_spaces_and_lower
 

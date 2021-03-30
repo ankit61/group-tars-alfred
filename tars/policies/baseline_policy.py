@@ -2,7 +2,7 @@ from collections import defaultdict
 import itertools
 import numpy as np
 import torch
-from tars.policies.seq2seq_policy import Seq2SeqPolicy
+from tars.policies import Seq2SeqPolicy
 from tars.alfred.models.model.seq2seq_im_mask import Module as BaselineModel
 
 

@@ -12,18 +12,28 @@ class Config():
         inst.load_from_cmd()
         return inst
 
-    def get_YAML(self):
-        yaml_types = set([int, float, bool, str, dict, list])
+    def get(self, mode='dict', types=None):
+        '''
+            Args:
+                format: which format to get config: yaml or dict
+                types: which types of variables to consider. If None,
+                        all types are considered in when `mode` is `dict` and
+                        int, float, bool, str, dict, list when `mode` is `yaml`
+        '''
+
+        assert mode in ['dict', 'yaml']
+        if mode == 'yaml' and types is None:
+            types = set([int, float, bool, str, dict, list])
         d = {}
 
         for k in self._get_vars():
             v = getattr(self, k)
-            if type(v) in yaml_types:
+            if isinstance(v, Config):
+                d[k] = v.get(mode='dict', types=types)
+            elif (types is None) or (type(v) in types):
                 d[k] = v
-            elif isinstance(v, Config):
-                d[k] = dict(YAML().load(v.get_YAML()))
 
-        return dump(d, Dumper=RoundTripDumper)
+        return d if (mode == 'dict') else dump(d, Dumper=RoundTripDumper)
 
     def _get_primitives(self, primitive_types=set([int, float, bool, str])):
         d = {}
@@ -59,8 +69,10 @@ class Config():
             setattr(self.__class__, k, getattr(args, f'{cls_prefix}_{k}'))
 
     @classmethod
-    def get_YAML_all(cls):
-        yaml = {}
+    def get_all(cls, mode='dict'):
+        assert mode in ['dict', 'yaml']
+
+        out = {}
         config_dir = (os.path.join(Path(__file__).absolute().parents[1], 'config'))
         for root, ds, fs  in os.walk(config_dir):
             for py_f in filter(lambda x: x.endswith('.py'), fs):
@@ -81,6 +93,6 @@ class Config():
                         break
                 assert hasattr(conf_module, conf_class), f'{conf_class} does not exist in {conf_module}'
                 conf = getattr(conf_module, conf_class)()
-                yaml[conf_class] = dict(YAML().load(conf.get_YAML()))
+                out[conf_class] = conf.get(mode='dict', types=set([int, float, bool, str, dict, list]))
 
-        return dump(yaml, Dumper=RoundTripDumper)
+        return out if (mode == 'dict') else dump(out, Dumper=RoundTripDumper)
