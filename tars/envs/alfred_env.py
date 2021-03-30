@@ -10,7 +10,7 @@ from tars.base.env import Env
 
 class AlfredEnv(Env):
     def __init__(
-        self, json_file, lang_idx, transforms=Compose([]),
+        self, thor_env, json_file, lang_idx, transforms=Compose([]),
         reward_type='dense', viz=True
     ):
         self.json_file = json_file
@@ -19,7 +19,7 @@ class AlfredEnv(Env):
         self.reward_type = reward_type
         self.viz = viz
 
-        self.env = ThorEnv()  # FIXME: use self.viz
+        self.env = thor_env  # FIXME: use self.viz
 
         with open(json_file) as f:
             self.traj_data = json.load(f)
@@ -60,23 +60,27 @@ class AlfredEnv(Env):
 
     def step(self, action):
         action_idx, interact_mask = action
+        
+        action_name = self.conf.actions.index2word(action_idx)
+        interact_mask = interact_mask if action_name in self.conf.interact_actions else None
+        
+        # print("STEP: {}, {}".format(action_idx, action_name))
 
-        action = self.conf.actions.index2word(action_idx)
-        interact_mask = interact_mask if action in self.conf.interact_actions else None
-
-        done = (action == self.conf.stop_action)
+        done = (action_name == self.conf.stop_action)
         next_obs = self.get_obs(self.env.last_event)
         reward = 0 if done else self.conf.failure_reward
+        success = False
 
         if not done:
-            success, event, _, err, _ = self.env.va_interact(action, interact_mask, smooth_nav=False)
-
+            success, event, _, err, _ = self.env.va_interact(action_name, interact_mask, smooth_nav=False)
+            # if err:
+            #     print("ERR: {}".format(err))
             if success:
                 next_obs = self.get_obs(event)
                 reward, d = self.env.get_transition_reward()
                 done = done or d
 
-        return next_obs, reward, done, None
+        return next_obs, reward, done, success
 
     def get_expert_traj(self):
         if 'plan' not in self.traj_data:
