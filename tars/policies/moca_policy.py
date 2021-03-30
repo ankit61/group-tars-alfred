@@ -1,4 +1,3 @@
-from collections import defaultdict
 from itertools import chain
 import numpy as np
 import revtok
