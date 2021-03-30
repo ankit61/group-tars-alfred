@@ -107,8 +107,7 @@ class MetricsEvaluator(Evaluator):
         plw_pc_spl = pc_spl * path_len_weight
 
         # log success/fails
-        log_entry = {'split': self.split_name,
-                     'trial': self.env.traj_data['task_id'],
+        log_entry = {'trial': self.env.traj_data['task_id'],
                      'type': self.env.traj_data['task_type'],
                      'repeat_idx': int(self.env.lang_idx),
                      'goal_instr': self.env.goal_inst,
