@@ -1,3 +1,5 @@
+import os
+from tars.base.dataset import Dataset, DatasetType
 from tars.base.configurable import Configurable
 from tars.base.policy import Policy
 from tars.envs.alfred_env import AlfredEnv
@@ -7,6 +9,15 @@ class Evaluator(Configurable):
     def __init__(self, policy: Policy):
         super().__init__()
         self.policy = policy
+
+    def evaluate_split(self, split: DatasetType):
+        '''
+            Run evaluate on entire dataset
+        '''
+        data = Dataset(split)
+        for task_dir, lang_idx in data.tasks():
+            json_file = os.path.join(task_dir, 'traj_data.json')
+            self.evaluate(json_file, lang_idx)
 
     def evaluate(self, json_file, lang_idx):
         env = AlfredEnv(json_file, lang_idx, self.policy.get_img_transforms())
@@ -42,6 +53,7 @@ class Evaluator(Configurable):
             )
             tot_reward += reward
 
+        env.close()
         print('Total Reward: ', tot_reward)
 
     def at_step_begin(self, env):
