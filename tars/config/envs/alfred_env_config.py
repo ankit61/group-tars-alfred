@@ -30,3 +30,5 @@ class AlfredEnvConfig(Config):
 
     max_failures = 10
     max_steps = 1000
+
+    debug = False

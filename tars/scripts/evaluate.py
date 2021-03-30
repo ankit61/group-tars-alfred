@@ -21,6 +21,7 @@ def get_args():
 
     return args
 
+
 def main():
     args = get_args()
     policy = globals()[args.policy]()

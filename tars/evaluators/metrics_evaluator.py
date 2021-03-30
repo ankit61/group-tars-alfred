@@ -14,24 +14,23 @@ class MetricsEvaluator(Evaluator):
         self.failures = []
         self.results = {}
 
-        self.intrinsic_metrics = dict()
-        self.episode_metrics = dict()
+        self.intrinsic_metrics = {}
+        self.episode_metrics = {}
         self.np_obj_id = None # used by the NP metric
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
         self.expert_interact_objects, self.expert_interact_objects_action = [], [] # used by IAPP metric
 
-    def at_step_begin(self, env):
+
+    def at_step_start(self):
         '''
             Args:
-                env: current environment
         '''
         pass
 
 
-    def at_step_end(self, env, policy_in, policy_out, nrd):
+    def at_step_end(self, policy_in, policy_out, nrd):
         '''
             Args:
-                env: current environment
                 policy_in: tuple containing input given to the policy
                 policy_out: tuple containing output of the policy
                 nrd: tuple of (next state, reward, done) after taking executing
@@ -42,42 +41,53 @@ class MetricsEvaluator(Evaluator):
 
         # Update Navigation Performance (NP) metric
         if self.episode_metrics['np'] != 1:
-            self.episode_metrics['np'] = int(self.np_metric(env, self.np_obj_id))
+            self.episode_metrics['np'] = int(self.calculate_np())
 
         # Interaction Action Prediction Performance (IAPP) Metric
-        # iapp = self.iapp_metric(env, self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
-        #                         predicted_mask)
-        # self.episode_metrics["iapp"] += iapp / len(
-        #     self.expert_interact_objects)  # percentage of correct actions predicted correctly
+        iapp = self.iapp_metric(self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
+                                predicted_mask)
+        self.episode_metrics["iapp"] += iapp / max(len(
+            self.expert_interact_objects), 1)  # percentage of correct actions predicted correctly
 
 
-    def at_start(self, env, start_state):
+    def at_episode_start(self, start_state):
         '''
             Args:
-                env: current environment
+                start_state: starting state of agent
         '''
         # reset episode metrics, prefetch per-episode values for metrics
-        self.episode_metrics = dict()
-        self.np_obj_id = self.get_np_obj_id(env)
+        self.episode_metrics = {}
+        self.np_obj_id = self.get_np_obj_id()
 
-        self.objects_already_interacted_with = []
-        self.expert_interact_objects, self.expert_interact_objects_action = MetricsEvaluator.find_objects_to_interact_with(
-            env)
+        # self.objects_already_interacted_with = []
+        # self.expert_interact_objects, self.expert_interact_objects_action = self.find_objects_to_interact_with(
+        #     env)
         self.episode_metrics['np'] = 0
+        self.episode_metrics['iapp'] = 0
 
 
-    def at_end(self, env: AlfredEnv, total_reward):
+    def at_episode_end(self, total_reward):
         '''
             Args:
-                env: current environment
+                tot_reward: cumulative episode reward
         '''
-        # save episode metrics
-        self.intrinsic_metrics[env.json_file] = self.episode_metrics
+        print("-------------")
+        print("Episode NP: {}".format(self.episode_metrics['np']))
+        print("Episode IAPP: {}".format(self.episode_metrics['iapp']))
+        self.intrinsic_metrics[self.env.json_file] = self.episode_metrics
+        self.update_task_level_metrics(total_reward)
+        
 
-        # calculate task-level metrics
 
+    def at_end(self):
+        super().at_end()
+        # save task-level metrics
+        self.save_results()
+
+    
+    def update_task_level_metrics(self, total_reward):
         # check if goal was satisfied
-        goal_satisfied = env.env.get_goal_satisfied()
+        goal_satisfied = self.env.thor_env.get_goal_satisfied()
         if goal_satisfied:
             print("Goal Reached")
             success = True
@@ -85,23 +95,23 @@ class MetricsEvaluator(Evaluator):
             success = False
 
         # goal_conditions
-        pcs = env.env.get_goal_conditions_met()
+        pcs = self.env.thor_env.get_goal_conditions_met()
         goal_condition_success_rate = pcs[0] / float(pcs[1])
 
         # SPL
-        path_len_weight = len(env.traj_data['plan']['low_actions'])
-        s_spl = (1 if goal_satisfied else 0) * min(1., path_len_weight / float(env.episode_len))
-        pc_spl = goal_condition_success_rate * min(1., path_len_weight / float(env.episode_len))
+        path_len_weight = len(self.env.traj_data['plan']['low_actions'])
+        s_spl = (1 if goal_satisfied else 0) * min(1., path_len_weight / float(self.env.episode_len))
+        pc_spl = goal_condition_success_rate * min(1., path_len_weight / float(self.env.episode_len))
 
         # path length weighted SPL
         plw_s_spl = s_spl * path_len_weight
         plw_pc_spl = pc_spl * path_len_weight
 
         # log success/fails
-        log_entry = {'trial': env.traj_data['task_id'],
-                     'type': env.traj_data['task_type'],
-                     'repeat_idx': int(env.lang_idx),
-                     'goal_instr': env.goal_inst,
+        log_entry = {'trial': self.env.traj_data['task_id'],
+                     'type': self.env.traj_data['task_type'],
+                     'repeat_idx': int(self.env.lang_idx),
+                     'goal_instr': self.env.goal_inst,
                      'completed_goal_conditions': int(pcs[0]),
                      'total_goal_conditions': int(pcs[1]),
                      'goal_condition_success': float(goal_condition_success_rate),
@@ -190,23 +200,23 @@ class MetricsEvaluator(Evaluator):
             json.dump(results, r, indent=4, sort_keys=True)
 
 
-    def np_metric(self, env: AlfredEnv, np_obj_id):
+    def calculate_np(self):
         '''
         Assumptions:
 
         How do positions/coordinates work? Assuming positions/coordinates are absolute for whole environment instead of
         a particular scene/image
         '''
-        for obj in env.env.last_event.metadata['objects']:
-            if obj['objectId'] == np_obj_id and obj['visible']:
+        for obj in self.env.thor_env.last_event.metadata['objects']:
+            if obj['objectId'] == self.np_obj_id and obj['visible']:
                 return True
         return False
 
 
     # Note: expert_interact_objects, expert_interact_objects_action are arguments so they are not computed every time
-    def iapp_metric(self, env: AlfredEnv, expert_interact_objects, expert_interact_objects_action, predicted_action, predicted_mask):
+    def iapp_metric(self, expert_interact_objects, expert_interact_objects_action, predicted_action, predicted_mask):
 
-        agent_inter_object = env.env.get_target_instance_id(predicted_mask)
+        agent_inter_object = self.env.thor_env.get_target_instance_id(predicted_mask)
 
         for expert_inter_object, expert_inter_object_action in zip(expert_interact_objects, expert_interact_objects_action):
             if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
@@ -216,25 +226,23 @@ class MetricsEvaluator(Evaluator):
         return False
 
 
-    @staticmethod
-    def get_np_obj_id(env: AlfredEnv):
+    def get_np_obj_id(self):
         '''
         Assumptions:
 
         'First object' here is assumed to be the first object the expert 
         interacts with in the low-level actions
         '''
-        for action in env.low_level_actions:
+        for action in self.env.low_level_actions:
             if 'objectId' in action['api_action']:
                 return action['api_action']['objectId']
         return ""
 
 
-    @staticmethod
-    def find_objects_to_interact_with(env: AlfredEnv):
+    def find_objects_to_interact_with(self):
         interact_objects = []
         interact_objects_action = []
-        for action in env.low_level_actions:
+        for action in self.env.low_level_actions:
             if "objectId" in action['api_action']:  # interactions with objects
                 objectId = action['api_action']['objectId']
                 interact_objects.append(objectId[:objectId.find('|')])
