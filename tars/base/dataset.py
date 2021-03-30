@@ -28,12 +28,15 @@ class Dataset(Configurable, data.Dataset):
 
     def tasks(self):
         for task in self.tasks_json:
-            yield os.path.join(self.data_dir, task['task']), task['repeat_idx']
+            yield task
 
     def get_task(self, idx):
         task = self.tasks_json[idx]
-        return os.path.join(self.data_dir, task['task']), task['repeat_idx']
+        return task
 
     def get_img(self, task_dir, img_dir, idx):
         ims = os.list_dir(os.path.join(task_dir, img_dir))
         return Image.open(sorted(ims)[idx])
+
+    def __len__(self):
+        return len(self.tasks_json)

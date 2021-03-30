@@ -78,6 +78,12 @@ class AlfredEnv(Env):
         if not done:
             success, event, _, err, _ = self.env.va_interact(action_name, interact_mask, smooth_nav=False)
 
+            # TODO: I like having these print statements for debugging, need to add a debug or verbose option
+            # if err:
+            #     print("ERR: {}, {}".format(action_name, err))
+            # else:
+            #     print("SUCCESS: {}".format(action_name))
+
             if success:
                 next_obs = self.get_obs(event)
                 reward, d = self.env.get_transition_reward()
@@ -85,7 +91,7 @@ class AlfredEnv(Env):
             else:
                 self.num_failures += 1
                 if self.num_failures >= self.conf.max_failures:
-                    print("Interact API failed %d times" % self.num_failures)
+                    print("Interact API failed %d times" % self.num_failures + "; latest error '%s'" % err)
                     done = True
 
         self.episode_len += 1

@@ -14,7 +14,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # settings
-    parser.add_argument('--splits', type=str, default="alfred/data/splits/oct21.json")
     parser.add_argument('--data', type=str, default="alfred/data/json_feat_2.1.0")
     parser.add_argument('--eval_split', type=str, default="valid_seen")
     parser.add_argument('--policy_name', type=str, default="baseline_policy")

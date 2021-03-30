@@ -15,9 +15,9 @@ def get_args():
     parser.add_argument('--policy', type=str, default='BaselinePolicy')
     parser.add_argument('--evaluator', type=str, default='MetricsEvaluator')
 
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
     args.task = os.path.join(DatasetConfig().data_base_dir, args.task)
-    args.json_file = os.path.join(args.task, 'traj_data.json')
+    args.json_file = os.path.join(args.task, DatasetConfig().traj_file)
 
     return args
 

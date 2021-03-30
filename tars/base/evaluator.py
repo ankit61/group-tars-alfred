@@ -1,5 +1,6 @@
 import os
 from tars.base.dataset import Dataset, DatasetType
+from tars.config.base.dataset_config import DatasetConfig
 from tars.base.configurable import Configurable
 from tars.base.policy import Policy
 from tars.envs.alfred_env import AlfredEnv
@@ -15,9 +16,11 @@ class Evaluator(Configurable):
             Run evaluate on entire dataset
         '''
         data = Dataset(split)
-        for task_dir, lang_idx in data.tasks():
-            json_file = os.path.join(task_dir, 'traj_data.json')
-            self.evaluate(json_file, lang_idx)
+        for i, task in enumerate(data.tasks()):
+            print("Evaluating {} ({})".format(task['task'], task['repeat_idx']))
+            print("Number of trajectories left: {}".format(len(data) - i - 1))
+            json_file = os.path.join(data.data_dir, task['task'], DatasetConfig().traj_file)
+            self.evaluate(json_file, task['repeat_idx'])
 
     def evaluate(self, json_file, lang_idx):
         env = AlfredEnv(json_file, lang_idx, self.policy.get_img_transforms())

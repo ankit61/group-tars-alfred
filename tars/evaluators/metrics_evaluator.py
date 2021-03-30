@@ -1,6 +1,9 @@
+import numpy as np
+import os
+import json
 from tars.base.evaluator import Evaluator
 from tars.envs.alfred_env import AlfredEnv
-import numpy as np
+from datetime import datetime
 
 
 class MetricsEvaluator(Evaluator):
@@ -11,7 +14,7 @@ class MetricsEvaluator(Evaluator):
         self.failures = []
         self.results = {}
 
-        self.json_file_metrics = dict()
+        self.intrinsic_metrics = dict()
         self.episode_metrics = dict()
         self.np_obj_id = None # used by the NP metric
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
@@ -42,10 +45,10 @@ class MetricsEvaluator(Evaluator):
             self.episode_metrics['np'] = int(self.np_metric(env, self.np_obj_id))
 
         # Interaction Action Prediction Performance (IAPP) Metric
-        iapp = self.iapp_metric(env, self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
-                                predicted_mask)
-        self.episode_metrics["iapp"] += iapp / len(
-            self.expert_interact_objects)  # percentage of correct actions predicted correctly
+        # iapp = self.iapp_metric(env, self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
+        #                         predicted_mask)
+        # self.episode_metrics["iapp"] += iapp / len(
+        #     self.expert_interact_objects)  # percentage of correct actions predicted correctly
 
 
     def at_start(self, env, start_state):
@@ -60,6 +63,7 @@ class MetricsEvaluator(Evaluator):
         self.objects_already_interacted_with = []
         self.expert_interact_objects, self.expert_interact_objects_action = MetricsEvaluator.find_objects_to_interact_with(
             env)
+        self.episode_metrics['np'] = 0
 
 
     def at_end(self, env: AlfredEnv, total_reward):
@@ -68,7 +72,7 @@ class MetricsEvaluator(Evaluator):
                 env: current environment
         '''
         # save episode metrics
-        self.json_file_metrics[env.json_file] = self.episode_metrics
+        self.intrinsic_metrics[env.json_file] = self.episode_metrics
 
         # calculate task-level metrics
 
@@ -77,6 +81,8 @@ class MetricsEvaluator(Evaluator):
         if goal_satisfied:
             print("Goal Reached")
             success = True
+        else:
+            success = False
 
         # goal_conditions
         pcs = env.env.get_goal_conditions_met()
@@ -84,8 +90,8 @@ class MetricsEvaluator(Evaluator):
 
         # SPL
         path_len_weight = len(env.traj_data['plan']['low_actions'])
-        s_spl = (1 if goal_satisfied else 0) * min(1., path_len_weight / float(t))
-        pc_spl = goal_condition_success_rate * min(1., path_len_weight / float(t))
+        s_spl = (1 if goal_satisfied else 0) * min(1., path_len_weight / float(env.episode_len))
+        pc_spl = goal_condition_success_rate * min(1., path_len_weight / float(env.episode_len))
 
         # path length weighted SPL
         plw_s_spl = s_spl * path_len_weight
