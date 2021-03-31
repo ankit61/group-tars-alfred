@@ -28,7 +28,7 @@ class Evaluator(Configurable):
             json_file = os.path.join(data.data_dir, task['task'], DatasetConfig().traj_file)
             self.evaluate(json_file, task['repeat_idx'])
         self.at_end()
-        
+
 
     def evaluate(self, json_file, lang_idx):
         img = self.env.setup_task(json_file, lang_idx)
