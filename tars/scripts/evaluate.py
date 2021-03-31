@@ -14,7 +14,7 @@ def get_args():
     parser.add_argument('--lang-idx', type=int, default=0)
     parser.add_argument('--policy', type=str, default='BaselinePolicy')
     parser.add_argument('--evaluator', type=str, default='MetricsEvaluator')
-
+    
     args, _ = parser.parse_known_args()
     return args
 
@@ -29,7 +29,7 @@ def main():
         json_file = os.path.join(DatasetConfig().data_base_dir, args.split, args.task, DatasetConfig().traj_file)
         evaluator.evaluate(json_file, args.lang_idx)
     else:
-        # evaluate an entire split
+        # evaluate an entire split (or part of it depending on the config)
         evaluator.evaluate_split(DatasetType(args.split))
 
 

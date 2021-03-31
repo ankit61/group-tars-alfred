@@ -13,5 +13,5 @@ class DatasetConfig(Config):
     instance_mask_dir = 'instance_masks'
     depth_img_dir = 'depth_images'
 
-    fast_epoch = False
-    fast_epoch_size = 4
+    start_idx = 0 # start dataset from this index, inclusive
+    end_idx = 0 # end dataset at this index, exclusive
