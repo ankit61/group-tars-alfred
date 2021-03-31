@@ -12,6 +12,7 @@ from datetime import datetime
 class MetricsEvaluator(Evaluator):
     def __init__(self, policy):
         super().__init__(policy)
+        self.policy = policy
 
         self.successes = []
         self.failures = []
@@ -49,9 +50,8 @@ class MetricsEvaluator(Evaluator):
         # Interaction Action Prediction Performance (IAPP) Metric
         iapp = self.iapp_metric(self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
                                 predicted_mask)
-        # FIXME: ran into divide by 0 error, wrapped it in a max(x, 1) for now
-        self.episode_metrics["iapp"] += iapp / max(len(
-            self.expert_interact_objects), 1)  # percentage of correct actions predicted correctly
+        if iapp > -1:
+            self.episode_metrics["iapp"] += iapp / len(self.expert_interact_objects)  # percentage of correct actions predicted correctly
                                                 
 
 
@@ -233,18 +233,25 @@ class MetricsEvaluator(Evaluator):
     # Note: expert_interact_objects, expert_interact_objects_action are arguments so they are not computed every time
     def iapp_metric(self, expert_interact_objects, expert_interact_objects_action, predicted_action, predicted_mask):
 
-        agent_inter_object = self.env.full_state.metadata['actionReturn']
+        predicted_action = self.policy.get_action_str([predicted_action])[0]
 
-        ''' 
-        FIXME: getting error: "if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
-TypeError: 'in <string>' requires string as left operand, not tuple"
-        '''
-        # for expert_inter_object, expert_inter_object_action in zip(expert_interact_objects, expert_interact_objects_action):
-        #     if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
-        #             and (agent_inter_object, predicted_action) not in self.objects_already_interacted_with:
-        #         self.objects_already_interacted_with.append((agent_inter_object, predicted_action)) # prevent double counting if agent stuck in loop, etc.
-        #         return True
-        return False
+        if self.env.is_interact_action(predicted_action):
+
+            if self.env.is_action_changing_object_pos(predicted_action):
+                agent_inter_object = self.env.full_state.metadata['actionReturn']
+            else:
+                agent_inter_object = self.env.thor_env.get_target_instance_id(predicted_mask)
+
+            if agent_inter_object:
+                for expert_inter_object, expert_inter_object_action in zip(expert_interact_objects, expert_interact_objects_action):
+                    if expert_inter_object in agent_inter_object and predicted_action == expert_inter_object_action \
+                        and (agent_inter_object, predicted_action) not in self.objects_already_interacted_with:
+                        self.objects_already_interacted_with.append((agent_inter_object, predicted_action)) # prevent double counting if agent stuck in loop, etc.
+                        return 1 # computed the correct action for the interaction mask
+
+            return 0 # did not compute the correct action
+
+        return -1 # not relevant
 
 
     def get_np_obj_id(self):
