@@ -233,7 +233,7 @@ class MetricsEvaluator(Evaluator):
     # Note: expert_interact_objects, expert_interact_objects_action are arguments so they are not computed every time
     def iapp_metric(self, expert_interact_objects, expert_interact_objects_action, predicted_action, predicted_mask):
 
-        agent_inter_object = self.env.thor_env.get_target_instance_id(predicted_mask)
+        agent_inter_object = self.env.full_state.metadata['actionReturn']
 
         ''' 
         FIXME: getting error: "if agent_inter_object in expert_inter_object and predicted_action == expert_inter_object_action \
