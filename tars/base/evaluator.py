@@ -20,9 +20,10 @@ class Evaluator(Configurable):
         self.split_name = split.value
         self.at_start()
         data = Dataset(split)
+        print("Dataset start: {}\nDataset end: {}".format(data.conf.start_idx, data.conf.end_idx))
         for i, task in enumerate(data.tasks()):
+            print("\n============ TRAJ {} OF {} ============".format(i + 1 + data.conf.start_idx, (data.conf.end_idx if data.conf.end_idx else len(data))))
             print("Evaluating {} ({})".format(task['task'], task['repeat_idx']))
-            print("Number of trajectories left: {}".format(len(data) - i - 1))
             json_file = os.path.join(data.data_dir, task['task'], DatasetConfig().traj_file)
             self.evaluate(json_file, task['repeat_idx'])
         self.at_end()

@@ -23,14 +23,14 @@ class Dataset(Configurable, data.Dataset):
         self.splits_file = self.conf.splits_file if splits_file is None else splits_file
         with open(self.splits_file, 'r') as f:
             self.tasks_json = json.load(f)[self.type.value]
-
-        if self.conf.fast_epoch:
-            self.tasks_json = self.tasks_json[:self.conf.fast_epoch_size]
-
+    
         self.unique_tasks = list(set(t for t, _ in self.tasks()))
 
-    def tasks(self):
-        for task in self.tasks_json:
+    def tasks(self, start_idx=None, end_idx=None):
+        start_idx = start_idx if start_idx else self.conf.start_idx
+        end_idx = end_idx if end_idx else (self.conf.end_idx if self.conf.end_idx else len(self.tasks_json))
+        assert(start_idx < end_idx)
+        for task in self.tasks_json[start_idx:end_idx]:
             yield task
 
     def get_task(self, idx):
