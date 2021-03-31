@@ -9,7 +9,7 @@ from tars.alfred.models.model.seq2seq_im_mask import Module as BaselineModel
 class BaselinePolicy(Seq2SeqPolicy):
     def __init__(self, model_load_path=None):
         model_load_path = self.conf.saved_model_path if model_load_path is None else model_load_path
-
+        print("Loading model from {}".format(model_load_path))
         model, _ = BaselineModel.load(model_load_path, self.conf.main.device)
         super().__init__(model)
 
