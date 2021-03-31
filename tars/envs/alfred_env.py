@@ -69,7 +69,7 @@ class AlfredEnv(Env):
         action_idx, interact_mask = action
 
         action_name = self.conf.actions.index2word(action_idx)
-        interact_mask = interact_mask if action_name in self.conf.interact_actions else None
+        interact_mask = interact_mask if self.is_interact_action(action_name) else None
 
         done = (action_name == self.conf.stop_action)
         next_obs = self.get_obs(self.thor_env.last_event)
@@ -122,6 +122,8 @@ class AlfredEnv(Env):
         # saves images, etc for supervised learning setup
         raise NotImplementedError
 
+    def is_interact_action(self, action_name):
+        return action_name in self.conf.interact_actions
 
     @property
     def full_state(self):
