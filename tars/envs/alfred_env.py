@@ -131,6 +131,9 @@ class AlfredEnv(Env):
     def is_interact_action(self, action_name):
         return action_name in self.conf.interact_actions
 
+    def is_action_changing_object_pos(self, action_name):
+        return action_name in self.conf.actions_change_object_pos
+
     @property
     def full_state(self):
         return self.thor_env.last_event

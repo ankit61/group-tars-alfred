@@ -5,16 +5,12 @@ from vocab import Vocab
 
 
 class AlfredEnvConfig(Config):
-    nav_actions = set([
-                        'MoveAhead', 'RotateRight', 'RotateLeft',
-                        'LookUp', 'LookDown'
-                    ])
+    nav_actions = {'MoveAhead', 'RotateRight', 'RotateLeft', 'LookUp', 'LookDown'}
 
-    interact_actions = set([
-                            'PickupObject', 'PutObject', 'OpenObject',
-                            'CloseObject', 'ToggleObjectOn', 'ToggleObjectOff',
-                            'SliceObject'
-                        ])
+    interact_actions = {'PickupObject', 'PutObject', 'OpenObject', 'CloseObject', 'ToggleObjectOn', 'ToggleObjectOff',
+                        'SliceObject'}
+
+    actions_change_object_pos = {'PickupObject', 'PutObject'}
 
     stop_action = '<<stop>>'
 
