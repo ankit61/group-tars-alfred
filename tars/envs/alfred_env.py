@@ -42,10 +42,9 @@ class AlfredEnv(Env):
         self.high_level_actions = self.traj_data['plan']['high_pddl']
         self.low_level_actions = self.traj_data['plan']['low_actions']
 
-        # reset
-        args = argparse.Namespace()
-        args.reward_config = self.conf.reward_config
-        self.thor_env.set_task(self.traj_data, args, reward_type=self.reward_type)
+        # print goal instr
+        print("Task: %s" % (self.traj_data['turk_annotations']['anns'][lang_idx]['task_desc']))
+
         return self.reset()
 
 
@@ -54,16 +53,23 @@ class AlfredEnv(Env):
 
 
     def reset(self):
-        self.thor_env.reset(self.scene_name)
-        self.thor_env.restore_scene(self.object_poses, self.object_toggles, self.dirty_and_empty)
-
-        state = self.thor_env.step(dict(self.traj_data['scene']['init_action']))
-
         self.num_failures = 0
         self.episode_len = 0
 
-        return self.get_obs(state)
+        args = argparse.Namespace()
+        args.reward_config = self.conf.reward_config
 
+        self.thor_env.reset(self.scene_name)
+        self.thor_env.restore_scene(self.object_poses, self.object_toggles, self.dirty_and_empty)
+
+        # initialize to start position
+        state = self.thor_env.step(dict(self.traj_data['scene']['init_action']))
+
+        # setup task for reward
+        self.thor_env.set_task(self.traj_data, args, reward_type=self.reward_type)
+
+        return self.get_obs(state)
+    
 
     def step(self, action):
         action_idx, interact_mask = action
