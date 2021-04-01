@@ -543,7 +543,7 @@ class ThorEnv(Controller):
         if len(instance_ids) == 0:
             err = "Bad interact mask. Couldn't locate target object"
             success = False
-            return success, None, None, err, None
+            return None
 
         target_instance_id = instance_ids[0]
         return target_instance_id
