@@ -23,7 +23,7 @@ class Dataset(Configurable, data.Dataset):
         self.splits_file = self.conf.splits_file if splits_file is None else splits_file
         with open(self.splits_file, 'r') as f:
             self.tasks_json = json.load(f)[self.type.value]
-    
+
         self.unique_tasks = list(set(t for t, _ in self.tasks()))
 
     def tasks(self, start_idx=None, end_idx=None):
