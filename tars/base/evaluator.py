@@ -28,6 +28,7 @@ class Evaluator(Configurable):
             json_file = os.path.join(data.data_dir, task['task'], DatasetConfig().traj_file)
             self.evaluate(json_file, task['repeat_idx'])
         self.at_end()
+        self.env.close()
 
 
     def evaluate(self, json_file, lang_idx):
@@ -103,6 +104,6 @@ class Evaluator(Configurable):
     def at_start(self):
         pass
 
-    
+
     def at_end(self):
-        self.env.close()
+        pass

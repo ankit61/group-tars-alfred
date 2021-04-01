@@ -69,7 +69,7 @@ class MetricsEvaluator(Evaluator):
         unnecessary_interactions = self.unnecessary_interactions(self.expert_interact_objects, info, predicted_action,
                                                                  predicted_mask)
         self.episode_metrics["ui"] += unnecessary_interactions
-                                                
+
 
     def at_episode_start(self, start_state):
         '''
@@ -89,7 +89,7 @@ class MetricsEvaluator(Evaluator):
 
         self.objects_already_interacted_with = []
         self.expert_interact_objects, self.expert_interact_objects_action = self.find_objects_to_interact_with()
-        
+
 
     def at_episode_end(self, total_reward):
         '''
@@ -97,14 +97,13 @@ class MetricsEvaluator(Evaluator):
                 tot_reward: cumulative episode reward
         '''
         self.update_metrics(total_reward)
-        
+
 
     def at_end(self):
-        super().at_end()
         # save task-level metrics
         self.save_results()
 
-    
+
     def update_metrics(self, total_reward):
         # check if goal was satisfied
         goal_satisfied = self.env.thor_env.get_goal_satisfied()
@@ -150,7 +149,7 @@ class MetricsEvaluator(Evaluator):
                      'bad_mask_interactions': int(self.episode_metrics['bad_mask_interactions']),
                      'ui': float(self.episode_metrics['ui'])}
 
-                        
+
         for (k, v) in log_entry.items():
             self.results_for_df[k].append(v)
 
@@ -328,7 +327,7 @@ class MetricsEvaluator(Evaluator):
 
         return interact_objects, interact_objects_action
 
-    
+
 def remove_dupes(l):
     res = []
     for elem in l:
