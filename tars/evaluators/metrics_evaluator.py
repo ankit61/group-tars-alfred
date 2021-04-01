@@ -239,9 +239,6 @@ class MetricsEvaluator(Evaluator):
         results_df.to_pickle(df_save_path)
 
 
-     
-
-
     # Note: expert_interact_objects, expert_interact_objects_action are arguments so they are not computed every time
     def iapp_metric(self, expert_interact_objects, expert_interact_objects_action, predicted_action, predicted_mask):
 
@@ -265,18 +262,6 @@ class MetricsEvaluator(Evaluator):
 
         return -1 # not relevant
 
-
-    # def get_fons_obj_id(self):
-    #     '''
-    #     Assumptions:
-
-    #     'First object' here is assumed to be the first object the expert 
-    #     interacts with in the low-level actions
-    #     '''
-    #     for action in self.env.low_level_actions:
-    #         if 'objectId' in action['api_action']:
-    #             return action['api_action']['objectId']
-    #     return None
 
     def update_visible_interact_obj_ids(self):
         '''
@@ -308,7 +293,6 @@ class MetricsEvaluator(Evaluator):
                 interact_objects_action.append(action['api_action']['action'])
 
         return interact_objects, interact_objects_action
-
 
     
 def remove_dupes(l):
