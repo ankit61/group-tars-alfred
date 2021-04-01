@@ -23,6 +23,7 @@ class MetricsEvaluator(Evaluator):
         self.np_obj_id = None # used by the NP metric
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
         self.expert_interact_objects, self.expert_interact_objects_action = [], [] # used by IAPP metric
+        self.all_objects_already_interacted_with = [] # prevent double counting for UI
 
 
     def at_step_start(self):
@@ -262,13 +263,17 @@ class MetricsEvaluator(Evaluator):
     def unnecessary_interactions(self, expert_interact_objects, predicted_action, predicted_mask):
         predicted_action = self.policy.get_action_str([predicted_action])[0]
         if self.env.is_interact_action(predicted_action):
+            print(expert_interact_objects)
             if self.env.is_action_changing_object_pos(predicted_action):
                 agent_inter_object = self.env.full_state.metadata['actionReturn']
             else:
                 agent_inter_object = self.env.thor_env.get_target_instance_id(predicted_mask)
 
             # check if expert interacted with this object
-            if agent_inter_object not in expert_interact_objects:
+            if not agent_inter_object: # this means the agent tried to perform an invalid action like pick up on a countertop or a basin
+                return 1
+            elif agent_inter_object[:agent_inter_object.find("|")] not in expert_interact_objects and agent_inter_object[:agent_inter_object.find("|")] not in self.all_objects_already_interacted_with:
+                self.all_objects_already_interacted_with.append(agent_inter_object[:agent_inter_object.find("|")])
                 return 1
 
         return 0
