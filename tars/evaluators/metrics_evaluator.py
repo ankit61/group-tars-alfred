@@ -52,7 +52,9 @@ class MetricsEvaluator(Evaluator):
                                 predicted_mask)
         if iapp > -1:
             self.episode_metrics["iapp"] += iapp / len(self.expert_interact_objects)  # percentage of correct actions predicted correctly
-                                                
+
+        unnecessary_interactions = self.unnecessary_interactions(self.expert_interact_objects, predicted_action, predicted_mask)
+        self.episode_metrics["ui"] += unnecessary_interactions
 
 
     def at_episode_start(self, start_state):
@@ -63,6 +65,7 @@ class MetricsEvaluator(Evaluator):
         # reset episode metrics, prefetch per-episode values for metrics
         self.episode_metrics['np'] = 0
         self.episode_metrics['iapp'] = 0
+        self.episode_metrics["ui"] = 0
 
         self.np_obj_id = self.get_np_obj_id()
 
@@ -121,7 +124,8 @@ class MetricsEvaluator(Evaluator):
                      'path_len_weight': int(path_len_weight),
                      'reward': float(total_reward),
                      'np': float(self.episode_metrics['np']),
-                     'iapp': float(self.episode_metrics['iapp'])}
+                     'iapp': float(self.episode_metrics['iapp']),
+                     'ui': float(self.episode_metrics['ui'])}
 
         for (k, v) in log_entry.items():
             self.results_for_df[k].append(v)
@@ -140,6 +144,7 @@ class MetricsEvaluator(Evaluator):
         np_eps = len(self.results_for_df['np'])
         print("NP Rate: %d/%d = %.3f" % (np_succs, np_eps, np_succs / np_eps))
         print("Mean IAPP: %.3f" % np.mean(self.results_for_df['iapp']))
+        print("Mean UI: %.3f" % np.mean(self.results_for_df['ui']))
 
         # task-level metrics
         print("-------------")
@@ -252,6 +257,21 @@ class MetricsEvaluator(Evaluator):
             return 0 # did not compute the correct action
 
         return -1 # not relevant
+
+
+    def unnecessary_interactions(self, expert_interact_objects, predicted_action, predicted_mask):
+        predicted_action = self.policy.get_action_str([predicted_action])[0]
+        if self.env.is_interact_action(predicted_action):
+            if self.env.is_action_changing_object_pos(predicted_action):
+                agent_inter_object = self.env.full_state.metadata['actionReturn']
+            else:
+                agent_inter_object = self.env.thor_env.get_target_instance_id(predicted_mask)
+
+            # check if expert interacted with this object
+            if agent_inter_object not in expert_interact_objects:
+                return 1
+
+        return 0
 
 
     def get_np_obj_id(self):
