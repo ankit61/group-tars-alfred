@@ -20,7 +20,8 @@ class MetricsEvaluator(Evaluator):
 
         self.results_for_df = defaultdict(lambda: [])
         self.episode_metrics = {}
-        self.interact_obj_ids = None
+        self.interact_obj_ids = []
+        self.visible_obj_ids = set()
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
         self.expert_interact_objects, self.expert_interact_objects_action = [], [] # used by IAPP metric
 
@@ -43,8 +44,8 @@ class MetricsEvaluator(Evaluator):
 
         predicted_action, predicted_mask = policy_out
 
-        # update FONS metric
-        self.update_fons()
+        # update ONS metric
+        self.update_ons()
 
         # Interaction Action Prediction Performance (IAPP) Metric
         iapp = self.iapp_metric(self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
@@ -60,10 +61,11 @@ class MetricsEvaluator(Evaluator):
                 start_state: starting state of agent
         '''
         # reset episode metrics, prefetch per-episode values for metrics
-        self.episode_metrics['fons'] = False
+        self.episode_metrics['ons'] = 0
         self.episode_metrics['iapp'] = 0
 
-        self.fons_obj_id = self.get_fons_obj_id()
+        self.update_interact_obj_ids()
+        self.visible_obj_ids = set()
 
         self.objects_already_interacted_with = []
         self.expert_interact_objects, self.expert_interact_objects_action = self.find_objects_to_interact_with()
@@ -119,7 +121,8 @@ class MetricsEvaluator(Evaluator):
                      'path_len_weighted_goal_condition_spl': float(plw_pc_spl),
                      'path_len_weight': int(path_len_weight),
                      'reward': float(total_reward),
-                     'fons': int(self.episode_metrics['fons']),
+                     'ons': float(len(self.visible_obj_ids) / len(self.interact_obj_ids)),
+                     'fons': int(self.interact_obj_ids[0] in self.visible_obj_ids),
                      'iapp': float(self.episode_metrics['iapp'])}
 
         for (k, v) in log_entry.items():
@@ -135,9 +138,13 @@ class MetricsEvaluator(Evaluator):
 
         # intrinsic metrics
         print("-------------")
+        print("Episode ONS: %d/%d = %.3f" % (len(self.visible_obj_ids), len(self.interact_obj_ids), log_entry['ons']))
+        print("Episode FONS: %d" % log_entry['fons'])
+        print("Episode IAPP: %.3f" % log_entry['iapp'])
         fons_succs = sum(self.results_for_df['fons'])
         fons_eps = len(self.results_for_df['fons'])
         print("FONS Rate: %d/%d = %.3f" % (fons_succs, fons_eps, fons_succs / fons_eps))
+        print("Mean ONS: %.3f" % np.mean(self.results_for_df['ons']))
         print("Mean IAPP: %.3f" % np.mean(self.results_for_df['iapp']))
 
         # task-level metrics
@@ -216,19 +223,7 @@ class MetricsEvaluator(Evaluator):
         results_df.to_pickle(df_save_path)
 
 
-    def update_fons(self):
-        '''
-        Assumptions:
-
-        How do positions/coordinates work? Assuming positions/coordinates are absolute for whole environment instead of
-        a particular scene/image
-        '''
-        fons = False
-        for obj in self.env.thor_env.last_event.metadata['objects']:
-            if obj['objectId'] == self.fons_obj_id and obj['visible']:
-                fons = True
-        self.episode_metrics['fons'] = self.episode_metrics['fons'] or fons
-       
+     
 
 
     # Note: expert_interact_objects, expert_interact_objects_action are arguments so they are not computed every time
@@ -255,17 +250,36 @@ class MetricsEvaluator(Evaluator):
         return -1 # not relevant
 
 
-    def get_fons_obj_id(self):
+    # def get_fons_obj_id(self):
+    #     '''
+    #     Assumptions:
+
+    #     'First object' here is assumed to be the first object the expert 
+    #     interacts with in the low-level actions
+    #     '''
+    #     for action in self.env.low_level_actions:
+    #         if 'objectId' in action['api_action']:
+    #             return action['api_action']['objectId']
+    #     return None
+
+    def update_ons(self):
         '''
         Assumptions:
 
-        'First object' here is assumed to be the first object the expert 
-        interacts with in the low-level actions
+        How do positions/coordinates work? Assuming positions/coordinates are absolute for whole environment instead of
+        a particular scene/image
         '''
+        for obj in self.env.thor_env.last_event.metadata['objects']:
+            if obj['objectId'] in self.interact_obj_ids and obj['visible']:
+                self.visible_obj_ids.add(obj['objectId'])  
+
+
+    def update_interact_obj_ids(self):
+        self.interact_obj_ids = []
         for action in self.env.low_level_actions:
             if 'objectId' in action['api_action']:
-                return action['api_action']['objectId']
-        return None
+                self.interact_obj_ids.append(action['api_action']['objectId'])
+        self.interact_obj_ids = remove_dupes(self.interact_obj_ids)
 
 
     def find_objects_to_interact_with(self):
@@ -278,3 +292,12 @@ class MetricsEvaluator(Evaluator):
                 interact_objects_action.append(action['api_action']['action'])
 
         return interact_objects, interact_objects_action
+
+
+    
+def remove_dupes(l):
+    res = []
+    for elem in l:
+        if elem not in res:
+            res.append(elem)
+    return res
