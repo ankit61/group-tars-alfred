@@ -59,6 +59,11 @@ class EvalTask(Eval):
         fails = 0
         t = 0
         reward = 0
+
+        # intrinsic metrics
+        intrinsic_metrics = {'np': False, 'iapp': 0}
+        np_obj_id = cls.get_np_obj_id(env, traj_data)
+
         while not done:
             # break if max_steps reached
             if t >= args.max_steps:
@@ -99,6 +104,9 @@ class EvalTask(Eval):
             reward += t_reward
             t += 1
 
+            # update intrinsic metrics
+            intrinsic_metrics['np'] = intrinsic_metrics['np'] or cls.calculate_np(env, np_obj_id)
+
         # check if goal was satisfied
         goal_satisfied = env.get_goal_satisfied()
         if goal_satisfied:
@@ -133,7 +141,10 @@ class EvalTask(Eval):
                      'goal_condition_spl': float(pc_spl),
                      'path_len_weighted_goal_condition_spl': float(plw_pc_spl),
                      'path_len_weight': int(path_len_weight),
-                     'reward': float(reward)}
+                     'reward': float(reward),
+                     'np': int(intrinsic_metrics['np']),
+                     'iapp': float(intrinsic_metrics['iapp'])}
+                     
         if success:
             successes.append(log_entry)
         else:
@@ -141,6 +152,10 @@ class EvalTask(Eval):
 
         # overall results
         results['all'] = cls.get_metrics(successes, failures)
+
+        print("-------------")
+        print("Episode NP: {}".format(log_entry['np']))
+        # print("Episode IAPP: {}", log_entry['iapp'])
 
         print("-------------")
         print("SR: %d/%d = %.3f" % (results['all']['success']['num_successes'],
@@ -222,3 +237,19 @@ class EvalTask(Eval):
         with open(save_path, 'w') as r:
             json.dump(results, r, indent=4, sort_keys=True)
 
+
+    # ======================== INTRINSIC METRICS HELPER FUNCTIONS ========================
+
+    @classmethod
+    def get_np_obj_id(cls, env, traj_data):
+        for action in traj_data['plan']['low_actions']:
+            if 'objectId' in action['api_action']:
+                return action['api_action']['objectId']
+        return None
+
+    @classmethod
+    def calculate_np(cls, env, np_obj_id):
+        for obj in env.last_event.metadata['objects']:
+            if obj['objectId'] == np_obj_id and obj['visible']:
+                return True
+        return False

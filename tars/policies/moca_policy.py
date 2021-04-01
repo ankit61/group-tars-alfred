@@ -12,7 +12,7 @@ from tars.moca.gen.utils.py_util import remove_spaces_and_lower
 class MocaPolicy(Seq2SeqPolicy):
     def __init__(self, model_load_path=None):
         model_load_path = self.conf.saved_model_path if model_load_path is None else model_load_path
-
+        print("Loading model from {}".format(model_load_path))
         model, _ = MOCA.load(model_load_path, self.conf.main.device)
         super(MocaPolicy, self).__init__(model)
 
