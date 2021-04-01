@@ -276,9 +276,6 @@ class MetricsEvaluator(Evaluator):
     def unnecessary_interactions(self, expert_interact_objects, info, predicted_action, predicted_mask):
         predicted_action = self.policy.get_action_str([predicted_action])[0]
         if self.env.is_interact_action(predicted_action):
-            if "err" in info:
-                return 1
-            print(expert_interact_objects)
             if self.env.is_action_changing_object_pos(predicted_action):
                 agent_inter_object = self.env.full_state.metadata['actionReturn']
             else:
