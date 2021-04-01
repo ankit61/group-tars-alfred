@@ -21,7 +21,7 @@ class MetricsEvaluator(Evaluator):
         self.results_for_df = defaultdict(lambda: [])
         self.episode_metrics = {}
         self.interact_obj_ids = []
-        self.visible_obj_ids = set()
+        self.visible_interact_obj_ids = set()
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
         self.expert_interact_objects, self.expert_interact_objects_action = [], [] # used by IAPP metric
 
@@ -33,19 +33,30 @@ class MetricsEvaluator(Evaluator):
         pass
 
 
-    def at_step_end(self, policy_in, policy_out, nrd):
+    def at_step_end(self, policy_in, policy_out, nrdi):
         '''
             Args:
                 policy_in: tuple containing input given to the policy
                 policy_out: tuple containing output of the policy
-                nrd: tuple of (next state, reward, done) after taking executing
+                nrd: tuple of (next state, reward, done, info) after taking executing
                     policy_out
         '''
 
         predicted_action, predicted_mask = policy_out
 
-        # update ONS metric
-        self.update_ons()
+        _, _, _, info = nrdi
+
+        predicted_action_name = self.env.conf.actions.index2word(predicted_action)
+
+        if info and (predicted_action_name in self.env.conf.interact_actions):
+            self.episode_metrics['attempted_interactions'] += 1
+            if "SUCCESS" in info:
+                self.episode_metrics['successful_interactions'] += 1
+            elif "FAILURE" in info and "Bad interact mask" in info:
+                self.episode_metrics['bad_mask_interactions'] += 1
+            
+        # update visible object ids for ONS and FONS metrics
+        self.update_visible_interact_obj_ids()
 
         # Interaction Action Prediction Performance (IAPP) Metric
         iapp = self.iapp_metric(self.expert_interact_objects, self.expert_interact_objects_action, predicted_action,
@@ -53,7 +64,6 @@ class MetricsEvaluator(Evaluator):
         if iapp > -1:
             self.episode_metrics["iapp"] += iapp / len(self.expert_interact_objects)  # percentage of correct actions predicted correctly
                                                 
-
 
     def at_episode_start(self, start_state):
         '''
@@ -63,9 +73,12 @@ class MetricsEvaluator(Evaluator):
         # reset episode metrics, prefetch per-episode values for metrics
         self.episode_metrics['ons'] = 0
         self.episode_metrics['iapp'] = 0
+        self.episode_metrics['attempted_interactions'] = 0
+        self.episode_metrics['successful_interactions'] = 0
+        self.episode_metrics['bad_mask_interactions'] = 0
 
         self.update_interact_obj_ids()
-        self.visible_obj_ids = set()
+        self.visible_interact_obj_ids = set()
 
         self.objects_already_interacted_with = []
         self.expert_interact_objects, self.expert_interact_objects_action = self.find_objects_to_interact_with()
@@ -121,10 +134,15 @@ class MetricsEvaluator(Evaluator):
                      'path_len_weighted_goal_condition_spl': float(plw_pc_spl),
                      'path_len_weight': int(path_len_weight),
                      'reward': float(total_reward),
-                     'ons': float(len(self.visible_obj_ids) / len(self.interact_obj_ids)),
-                     'fons': int(self.interact_obj_ids[0] in self.visible_obj_ids),
-                     'iapp': float(self.episode_metrics['iapp'])}
+                     'visible_interact_objs': len(self.visible_interact_obj_ids),
+                     'interact_objs': len(self.interact_obj_ids),
+                     'first_interact_obj_success': int(self.interact_obj_ids[0] in self.visible_interact_obj_ids),
+                     'iapp': float(self.episode_metrics['iapp']),
+                     'successful_interactions': int(self.episode_metrics['successful_interactions']),
+                     'attempted_interactions': int(self.episode_metrics['attempted_interactions']),
+                     'bad_mask_interactions': int(self.episode_metrics['bad_mask_interactions'])}
 
+                        
         for (k, v) in log_entry.items():
             self.results_for_df[k].append(v)
 
@@ -138,14 +156,12 @@ class MetricsEvaluator(Evaluator):
 
         # intrinsic metrics
         print("-------------")
-        print("Episode ONS: %d/%d = %.3f" % (len(self.visible_obj_ids), len(self.interact_obj_ids), log_entry['ons']))
-        print("Episode FONS: %d" % log_entry['fons'])
+        print("Episode ONS: %d/%d = %.3f" % (len(self.visible_interact_obj_ids), len(self.interact_obj_ids), (len(self.visible_interact_obj_ids) / len(self.interact_obj_ids))))
+        print("Episode FONS: %d" % log_entry['first_interact_obj_success'])
         print("Episode IAPP: %.3f" % log_entry['iapp'])
-        fons_succs = sum(self.results_for_df['fons'])
-        fons_eps = len(self.results_for_df['fons'])
-        print("FONS Rate: %d/%d = %.3f" % (fons_succs, fons_eps, fons_succs / fons_eps))
-        print("Mean ONS: %.3f" % np.mean(self.results_for_df['ons']))
-        print("Mean IAPP: %.3f" % np.mean(self.results_for_df['iapp']))
+        print("Episode Interact Success: %d/%d = %.3f" % (self.episode_metrics['successful_interactions'], self.episode_metrics['attempted_interactions'], self.episode_metrics['successful_interactions'] / max(1, self.episode_metrics['attempted_interactions'])))
+        print("Episode Interact Bad Mask Failure: %d/%d = %.3f" % (self.episode_metrics['bad_mask_interactions'], (self.episode_metrics['attempted_interactions'] - self.episode_metrics['successful_interactions']), self.episode_metrics['bad_mask_interactions'] / max(1, (self.episode_metrics['attempted_interactions'] - self.episode_metrics['successful_interactions']))))
+
 
         # task-level metrics
         print("-------------")
@@ -262,7 +278,7 @@ class MetricsEvaluator(Evaluator):
     #             return action['api_action']['objectId']
     #     return None
 
-    def update_ons(self):
+    def update_visible_interact_obj_ids(self):
         '''
         Assumptions:
 
@@ -271,7 +287,7 @@ class MetricsEvaluator(Evaluator):
         '''
         for obj in self.env.thor_env.last_event.metadata['objects']:
             if obj['objectId'] in self.interact_obj_ids and obj['visible']:
-                self.visible_obj_ids.add(obj['objectId'])  
+                self.visible_interact_obj_ids.add(obj['objectId'])  
 
 
     def update_interact_obj_ids(self):

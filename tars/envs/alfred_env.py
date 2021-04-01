@@ -81,13 +81,16 @@ class AlfredEnv(Env):
         next_obs = self.get_obs(self.thor_env.last_event)
         reward = 0 if done else self.conf.failure_reward
 
+        debug_str = None
+
         if not done:
             success, event, _, err, _ = self.thor_env.va_interact(action_name, interact_mask, smooth_nav=False)
 
+            debug_str = "{}: {}".format("SUCCESS" if success else "FAILURE", action_name)
+            if err:
+                debug_str += " (err: {})".format(err)
+
             if self.conf.debug:
-                debug_str = "{}: {}".format("SUCCESS" if success else "FAILURE", action_name)
-                if err:
-                    debug_str += " (err: {})".format(err)
                 print(debug_str)
 
             if success:
@@ -104,7 +107,7 @@ class AlfredEnv(Env):
         if self.episode_len >= self.conf.max_steps:
             done = True
 
-        return next_obs, reward, done, None
+        return next_obs, reward, done, debug_str
 
 
     def close(self):

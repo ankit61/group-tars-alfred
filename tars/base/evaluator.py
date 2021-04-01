@@ -54,11 +54,11 @@ class Evaluator(Configurable):
             action, int_mask = action.squeeze(0), int_mask.squeeze(0) # since batch size = 1
 
             # update env
-            img, reward, done, _ = self.env.step((action, int_mask))
+            img, reward, done, info = self.env.step((action, int_mask))
             self.at_step_end(
                 (img, goal_inst, low_level_insts),
                 (action, int_mask),
-                (img, reward, done)
+                (img, reward, done, info)
             )
             tot_reward += reward
 
