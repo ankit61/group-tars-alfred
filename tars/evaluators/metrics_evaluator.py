@@ -24,6 +24,7 @@ class MetricsEvaluator(Evaluator):
         self.visible_interact_obj_ids = set()
         self.objects_already_interacted_with = [] # prevent double counting for IAPP
         self.expert_interact_objects, self.expert_interact_objects_action = [], [] # used by IAPP metric
+        self.all_objects_already_interacted_with = []  # prevent double counting for UI
 
 
     def at_step_start(self):
@@ -63,6 +64,11 @@ class MetricsEvaluator(Evaluator):
                                 predicted_mask)
         if iapp > -1:
             self.episode_metrics["iapp"] += iapp / len(self.expert_interact_objects)  # percentage of correct actions predicted correctly
+
+        # Unnecessary Interactions Metric
+        unnecessary_interactions = self.unnecessary_interactions(self.expert_interact_objects, info, predicted_action,
+                                                                 predicted_mask)
+        self.episode_metrics["ui"] += unnecessary_interactions
                                                 
 
     def at_episode_start(self, start_state):
@@ -76,6 +82,7 @@ class MetricsEvaluator(Evaluator):
         self.episode_metrics['attempted_interactions'] = 0
         self.episode_metrics['successful_interactions'] = 0
         self.episode_metrics['bad_mask_interactions'] = 0
+        self.episode_metrics["ui"] = 0
 
         self.update_interact_obj_ids()
         self.visible_interact_obj_ids = set()
@@ -140,7 +147,8 @@ class MetricsEvaluator(Evaluator):
                      'iapp': float(self.episode_metrics['iapp']),
                      'successful_interactions': int(self.episode_metrics['successful_interactions']),
                      'attempted_interactions': int(self.episode_metrics['attempted_interactions']),
-                     'bad_mask_interactions': int(self.episode_metrics['bad_mask_interactions'])}
+                     'bad_mask_interactions': int(self.episode_metrics['bad_mask_interactions']),
+                     'ui': float(self.episode_metrics['ui'])}
 
                         
         for (k, v) in log_entry.items():
@@ -159,6 +167,7 @@ class MetricsEvaluator(Evaluator):
         print("Episode ONS: %d/%d = %.3f" % (len(self.visible_interact_obj_ids), len(self.interact_obj_ids), (len(self.visible_interact_obj_ids) / len(self.interact_obj_ids))))
         print("Episode FONS: %d" % log_entry['first_interact_obj_success'])
         print("Episode IAPP: %.3f" % log_entry['iapp'])
+        print("Episode UI: %d" % log_entry['ui'])
         print("Episode Interact Success: %d/%d = %.3f" % (self.episode_metrics['successful_interactions'], self.episode_metrics['attempted_interactions'], self.episode_metrics['successful_interactions'] / max(1, self.episode_metrics['attempted_interactions'])))
         print("Episode Interact Bad Mask Failure: %d/%d = %.3f" % (self.episode_metrics['bad_mask_interactions'], (self.episode_metrics['attempted_interactions'] - self.episode_metrics['successful_interactions']), self.episode_metrics['bad_mask_interactions'] / max(1, (self.episode_metrics['attempted_interactions'] - self.episode_metrics['successful_interactions']))))
 
@@ -261,6 +270,31 @@ class MetricsEvaluator(Evaluator):
             return 0 # did not compute the correct action
 
         return -1 # not relevant
+
+
+    def unnecessary_interactions(self, expert_interact_objects, info, predicted_action, predicted_mask):
+        predicted_action = self.policy.get_action_str([predicted_action])[0]
+        if self.env.is_interact_action(predicted_action):
+            if self.env.is_action_changing_object_pos(predicted_action):
+                agent_inter_object = self.env.full_state.metadata['actionReturn']
+            else:
+                agent_inter_object = self.env.thor_env.get_target_instance_id(predicted_mask)
+
+            # check if expert interacted with this object
+            if not agent_inter_object and "err" in info:
+                # this should never get here because err will be in info, but cannot check this currently
+                # e.g.: means the agent tried to perform an invalid action like pick up on a countertop or a basin
+                return 1
+            elif not agent_inter_object:
+                return 0 # bad interaction mask: mask cannot be read
+            elif agent_inter_object[
+                 :agent_inter_object.find("|")] not in expert_interact_objects and agent_inter_object[
+                                                                                   :agent_inter_object.find(
+                                                                                           "|")] not in self.all_objects_already_interacted_with:
+                self.all_objects_already_interacted_with.append(agent_inter_object[:agent_inter_object.find("|")])
+                return 1
+
+        return 0
 
 
     def update_visible_interact_obj_ids(self):
