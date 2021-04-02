@@ -1,4 +1,4 @@
 - architectured the design of the pipeline to make things super clean and general
 - wrote all base classes
 - coded up the baseline model and MOCA model in our pipeline
-- wrote sections 7.2, 7.3, and significant parts of 4.2 and 4.3
+- wrote sections 4.4, 7.2, 7.3, and significant parts of 4.2 and 4.3
