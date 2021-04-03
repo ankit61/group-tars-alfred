@@ -1,0 +1,3 @@
+- Helped develop and test our model evaluation pipeline
+- Proposed and implemented several new intrinsic metrics
+- Evaluated models and analyzed the quantitative results
