@@ -298,12 +298,6 @@ class MetricsEvaluator(Evaluator):
 
 
     def update_visible_interact_obj_ids(self):
-        '''
-        Assumptions:
-
-        How do positions/coordinates work? Assuming positions/coordinates are absolute for whole environment instead of
-        a particular scene/image
-        '''
         for obj in self.env.thor_env.last_event.metadata['objects']:
             if obj['objectId'] in self.interact_obj_ids and obj['visible']:
                 self.visible_interact_obj_ids.add(obj['objectId'])  
