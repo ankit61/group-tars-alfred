@@ -1,9 +1,11 @@
 import os
 import json
 from enum import Enum
+from vocab import Vocab
 from torch.utils import data
 from PIL import Image
 from tars.base.configurable import Configurable
+from tars.config.envs.alfred_env_config import AlfredEnvConfig
 
 
 class DatasetType(Enum):
@@ -29,17 +31,42 @@ class Dataset(Configurable, data.Dataset):
     def tasks(self, start_idx=None, end_idx=None):
         start_idx = start_idx if start_idx else self.conf.start_idx
         end_idx = end_idx if end_idx else (self.conf.end_idx if self.conf.end_idx else len(self.tasks_json))
-        assert(start_idx < end_idx)
+        assert start_idx < end_idx
         for task in self.tasks_json[start_idx:end_idx]:
-            yield task
+            yield os.path.join(self.data_dir, task['task']), task['repeat_idx']
 
     def get_task(self, idx):
         task = self.tasks_json[idx]
-        return task
+        return os.path.join(self.data_dir, task['task']), task['repeat_idx']
 
     def get_img(self, task_dir, img_dir, idx):
-        ims = os.list_dir(os.path.join(task_dir, img_dir))
-        return Image.open(sorted(ims)[idx])
+        ims = os.listdir(os.path.join(task_dir, img_dir))
+        return Image.open(os.path.join(task_dir, img_dir, sorted(ims)[idx]))
+
+    def get_insts(self, task_dir, lang_idx):
+        with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
+            anns = json.load(f)['turk_annotations']['anns'][lang_idx]
+            return anns['task_desc'], anns['high_descs']
+
+    def get_expert_action(self, task_dir, idx):
+        with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
+            data = json.load(f)
+            low_action = data['plan']['low_actions'][idx]
+
+            action = low_action['api_action']['action']
+
+            object_type = self.conf.object_na
+            if action in AlfredEnvConfig.interact_actions:
+                object_type = low_action['api_action']['objectId'].split('|')[0]
+
+            object_type = self.conf.objects_vocab.word2index(object_type)
+
+            action = AlfredEnvConfig.actions.word2index(action)
+
+            # all processing can image one-to-one correspondence between images and actions
+            assert data['images'][idx]['low_idx'] == idx
+
+            return action, object_type
 
     def __len__(self):
         return len(self.tasks_json)
