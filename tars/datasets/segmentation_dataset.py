@@ -34,8 +34,6 @@ class SegmentationDataset(Dataset):
         out = np.array(gt_im)
         bg_mask = np.ones_like(out[:, :, 0], dtype=bool)
         for k in color_data:
-            if color_data[k]['objectType'].lower() == 'soapbottle':
-                breakpoint()
             obj_idx = self.conf.objects_vocab.word2index(color_data[k]['objectType'])
             k = tuple(map(int, k.strip('()').split(', ')))
             mask = (out[:, :, 0] == k[0]) & (out[:, :, 1] == k[1]) & (out[:, :, 2] == k[2])
