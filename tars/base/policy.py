@@ -15,9 +15,11 @@ class Policy(Configurable, Module):
         self.num_actions = len(AlfredEnvConfig.actions)
         self.int_mask_size = [constants.DETECTION_SCREEN_HEIGHT, constants.DETECTION_SCREEN_WIDTH]
 
-    def clean_preds(self, action, int_mask):
-        return action.argmax(1).cpu().numpy(), \
-            F.interpolate(int_mask.round(), self.int_mask_size).round().squeeze(1).bool().cpu().numpy()
+    def clean_preds(self, action, int_mask, int_object):
+        clean_action = action.argmax(1).cpu().numpy()
+        clean_mask = F.interpolate(int_mask.round(), self.int_mask_size).round().squeeze(1).bool().cpu().numpy()
+        clean_object = None if int_object is None else int_object.argmax(1).cpu().numpy()
+        return clean_action, clean_mask, clean_object
 
     @classmethod
     def get_action_str(cls, clean_action):
@@ -42,6 +44,7 @@ class Policy(Configurable, Module):
             Returns:
                 action: [N, A]
                 interaction_mask: [N, 1, H, W]
+                interaction_object: [N, O] (optional)
 
             Legend:
                 N: batch size
@@ -49,6 +52,7 @@ class Policy(Configurable, Module):
                 M: sentence lengths (varies per sentence, but for ease of notation displayed as one variable)
                 ML: number of low level instructions (varies per env, but for ease of notation displayed as one variable)
                 A: number of actions
+                O: number of objects
         '''
         raise NotImplementedError
 

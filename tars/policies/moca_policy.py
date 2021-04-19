@@ -106,4 +106,4 @@ class MocaPolicy(Seq2SeqPolicy):
             action = torch.zeros(1, self.num_actions) # assumes above assert
             action[..., new_action_idx] = 1
 
-            return action, mask.unsqueeze(0).unsqueeze(0)
+            return action, mask.unsqueeze(0).unsqueeze(0), None

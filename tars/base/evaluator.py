@@ -50,8 +50,8 @@ class Evaluator(Configurable):
             img = img.unsqueeze(0) # add batch size dimension
 
             # predict
-            action, int_mask = self.policy(img, goal_inst, low_level_insts)
-            action, int_mask = self.policy.clean_preds(action, int_mask)
+            action, int_mask, int_object = self.policy(img, goal_inst, low_level_insts)
+            action, int_mask, int_object = self.policy.clean_preds(action, int_mask, int_object)
             action, int_mask = action.squeeze(0), int_mask.squeeze(0) # since batch size = 1
 
             # update env

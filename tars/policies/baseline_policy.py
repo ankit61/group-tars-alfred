@@ -44,4 +44,4 @@ class BaselinePolicy(Seq2SeqPolicy):
             action, mask = self.remap_actions(action.squeeze()), torch.sigmoid(mask.squeeze())
 
             # FIXME: depends on above assert
-            return action.unsqueeze(0), mask.unsqueeze(0).unsqueeze(0)
+            return action.unsqueeze(0), mask.unsqueeze(0).unsqueeze(0), None
