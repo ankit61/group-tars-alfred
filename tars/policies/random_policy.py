@@ -16,4 +16,4 @@ class RandomPolicy(Policy):
         return transforms.ToTensor()
 
     def get_text_transforms(self):
-        return lambda x: x
+        return lambda x, is_goal: x
