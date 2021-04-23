@@ -33,7 +33,8 @@ class Policy(Configurable, Module):
         '''
             Clear any stateful info
         '''
-        raise NotImplementedError
+        # raise NotImplementedError
+        pass
 
     def forward(self, img, goal_inst, low_insts):
         '''
