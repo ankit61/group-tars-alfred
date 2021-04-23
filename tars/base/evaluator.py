@@ -22,11 +22,11 @@ class Evaluator(Configurable):
         self.at_start()
         data = Dataset(split)
         print("Dataset start: {}\nDataset end: {}".format(data.conf.start_idx, data.conf.end_idx))
-        for i, task in tqdm(enumerate(data.tasks()), total=len(data)):
+        for i, (task_dir, lang_idx) in tqdm(enumerate(data.tasks()), total=len(data)):
             print("\n============ TRAJ {} OF {} ============".format(i + 1 + data.conf.start_idx, (data.conf.end_idx if data.conf.end_idx else len(data))))
-            print("Evaluating {} ({})".format(task['task'], task['repeat_idx']))
-            json_file = os.path.join(data.data_dir, task['task'], DatasetConfig().traj_file)
-            self.evaluate(json_file, task['repeat_idx'])
+            print("Evaluating {} ({})".format(os.path.basename(task_dir), lang_idx))
+            json_file = os.path.join(task_dir, DatasetConfig().traj_file)
+            self.evaluate(json_file, lang_idx)
         self.at_end()
         self.env.close()
 

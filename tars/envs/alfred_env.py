@@ -43,7 +43,9 @@ class AlfredEnv(Env):
         self.low_level_actions = self.traj_data['plan']['low_actions']
 
         # print goal instr
-        print("Task: %s" % (self.traj_data['turk_annotations']['anns'][lang_idx]['task_desc']))
+        print("Task: %s\n" % (self.traj_data['turk_annotations']['anns'][lang_idx]['task_desc']))
+        insts = self.traj_data['turk_annotations']['anns'][lang_idx]['high_descs']
+        print("Instructions:\n" + '\n'.join([f"({i+1}) {inst}" for (i, inst) in enumerate(insts)]))
 
         return self.reset()
 
