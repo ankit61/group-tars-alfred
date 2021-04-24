@@ -1,0 +1,3 @@
+- Contributed to brainstorming of approaches
+- Created final diagram of our proposed model for report, made various other suggestions
+- Resolved segmentation dataset issues
