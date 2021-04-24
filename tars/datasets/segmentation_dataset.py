@@ -4,9 +4,6 @@ import json
 import numpy as np
 from tars.base.dataset import Dataset
 from PIL import Image
-import pprint
-
-pp = pprint.PrettyPrinter(indent=4)
 
 class SegmentationDataset(Dataset):
     def __init__(self, type, splits_file=None):
@@ -32,7 +29,7 @@ class SegmentationDataset(Dataset):
     def clean_raw_gt(self, gt_im, task_dir):
         with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
             color_data = json.load(f)['scene']['color_to_object_type'] 
-                 
+
         out = np.array(gt_im)
         bg_mask = np.ones_like(out[:, :, 0], dtype=bool)
         for k in color_data:
