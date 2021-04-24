@@ -11,6 +11,9 @@ class RandomPolicy(Policy):
 
         return action, int_mask, None
 
+    def reset(self):
+        pass
+
     @staticmethod
     def get_img_transforms():
         return transforms.ToTensor()
