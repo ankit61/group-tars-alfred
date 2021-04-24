@@ -4,7 +4,9 @@ import json
 import numpy as np
 from tars.base.dataset import Dataset
 from PIL import Image
+import pprint
 
+pp = pprint.PrettyPrinter(indent=4)
 
 class SegmentationDataset(Dataset):
     def __init__(self, type, splits_file=None):
@@ -29,14 +31,14 @@ class SegmentationDataset(Dataset):
 
     def clean_raw_gt(self, gt_im, task_dir):
         with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
-            color_data = json.load(f)['scene']['color_to_object_type']
-
+            color_data = json.load(f)['scene']['color_to_object_type'] 
+                 
         out = np.array(gt_im)
         bg_mask = np.ones_like(out[:, :, 0], dtype=bool)
         for k in color_data:
             obj_idx = self.conf.objects_vocab.word2index(color_data[k]['objectType'])
             k = tuple(map(int, k.strip('()').split(', ')))
-            mask = (out[:, :, 0] == k[0]) & (out[:, :, 1] == k[1]) & (out[:, :, 2] == k[2])
+            mask = (out[:, :, 0] == k[2]) & (out[:, :, 1] == k[1]) & (out[:, :, 2] == k[0])
             bg_mask = (bg_mask & (~mask))
             out[mask] = [obj_idx] * 3
 
