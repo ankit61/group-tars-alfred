@@ -1,17 +1,15 @@
 from typing import Union, List
-import torch
-from pytorch_lightning.core.lightning import LightningModule
 import torch.nn.functional as F
-from torchvision import transforms
 from tars.base.configurable import Configurable
+from tars.base.model import Model
 from tars.config.envs.alfred_env_config import AlfredEnvConfig
 from tars.alfred.gen import constants
 
 
-class Policy(Configurable, LightningModule):
+class Policy(Configurable, Model):
     def __init__(self):
         Configurable.__init__(self)
-        LightningModule.__init__(self)
+        Model.__init__(self)
         self.num_actions = len(AlfredEnvConfig.actions)
         self.int_mask_size = [constants.DETECTION_SCREEN_HEIGHT, constants.DETECTION_SCREEN_WIDTH]
 
