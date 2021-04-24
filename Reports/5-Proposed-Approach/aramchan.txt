@@ -1,0 +1,2 @@
+- proposed the majority of the architecture (but brainstorming with others was very important in formulation)
+- described the architecture in the report
