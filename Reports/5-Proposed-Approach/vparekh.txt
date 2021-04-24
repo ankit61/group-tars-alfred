@@ -1,0 +1,3 @@
+Brainstorm different model architectures
+Set up GCP
+Made minor edits to the report
