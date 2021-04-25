@@ -50,10 +50,10 @@ class SegmentationDataset(Dataset):
 
         # convert to tensors
         boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        labels = torch.Tensor(labels)
+        labels = torch.as_tensor(labels, dtype=torch.int64)
         masks = torch.as_tensor(masks, dtype=torch.uint8)
 
-        image_id = torch.Tensor([idx])
+        image_id = torch.tensor([idx])
         area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
         # suppose all instances are not crowd
         iscrowd = torch.zeros((len(masks),), dtype=torch.int64)
