@@ -25,7 +25,7 @@ class SegmentationDataset(Dataset):
 
         with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
             color_data = json.load(f)['scene']['color_to_object_type'] 
-        
+
         bg_mask = np.ones_like(out[:, :, 0], dtype=bool)
         boxes = []
         labels = []
@@ -35,7 +35,7 @@ class SegmentationDataset(Dataset):
             obj_idx = self.conf.objects_vocab.word2index(color_data[k]['objectType'])
             k = tuple(map(int, k.strip('()').split(', ')))
             obj_mask = (out[:, :, 0] == k[2]) & (out[:, :, 1] == k[1]) & (out[:, :, 2] == k[0])
-            
+
             # get object bounding box coordinates
             pos = np.where(obj_mask)
             if len(pos[0]) + len(pos[1]) > 0:
@@ -69,5 +69,3 @@ class SegmentationDataset(Dataset):
 
     def __len__(self):
         return self.cum_img_lens[-1]
-
-
