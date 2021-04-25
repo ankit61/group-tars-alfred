@@ -57,10 +57,11 @@ def save_image(event, save_path):
     rgb_image = event.frame[:, :, ::-1]
 
     # depth
-    depth_save_path = os.path.join(save_path, DEPTH_IMAGES_FOLDER)
-    depth_image = event.depth_frame
-    depth_image = depth_image * (255 / 10000)
-    depth_image = depth_image.astype(np.uint8)
+    if args.save_depth:
+        depth_save_path = os.path.join(save_path, DEPTH_IMAGES_FOLDER)
+        depth_image = event.depth_frame
+        depth_image = depth_image * (255 / 10000)
+        depth_image = depth_image.astype(np.uint8)
 
     # masks
     mask_save_path = os.path.join(save_path, INSTANCE_MASKS_FOLDER)
@@ -69,7 +70,8 @@ def save_image(event, save_path):
     # dump images
     im_ind = get_image_index(rgb_save_path)
     cv2.imwrite(rgb_save_path + '/%09d.png' % im_ind, rgb_image)
-    cv2.imwrite(depth_save_path + '/%09d.png' % im_ind, depth_image)
+    if args.save_depth:
+        cv2.imwrite(depth_save_path + '/%09d.png' % im_ind, depth_image)
     cv2.imwrite(mask_save_path + '/%09d.png' % im_ind, mask_image)
 
     return im_ind
@@ -289,6 +291,8 @@ parser.add_argument('--num_threads', type=int, default=1)
 parser.add_argument('--reward_config', type=str, default=os.path.join(Path(__file__).absolute().parents[2], "models/config/rewards.json"))
 parser.add_argument('--split_type', type=str, default='train')
 parser.add_argument('--generate_video', action='store_true')
+parser.add_argument('--save-depth', action='store_true')
+
 args = parser.parse_args()
 print(args.data_path)
 print(args.split_type)
