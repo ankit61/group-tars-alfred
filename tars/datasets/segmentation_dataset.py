@@ -6,6 +6,7 @@ import torch
 from tars.base.dataset import Dataset
 from PIL import Image
 
+
 class SegmentationDataset(Dataset):
     def __init__(self, type, splits_file=None):
         super().__init__(type, splits_file=splits_file)

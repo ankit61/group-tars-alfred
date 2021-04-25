@@ -1,5 +1,6 @@
 gym
 numpy
+pytorch-lightning
 pandas
 opencv-python
 networkx
