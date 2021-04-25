@@ -8,20 +8,21 @@ from PIL import Image
 
 
 class SegmentationDataset(Dataset):
-    def __init__(self, type, splits_file=None):
+    def __init__(self, type, splits_file=None, transforms=None):
         super().__init__(type, splits_file=splits_file)
         img_lens = [len(os.listdir(os.path.join(t, self.conf.instance_mask_dir))) for t in self.unique_tasks]
         self.cum_img_lens = np.cumsum(img_lens)
+        self.transforms = transforms
 
     def __getitem__(self, idx):
         task_idx = bisect.bisect(self.cum_img_lens, idx)
         im_idx = idx - self.cum_img_lens[task_idx - 1] if task_idx > 0 else idx
         task_dir = self.get_task(task_idx)[0]
 
-        rgb_im = self.get_img(task_dir, self.conf.high_res_img_dir, im_idx)
-        gt_im = self.get_img(task_dir, self.conf.instance_mask_dir, im_idx)
+        img = self.get_img(task_dir, self.conf.high_res_img_dir, im_idx)
+        inst_mask = self.get_img(task_dir, self.conf.instance_mask_dir, im_idx)
 
-        out = np.array(gt_im)
+        out = np.array(inst_mask)
 
         with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
             color_data = json.load(f)['scene']['color_to_object_type'] 
@@ -65,7 +66,10 @@ class SegmentationDataset(Dataset):
         target["area"] = area
         target["iscrowd"] = iscrowd
 
-        return rgb_im, target
+        if self.transforms is not None:
+            img, target = self.transforms(img, target)
+
+        return img, target
 
     def __len__(self):
         return self.cum_img_lens[-1]
