@@ -57,21 +57,22 @@ def save_image_with_delays(env, action,
 
 
 def get_target(mask_image, save_path):
-    out = np.array(mask_image)
+    # print(f"mask image: {mask_image}")
 
     with open(os.path.join(save_path, 'augmented_traj_data.json'), 'r') as f:
         color_data = json.load(f)['scene']['color_to_object_type'] 
 
-    bg_mask = np.ones_like(out[:, :, 0], dtype=bool)
+    bg_mask = np.ones_like(mask_image[:, :, 0], dtype=bool)
     boxes = []
     labels = []
     masks = []
+    # print(f"\ncolor_data: {color_data}")
     
     for k in color_data:
         # get object mask
         obj_idx = DatasetConfig.objects_vocab.word2index(color_data[k]['objectType'])
         k = tuple(map(int, k.strip('()').split(', ')))
-        obj_mask = (out[:, :, 0] == k[2]) & (out[:, :, 1] == k[1]) & (out[:, :, 2] == k[0])
+        obj_mask = (mask_image[:, :, 0] == k[0]) & (mask_image[:, :, 1] == k[1]) & (mask_image[:, :, 2] == k[2])
 
         # get object bounding box coordinates
         pos = np.where(obj_mask)
@@ -90,9 +91,10 @@ def get_target(mask_image, save_path):
     masks = torch.as_tensor(np.asarray(masks), dtype=torch.uint8)
 
     if boxes.shape[0] == 0:
+        print("bad target")
         return None
     
-    image_id = torch.tensor([hash(out.tostring())])
+    image_id = torch.tensor([hash(mask_image.tostring())])
     area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
     # suppose all instances are not crowd
     iscrowd = torch.zeros((len(masks),), dtype=torch.int64)
