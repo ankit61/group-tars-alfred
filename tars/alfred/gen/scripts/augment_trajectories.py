@@ -12,10 +12,12 @@ import time
 import copy
 import random
 import pickle
+import torch
 from pathlib import Path
 from tars.alfred.gen.utils.video_util import VideoSaver
 from tars.alfred.gen.utils.py_util import walklevel
 from tars.alfred.env.thor_env import ThorEnv
+from tars.config.base.dataset_config import DatasetConfig
 
 
 TRAJ_DATA_JSON_FILENAME = "traj_data.json"
@@ -37,6 +39,7 @@ render_settings['renderObjectImage'] = True
 render_settings['renderClassImage'] = True
 
 video_saver = VideoSaver()
+
 
 
 def get_image_index(save_path):
@@ -66,7 +69,7 @@ def get_target(mask_image, save_path):
     
     for k in color_data:
         # get object mask
-        obj_idx = self.conf.objects_vocab.word2index(color_data[k]['objectType'])
+        obj_idx = DatasetConfig.objects_vocab.word2index(color_data[k]['objectType'])
         k = tuple(map(int, k.strip('()').split(', ')))
         obj_mask = (out[:, :, 0] == k[2]) & (out[:, :, 1] == k[1]) & (out[:, :, 2] == k[0])
 
@@ -87,9 +90,9 @@ def get_target(mask_image, save_path):
     masks = torch.as_tensor(np.asarray(masks), dtype=torch.uint8)
 
     if boxes.shape[0] == 0:
-        return img, None
+        return None
     
-    image_id = torch.tensor([idx])
+    image_id = torch.tensor([hash(out.tostring())])
     area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
     # suppose all instances are not crowd
     iscrowd = torch.zeros((len(masks),), dtype=torch.int64)
@@ -170,14 +173,18 @@ def augment_traj(env, json_file):
     high_res_images_dir = os.path.join(root_dir, HIGH_RES_IMAGES_FOLDER)
     depth_images_dir = os.path.join(root_dir, DEPTH_IMAGES_FOLDER)
     instance_masks_dir = os.path.join(root_dir, INSTANCE_MASKS_FOLDER)
+    targets_dir = os.path.join(root_dir, TARGETS_FOLDER)
     augmented_json_file = os.path.join(root_dir, AUGMENTED_TRAJ_DATA_JSON_FILENAME)
 
     # fresh images list
     traj_data['images'] = list()
 
     clear_and_create_dir(high_res_images_dir)
-    clear_and_create_dir(depth_images_dir)
     clear_and_create_dir(instance_masks_dir)
+    if args.save_depth:
+        clear_and_create_dir(depth_images_dir)
+    if args.segmentation_dataset:
+        clear_and_create_dir(targets_dir)
 
     # scene setup
     scene_num = traj_data['scene']['scene_num']
