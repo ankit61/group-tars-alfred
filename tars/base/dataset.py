@@ -1,9 +1,11 @@
 import os
 import json
+import pickle
 from enum import Enum
 from vocab import Vocab
 from torch.utils import data
 from PIL import Image
+from collections import OrderedDict
 from tars.base.configurable import Configurable
 from tars.config.envs.alfred_env_config import AlfredEnvConfig
 
@@ -26,12 +28,12 @@ class Dataset(Configurable, data.Dataset):
         with open(self.splits_file, 'r') as f:
             self.tasks_json = json.load(f)[self.type.value]
 
-        self.unique_tasks = list(set(t for t, _ in self.tasks()))
+        self.unique_tasks = list(OrderedDict.fromkeys([t for t, _ in self.tasks()]).keys())
 
     def tasks(self, start_idx=None, end_idx=None):
         start_idx = start_idx if start_idx else self.conf.start_idx
         end_idx = end_idx if end_idx else (self.conf.end_idx if self.conf.end_idx else len(self.tasks_json))
-        assert start_idx < end_idx
+        assert(start_idx < end_idx)
         for task in self.tasks_json[start_idx:end_idx]:
             yield os.path.join(self.data_dir, task['task']), task['repeat_idx']
 
@@ -42,6 +44,11 @@ class Dataset(Configurable, data.Dataset):
     def get_img(self, task_dir, img_dir, idx):
         ims = os.listdir(os.path.join(task_dir, img_dir))
         return Image.open(os.path.join(task_dir, img_dir, sorted(ims)[idx]))
+
+    def get_tgt(self, task_dir, tgt_dir, idx):
+        tgts = os.listdir(os.path.join(task_dir, tgt_dir))
+        with open(os.path.join(task_dir, tgt_dir, sorted(tgts)[idx]), "rb") as f:
+            return pickle.load(f)
 
     def get_insts(self, task_dir, lang_idx):
         with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:

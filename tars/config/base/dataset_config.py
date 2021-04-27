@@ -17,6 +17,7 @@ class DatasetConfig(Config):
     aug_traj_file = 'augmented_traj_data.json'
     high_res_img_dir = 'high_res_images'
     instance_mask_dir = 'instance_masks'
+    target_dir = 'targets'
     depth_img_dir = 'depth_images'
 
     start_idx = 0 # start dataset from this index, inclusive

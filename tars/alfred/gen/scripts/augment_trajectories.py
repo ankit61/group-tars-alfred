@@ -11,6 +11,7 @@ import threading
 import time
 import copy
 import random
+import pickle
 from pathlib import Path
 from tars.alfred.gen.utils.video_util import VideoSaver
 from tars.alfred.gen.utils.py_util import walklevel
@@ -24,6 +25,7 @@ ORIGINAL_IMAGES_FORLDER = "raw_images"
 HIGH_RES_IMAGES_FOLDER = "high_res_images"
 DEPTH_IMAGES_FOLDER = "depth_images"
 INSTANCE_MASKS_FOLDER = "instance_masks"
+TARGETS_FOLDER = "targets"
 
 IMAGE_WIDTH = 600
 IMAGE_HEIGHT = 600
@@ -51,6 +53,58 @@ def save_image_with_delays(env, action,
     return im_ind
 
 
+def get_target(mask_image, save_path):
+    out = np.array(mask_image)
+
+    with open(os.path.join(save_path, 'augmented_traj_data.json'), 'r') as f:
+        color_data = json.load(f)['scene']['color_to_object_type'] 
+
+    bg_mask = np.ones_like(out[:, :, 0], dtype=bool)
+    boxes = []
+    labels = []
+    masks = []
+    
+    for k in color_data:
+        # get object mask
+        obj_idx = self.conf.objects_vocab.word2index(color_data[k]['objectType'])
+        k = tuple(map(int, k.strip('()').split(', ')))
+        obj_mask = (out[:, :, 0] == k[2]) & (out[:, :, 1] == k[1]) & (out[:, :, 2] == k[0])
+
+        # get object bounding box coordinates
+        pos = np.where(obj_mask)
+        if len(pos[0]) + len(pos[1]) > 0:
+            xmin = np.min(pos[1])
+            xmax = np.max(pos[1])
+            ymin = np.min(pos[0])
+            ymax = np.max(pos[0])
+            boxes.append([xmin, ymin, xmax, ymax])
+            labels.append(obj_idx)
+            masks.append(obj_mask)
+
+    # convert to tensors
+    boxes = torch.as_tensor(np.asarray(boxes), dtype=torch.float32)
+    labels = torch.as_tensor(np.asarray(labels), dtype=torch.int64)
+    masks = torch.as_tensor(np.asarray(masks), dtype=torch.uint8)
+
+    if boxes.shape[0] == 0:
+        return img, None
+    
+    image_id = torch.tensor([idx])
+    area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+    # suppose all instances are not crowd
+    iscrowd = torch.zeros((len(masks),), dtype=torch.int64)
+
+    target = {}
+    target["boxes"] = boxes
+    target["labels"] = labels
+    target["masks"] = masks
+    target["image_id"] = image_id
+    target["area"] = area
+    target["iscrowd"] = iscrowd
+
+    return target
+
+
 def save_image(event, save_path):
     # rgb
     rgb_save_path = os.path.join(save_path, HIGH_RES_IMAGES_FOLDER)
@@ -67,14 +121,30 @@ def save_image(event, save_path):
     mask_save_path = os.path.join(save_path, INSTANCE_MASKS_FOLDER)
     mask_image = event.instance_segmentation_frame
 
-    # dump images
-    im_ind = get_image_index(rgb_save_path)
-    cv2.imwrite(rgb_save_path + '/%09d.png' % im_ind, rgb_image)
-    if args.save_depth:
-        cv2.imwrite(depth_save_path + '/%09d.png' % im_ind, depth_image)
-    cv2.imwrite(mask_save_path + '/%09d.png' % im_ind, mask_image)
+    if args.segmentation_dataset:
+        # targets for instance segmentation
+        target_save_path = os.path.join(save_path, TARGETS_FOLDER)
+        target = get_target(mask_image, save_path)
+    else:
+        target = None
 
-    return im_ind
+    # if collecting images for segmentation dataset, only save image if target is valid
+    if target or not args.segmentation_dataset:
+        # dump images
+        im_ind = get_image_index(rgb_save_path)
+        cv2.imwrite(rgb_save_path + '/%09d.png' % im_ind, rgb_image)
+        if args.save_depth:
+            cv2.imwrite(depth_save_path + '/%09d.png' % im_ind, depth_image)
+        cv2.imwrite(mask_save_path + '/%09d.png' % im_ind, mask_image)
+
+        if args.segmentation_dataset:
+            # dump target
+            with open(target_save_path + '/%09d.pkl' % im_ind, "wb+") as f:
+                pickle.dump(target, f, pickle.HIGHEST_PROTOCOL)
+
+        return im_ind
+
+    return None
 
 
 def save_images_in_events(events, root_dir):
@@ -291,7 +361,8 @@ parser.add_argument('--num_threads', type=int, default=1)
 parser.add_argument('--reward_config', type=str, default=os.path.join(Path(__file__).absolute().parents[2], "models/config/rewards.json"))
 parser.add_argument('--split_type', type=str, default='train')
 parser.add_argument('--generate_video', action='store_true')
-parser.add_argument('--save-depth', action='store_true')
+parser.add_argument('--save_depth', action='store_true')
+parser.add_argument('--segmentation_dataset', action='store_true')
 
 args = parser.parse_args()
 print(args.data_path)
