@@ -8,7 +8,7 @@ from PIL import Image
 import time
 
 
-class SegmentationDataset(Dataset):
+class InstanceSegmentationDataset(Dataset):
     def __init__(self, type, splits_file=None, transforms=None):
         super().__init__(type, splits_file=splits_file)
         img_lens = [len(os.listdir(os.path.join(task_dir, self.conf.instance_mask_dir))) for task_dir in self.unique_tasks]
