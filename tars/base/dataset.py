@@ -43,12 +43,7 @@ class Dataset(Configurable, data.Dataset):
 
     def get_img(self, task_dir, img_dir, idx):
         ims = os.listdir(os.path.join(task_dir, img_dir))
-        return Image.open(os.path.join(task_dir, img_dir, sorted(ims)[idx]))
-
-    def get_tgt(self, task_dir, tgt_dir, idx):
-        tgts = os.listdir(os.path.join(task_dir, tgt_dir))
-        with open(os.path.join(task_dir, tgt_dir, sorted(tgts)[idx]), "rb") as f:
-            return pickle.load(f)
+        return Image.open(os.path.join(task_dir, img_dir, sorted(ims)[idx]))   
 
     def get_insts(self, task_dir, lang_idx):
         with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
