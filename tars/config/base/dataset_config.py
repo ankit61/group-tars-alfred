@@ -12,6 +12,7 @@ class DatasetConfig(Config):
     object_na = 0
     objects_list = [object_na] + OBJECTS + ['AppleSliced', 'ShowerCurtain', 'TomatoSliced', 'LettuceSliced', 'Lamp', 'ShowerHead', 'EggCracked', 'BreadSliced', 'PotatoSliced', 'Faucet']
     objects_vocab = Vocab(objects_list)
+    object_na_idx = objects_vocab.word2index(object_na)
 
     traj_file = 'traj_data.json'
     aug_traj_file = 'augmented_traj_data.json'
