@@ -1,0 +1,83 @@
+import torch
+import torch.nn as nn
+from tars.base.model import Model
+
+
+class ActionModule(Model):
+    def __init__(self, action_emb, obj_emb, conf):
+        super(ActionModule, self).__init__()
+        self.num_actions = action_emb.num_embeddings
+        self.num_objects = obj_emb.num_embeddings
+
+        self.action_emb = action_emb
+        self.obj_emb = obj_emb
+
+        # FIXME: this should be replaced by context embedding model
+        self.context_emb_model = nn.Embedding(100, conf.word_emb_dim)
+
+        self.multi_attn_insts = nn.MultiheadAttention(
+                                    embed_dim=conf.context_size + conf.vision_features_size,
+                                    num_heads=conf.action_attn_heads,
+                                    kdim=conf.word_emb_dim,
+                                    vdim=conf.word_emb_dim
+                                )
+
+        self.multi_attn_goal = nn.MultiheadAttention(
+                                embed_dim=conf.context_size,
+                                num_heads=conf.action_attn_heads,
+                                kdim=conf.word_emb_dim,
+                                vdim=conf.word_emb_dim
+                            )
+
+        self.inst_lstm = nn.LSTMCell(
+                            2 * (conf.context_size + conf.vision_features_size),
+                            conf.inst_hidden_size
+                        )
+
+        self.goal_lstm = nn.LSTMCell(
+                            conf.context_size + conf.action_emb_dim + conf.object_emb_dim,
+                            conf.goal_hidden_size
+                        )
+
+        self.predictor_fc = nn.Linear(
+                                conf.inst_hidden_size,
+                                self.num_actions + self.num_objects
+                            )
+
+    def forward(
+        self, goal_inst, low_insts, vision_features,
+        context, inst_hidden_cell=None, goal_hidden_cell=None
+    ):
+        goal_embs = self.context_emb_model(goal_inst)
+        insts_embs = self.context_emb_model(low_insts)
+
+        # inst LSTM
+        context_vision = torch.cat((context, vision_features), dim=1)
+        insts_attended, inst_attn_wts = self.multi_attn_insts(
+                                query=context_vision.unsqueeze(0), key=insts_embs,
+                                value=insts_embs, need_weights=False
+                            )
+        insts_attended = insts_attended.squeeze(0)
+
+        inst_lstm_in = torch.cat((insts_attended, context_vision), dim=1)
+        inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
+
+        action_obj = self.predictor_fc(inst_hidden_cell[0])
+
+        # goal LSTM
+        goal_attended, goal_attn_wts = self.multi_attn_goal(
+                    query=context.unsqueeze(0), key=goal_embs,
+                    value=goal_embs, need_weights=False
+                )
+        goal_attended = goal_attended.squeeze(0)
+
+        action = action_obj[:, :self.num_actions]
+        obj = action_obj[:, self.num_actions:]
+
+        action_emb = self.action_emb(action.argmax(1))
+        obj_emb = self.obj_emb(obj.argmax(1))
+
+        goal_lstm_in = torch.cat((goal_attended, action_emb, obj_emb), dim=1)
+        goal_hidden_cell = self.goal_lstm(goal_lstm_in, goal_hidden_cell)
+
+        return action, obj, inst_hidden_cell, goal_hidden_cell
