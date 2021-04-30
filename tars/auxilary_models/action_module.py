@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from tars.base.model import Model
+from tars.auxilary_models.context_emb_model import ContextEmbeddingModel
 
 
 class ActionModule(Model):
@@ -12,8 +13,7 @@ class ActionModule(Model):
         self.action_emb = action_emb
         self.obj_emb = obj_emb
 
-        # FIXME: this should be replaced by context embedding model
-        self.context_emb_model = nn.Embedding(100, conf.word_emb_dim)
+        self.context_emb_model = ContextEmbeddingModel(conf.context_emb_model_name_or_path)
 
         self.multi_attn_insts = nn.MultiheadAttention(
                                     embed_dim=conf.context_size + conf.vision_features_size,

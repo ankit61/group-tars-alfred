@@ -38,3 +38,6 @@ class TarsPolicyConfig(Config):
 
     # action module
     action_attn_heads = 4
+
+    # contextual embedding model
+    context_emb_model_name_or_path = "albert-base-v2"
