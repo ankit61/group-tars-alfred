@@ -4,7 +4,7 @@ import transformers
 
 from transformers import (
     AutoTokenizer,
-    AutoModelWithLMHead
+    AutoModel
 )
 from tars.base.model import Model
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
@@ -17,7 +17,7 @@ class ContextEmbeddingModel(Model):
     def __init__(self, model_name_or_path):
         super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
-        self.model = AutoModelWithLMHead.from_pretrained(model_name_or_path)
+        self.model = AutoModel.from_pretrained(model_name_or_path)
 
         self.tokenizer.add_special_tokens({"additional_special_tokens": [SEP_TOKEN]})
         self.model.resize_token_embeddings(len(tokenizer))
