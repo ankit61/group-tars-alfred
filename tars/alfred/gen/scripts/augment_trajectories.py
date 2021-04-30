@@ -12,6 +12,7 @@ import time
 import copy
 import random
 from pathlib import Path
+from tqdm import tqdm
 from tars.alfred.gen.utils.video_util import VideoSaver
 from tars.alfred.gen.utils.py_util import walklevel
 from tars.alfred.env.thor_env import ThorEnv
@@ -257,6 +258,7 @@ def run():
 
     while len(traj_list) > 0:
         lock.acquire()
+        progress_bar.update()
         json_file = traj_list.pop()
         lock.release()
 
@@ -311,6 +313,7 @@ if args.shuffle:
     random.shuffle(traj_list)
 
 # start threads
+progress_bar = tqdm(total=len(traj_list))
 threads = []
 for n in range(args.num_threads):
     thread = threading.Thread(target=run)
