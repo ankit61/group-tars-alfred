@@ -12,15 +12,14 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 class ContextEmbeddingModel(Model):
 
-    SEP_TOKEN = "[SEP]"
-
     def __init__(self, model_name_or_path):
         super().__init__()
+        ContextEmbeddingModel.SEP_TOKEN = "[SEP]"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         self.model = AutoModel.from_pretrained(model_name_or_path)
 
-        self.tokenizer.add_special_tokens({"additional_special_tokens": [SEP_TOKEN]})
-        self.model.resize_token_embeddings(len(tokenizer))
+        self.tokenizer.add_special_tokens({"additional_special_tokens": [ContextEmbeddingModel.SEP_TOKEN]})
+        self.model.resize_token_embeddings(len(self.tokenizer))
 
 
     def forward(self, inputs: Dict[str, torch.Tensor]) -> torch.Tensor:
@@ -44,7 +43,7 @@ class ContextEmbeddingModel(Model):
         if is_goal:
             input_str = sents[0]
         else:
-            input_str = f" {SEP_TOKEN} ".join(sents)
+            input_str = f" {ContextEmbeddingModel.SEP_TOKEN} ".join(sents)
         result = self.tokenizer(input_str)
         return result
 
