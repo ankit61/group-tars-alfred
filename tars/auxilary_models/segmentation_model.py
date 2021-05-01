@@ -15,7 +15,7 @@ class SegmentationModel(Model):
         super(SegmentationModel, self).__init__()
         self.num_classes = len(DatasetConfig.objects_list)
         self.encoder_name = encoder_name
-        self.model = smp.MAnet(
+        self.model = smp.Unet(
             encoder_name=self.encoder_name,
             classes=self.num_classes
         )
@@ -35,7 +35,9 @@ class SegmentationModel(Model):
     def training_step(self, batch, batch_idx):
         img, gt = batch
         pred = self(img)
-        return self.loss(pred, gt)
+        loss = self.loss(pred, gt)
+        self.log('train_loss', loss.item())
+        return loss
 
     def configure_optimizers(self):
         return self.conf.get_optim(self.parameters())
@@ -51,7 +53,7 @@ class SegmentationModel(Model):
 
         self.log_dict({
             loss_key: self.loss(pred, gt).item(),
-            'val_iou': self.iou_metric(pred, gt)
+            'val_iou': self.iou_metric(pred.softmax(1), gt)
         })
 
     # data stuff
