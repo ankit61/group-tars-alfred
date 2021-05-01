@@ -1,10 +1,8 @@
 import itertools
 from numpy.core.fromnumeric import sort
 import torch
-from torchvision import transforms
+import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
-import torch.nn.utils.rnn as rnn_utils
-from tars.base.dataset import DatasetType
 from tars.datasets.imitation_dataset import ImitationDataset
 from tars.auxilary_models import VisionModule
 from tars.auxilary_models import ContextModule
@@ -31,6 +29,9 @@ class TarsPolicy(Policy):
                             )
 
         self.datasets = {}
+
+        self.action_loss = nn.CrossEntropyLoss()
+        self.object_loss = nn.CrossEntropyLoss()
 
         self.reset() # initializes all past trajectory info
 
@@ -93,26 +94,66 @@ class TarsPolicy(Policy):
 
         return action, int_mask, int_object
 
-    def get_img_transforms(self):
-        # forward to vision module
-        return transforms.Compose([
-            transforms.Resize(self.vision_module.detection_model.min_size),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225],
-            )
-        ])
+    def shared_step(self, batch):
+        # FIXME: Features needed:
+        # gradient clipping, truncated BPTT, teacher forcing
+        self.reset()
 
-    def text_transform(self, sents, is_goal):
-        return self.action_module.context_emb_model.text_transforms(sents, is_goal)
+        ac_loss, obj_loss = 0, 0
+        for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
+            self.trim_history(batch_size)
+            action, _, int_object = self(
+                                        mini_batch['images'],
+                                        mini_batch['goal_inst'],
+                                        mini_batch['low_insts']
+                                    )
+            ac_loss += self.action_loss(action, mini_batch['expert_actions'])
+            obj_loss += self.object_loss(int_object, mini_batch['expert_int_objects'])
+
+        return {
+            'loss': ac_loss + obj_loss,
+            'action_loss': ac_loss.item(),
+            'object_loss': obj_loss.item()
+        }
+
+    def configure_optimizers(self):
+        return self.conf.get_optim(self.parameters())
+
+    def training_step(self, batch, batch_idx):
+        return self.shared_step(batch)
+
+    def validation_step(self, batch, batch_idx, dataloader_idx):
+        metrics = self.shared_step(batch)
+        metrics = {f'val_{k}': metrics[k] for k in metrics}
+
+        if dataloader_idx == 0: # val seen
+            loss_key = 'val_seen_loss'
+        else:
+            loss_key = 'val_unseen_loss'
+
+        metrics[loss_key] = metrics.pop('val_loss')
+
+        self.log_dict(metrics)
+
+    def trim_history(self, batch_size):
+        self.past_actions = self.past_actions[:batch_size]
+        self.past_objects = self.past_objects[:batch_size]
+
+        self.inst_lstm_hidden = self.inst_lstm_hidden[:batch_size]
+        self.inst_lstm_cell = self.inst_lstm_cell[:batch_size]
+
+        self.goal_lstm_hidden = self.goal_lstm_hidden[:batch_size]
+        self.goal_lstm_cell = self.goal_lstm_cell[:batch_size]
+
+    # data stuff
 
     def setup(self, stage):
         for type in ['train', 'valid_seen', 'valid_unseen']:
             self.datasets[type] = ImitationDataset(
                                     type=type,
                                     img_transforms=self.get_img_transforms(),
-                                    text_transforms=self.text_transform
+                                    text_transforms=self.text_transform,
+                                    text_collate=self.action_module.context_emb_model.text_collate
                                 )
 
     def get_img_transforms(self):
@@ -131,41 +172,11 @@ class TarsPolicy(Policy):
         ]
 
     def shared_dataloader(self, type):
-        dataset = self.datasets[type]
-
-        def collate_fn(batch):
-            out = {}
-            sort_desc = (lambda x: sorted(x, key=lambda e: -e.shape[0]))
-            out['expert_actions'] = rnn_utils.pack_sequence(
-                                        sort_desc([b['expert_actions'] for b in batch])
-                                    )
-            out['expert_int_objects'] = rnn_utils.pack_sequence(
-                                        sort_desc([b['expert_int_objects'] for b in batch])
-                                    )
-
-            out['images'] = rnn_utils.pack_sequence(
-                                sort_desc([torch.stack(b['images']) for b in batch])
-                            )
-
-            out['goal_inst'] = \
-                self.action_module.context_emb_model.text_collate(
-                    [b['goal_inst'] for b in batch]
-                )
-
-            out['low_insts'] = \
-                self.action_module.context_emb_model.text_collate(
-                    [b['low_insts'] for b in batch]
-                )
-
-            return out
-
         return DataLoader(
-                dataset, batch_size=self.conf.batch_size,
-                collate_fn=collate_fn, pin_memory=True
+                self.datasets[type], batch_size=self.conf.batch_size,
+                collate_fn=self.datasets[type].collate, pin_memory=True,
+                num_workers=self.conf.main.num_threads
             )
-
-    def training_step(self, batch, batch_idx):
-        self.reset()
 
     def find_instance_mask(self, img, int_object):
         # run instance segmentation

@@ -1,3 +1,4 @@
+import torch.optim as optim
 from tars.base.config import Config
 from tars.config.base.dataset_config import DatasetConfig
 
@@ -41,3 +42,6 @@ class TarsPolicyConfig(Config):
 
     # contextual embedding model
     context_emb_model_name_or_path = "albert-base-v2"
+
+    def get_optim(self, parameters):
+        return optim.Adam(parameters, lr=1e-3)
