@@ -115,6 +115,12 @@ class TarsPolicy(Policy):
                                     text_transforms=self.text_transform
                                 )
 
+    def get_img_transforms(self):
+        return self.vision_module.get_img_transforms()
+
+    def text_transform(self, sents, is_goal):
+        return self.action_module.context_emb_model.text_transforms(sents, is_goal)
+
     def train_dataloader(self):
         return self.shared_dataloader('train')
 
