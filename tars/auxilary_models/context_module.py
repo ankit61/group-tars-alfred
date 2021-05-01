@@ -7,10 +7,11 @@ from tars.auxilary_models.readout_transformer import ReadoutTransformer
 class ContextModule(Model):
     def __init__(self, num_actions, num_objects, object_na_idx, conf):
         super(ContextModule, self).__init__()
+        self.padding_action_idx = num_actions
         self.action_emb = nn.Embedding(
                             num_actions + 1, # add one padding action
                             conf.action_emb_dim,
-                            padding_idx=num_actions
+                            padding_idx=self.padding_action_idx
                         )
 
         # FIXME: may want to use pretrained word embeddings for objects
