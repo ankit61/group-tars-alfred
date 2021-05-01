@@ -50,9 +50,9 @@ class Dataset(Configurable, data.Dataset):
     def get_all_expert_actions(self, task_dir):
         actions, objects = [], []
         for i in range(self.get_task_len(task_dir)):
-            a, o = self.get_expert_action(task_dir, i)
-            actions.append(a)
-            objects.append(a)
+            ac, obj = self.get_expert_action(task_dir, i)
+            actions.append(ac)
+            objects.append(obj)
         return actions, objects
 
     def get_all_imgs(self, task_dir, img_dir):
@@ -91,7 +91,7 @@ class Dataset(Configurable, data.Dataset):
 
             action = AlfredEnvConfig.actions.word2index(action)
 
-            # all processing can image one-to-one correspondence between images and actions
+            # all processing assumes one-to-one correspondence between images and actions
             assert data['images'][idx]['low_idx'] == idx
 
             return action, object_type
