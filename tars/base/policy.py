@@ -13,7 +13,7 @@ class Policy(Model):
 
     def clean_preds(self, action, int_mask, int_object):
         clean_action = action.argmax(1).cpu().numpy()
-        clean_mask = F.interpolate(int_mask.round(), self.int_mask_size).round().squeeze(1).bool().cpu().numpy()
+        clean_mask = None if int_mask is None else F.interpolate(int_mask.round(), self.int_mask_size).round().squeeze(1).bool().cpu().numpy()
         clean_object = None if int_object is None else int_object.argmax(1).cpu().numpy()
         return clean_action, clean_mask, clean_object
 
