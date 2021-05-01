@@ -12,8 +12,8 @@ from tars.config.envs.alfred_env_config import AlfredEnvConfig
 
 class DatasetType(Enum):
     TRAIN = 'train'
-    VAL_SEEN = 'valid_seen'
-    VAL_UNSEEN = 'valid_unseen'
+    VALID_SEEN = 'valid_seen'
+    VALID_UNSEEN = 'valid_unseen'
     TEST_SEEN = 'test_seen'
     TEST_UNSEEN = 'test_unseen'
 
