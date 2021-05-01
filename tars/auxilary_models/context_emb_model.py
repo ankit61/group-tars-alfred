@@ -12,13 +12,14 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 class ContextEmbeddingModel(Model):
 
+    INST_TOKEN = '[INST]'
+
     def __init__(self, model_name_or_path):
         super().__init__()
-        ContextEmbeddingModel.SEP_TOKEN = "[SEP]"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         self.model = AutoModel.from_pretrained(model_name_or_path)
 
-        self.tokenizer.add_special_tokens({"additional_special_tokens": [ContextEmbeddingModel.SEP_TOKEN]})
+        self.tokenizer.add_special_tokens({"additional_special_tokens": [ContextEmbeddingModel.INST_TOKEN]})
         self.model.resize_token_embeddings(len(self.tokenizer))
 
 
@@ -43,7 +44,7 @@ class ContextEmbeddingModel(Model):
         if is_goal:
             input_str = sents[0]
         else:
-            input_str = f" {ContextEmbeddingModel.SEP_TOKEN} ".join(sents)
+            input_str = f" {ContextEmbeddingModel.INST_TOKEN} ".join(sents)
         result = self.tokenizer(input_str)
         return result
 
