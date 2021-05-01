@@ -1,3 +1,4 @@
+import torch.optim as optim
 from tars.base.config import Config
 from tars.config.base.dataset_config import DatasetConfig
 
@@ -20,7 +21,7 @@ class TarsPolicyConfig(Config):
     object_emb_dim = 64
     action_hist_emb_dim = context_size // 2
     int_hist_emb_dim = context_size // 2
-    word_emb_dim = 128
+    # word_emb_dim = 128
     vision_object_emb_dim = 128
 
     # LSTMs
@@ -41,3 +42,6 @@ class TarsPolicyConfig(Config):
 
     # contextual embedding model
     context_emb_model_name_or_path = "albert-base-v2"
+
+    def get_optim(self, parameters):
+        return optim.Adam(parameters, lr=1e-3)

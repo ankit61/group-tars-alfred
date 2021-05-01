@@ -22,17 +22,15 @@ class ContextEmbeddingModel(Model):
         self.tokenizer.add_special_tokens({"additional_special_tokens": [ContextEmbeddingModel.INST_TOKEN]})
         self.model.resize_token_embeddings(len(self.tokenizer))
 
-
     def forward(self, inputs: Dict[str, torch.Tensor]) -> torch.Tensor:
         '''
             Args:
                 inputs: dict of padded tensors (output of data collator)
             Returns:
-                last hidden state of model: tensor of shape [seq_len, hidden_dim]
+                last hidden state of model: tensor of shape [seq_len, batch size, hidden_dim]
         '''
         outputs = self.model(**inputs)
-        return outputs.last_hidden_state[0]
-
+        return outputs.last_hidden_state.transpose(0, 1)
 
     def text_transforms(self, sents: List[str], is_goal: bool) -> Dict[str, Union[List[int], torch.Tensor]]:
         '''
@@ -58,3 +56,7 @@ class ContextEmbeddingModel(Model):
         '''
         batch = self.tokenizer.pad(features, padding=True, return_tensors="pt")
         return batch
+
+    @property
+    def hidden_size(self):
+        return self.model.config.hidden_size
