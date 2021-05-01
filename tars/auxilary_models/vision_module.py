@@ -3,7 +3,7 @@ import torch.nn as nn
 from torchvision.models import resnet18
 from tars.base.model import Model
 from tars.auxilary_models.mask_rcnn import MaskRCNN
-from tars.auxilary_models.segmentation_model import SegmentationModel
+from tars.auxilary_models import SegmentationModel
 from tars.auxilary_models.readout_transformer import ReadoutTransformer
 
 
@@ -34,9 +34,9 @@ class VisionModule(Model):
             self.detection_model = MaskRCNN(model_load_path=conf.detection_model_path)
         else:
             self.detection_model = SegmentationModel(
-                                    device=conf.main.device,
                                     model_load_path=conf.detection_model_path
                                 )
+        self.detection_model.eval()
 
         self.vision_mixer = nn.Linear(
                             conf.raw_vision_features_size + conf.vision_object_emb_dim,
