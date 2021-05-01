@@ -41,9 +41,35 @@ class Dataset(Configurable, data.Dataset):
         task = self.tasks_json[idx]
         return os.path.join(self.data_dir, task['task']), task['repeat_idx']
 
+    def get_task_len(self, task_dir):
+        with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
+            l = len(json.load(f)['plan']['low_actions'])
+            assert l > 0
+            return l
+
+    def get_all_expert_actions(self, task_dir):
+        actions, objects = [], []
+        for i in range(self.get_task_len(task_dir)):
+            a, o = self.get_expert_action(task_dir, i)
+            actions.append(a)
+            objects.append(a)
+        return actions, objects
+
+    def get_all_imgs(self, task_dir, img_dir):
+        files = sorted(os.listdir(os.path.join(task_dir, img_dir)))
+        task_len = self.get_task_len(task_dir)
+        assert task_len <= len(files),\
+            f'Task length ({task_len}) is more than total images ({len(files)}) for task: {task_dir}'
+
+        ims = []
+        for f in files[:task_len]: # ignore extra images
+            ims.append(Image.open(os.path.join(task_dir, img_dir, f)))
+
+        return ims
+
     def get_img(self, task_dir, img_dir, idx):
         ims = os.listdir(os.path.join(task_dir, img_dir))
-        return Image.open(os.path.join(task_dir, img_dir, sorted(ims)[idx]))   
+        return Image.open(os.path.join(task_dir, img_dir, sorted(ims)[idx]))
 
     def get_insts(self, task_dir, lang_idx):
         with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
