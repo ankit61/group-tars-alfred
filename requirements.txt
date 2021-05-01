@@ -18,4 +18,4 @@ seaborn
 transformers
 wordcloud
 ruamel.yaml
-segmentation-models-pytorch
+git+https://github.com/qubvel/segmentation_models.pytorch
