@@ -56,7 +56,7 @@ class Config():
         return members + statics
 
     def load_from_cmd(self):
-        parser = ArgumentParser()
+        parser = ArgumentParser(allow_abbrev=False)
         cls_prefix = self.__class__.__name__.lower()
         assert cls_prefix.endswith('config')
         cls_prefix = cls_prefix[:-6] # remove 'config' from end

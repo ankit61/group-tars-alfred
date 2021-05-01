@@ -1,21 +1,19 @@
 from typing import Union, List
 import torch.nn.functional as F
-from tars.base.configurable import Configurable
 from tars.base.model import Model
 from tars.config.envs.alfred_env_config import AlfredEnvConfig
 from tars.alfred.gen import constants
 
 
-class Policy(Configurable, Model):
+class Policy(Model):
     def __init__(self):
-        Configurable.__init__(self)
         Model.__init__(self)
         self.num_actions = len(AlfredEnvConfig.actions)
         self.int_mask_size = [constants.DETECTION_SCREEN_HEIGHT, constants.DETECTION_SCREEN_WIDTH]
 
     def clean_preds(self, action, int_mask, int_object):
         clean_action = action.argmax(1).cpu().numpy()
-        clean_mask = F.interpolate(int_mask.round(), self.int_mask_size).round().squeeze(1).bool().cpu().numpy()
+        clean_mask = None if int_mask is None else F.interpolate(int_mask.round(), self.int_mask_size).round().squeeze(1).bool().cpu().numpy()
         clean_object = None if int_object is None else int_object.argmax(1).cpu().numpy()
         return clean_action, clean_mask, clean_object
 

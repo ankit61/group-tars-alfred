@@ -9,11 +9,13 @@ class ContextModule(Model):
     def __init__(self, num_actions, num_objects, object_na_idx, conf):
         super(ContextModule, self).__init__()
 
+        self.padding_action_idx = num_actions
+
         self.action_embed_and_readout = EmbedAndReadout(
             dict_size=num_actions + 1,
             embed_dim=conf.action_emb_dim,
             out_dim=conf.action_hist_emb_dim,
-            padding_idx=num_actions,
+            padding_idx=self.padding_action_idx,
             max_len=conf.past_actions_len,
             conf=conf
         )

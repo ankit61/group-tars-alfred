@@ -3,16 +3,25 @@ from pathlib import Path
 import inspect
 from getpass import getuser
 from datetime import datetime
+import multiprocessing as mp
 import torch
 from tars.base.config import Config
 
 
 class MainConfig(Config):
 
-    # gpu use
+    # compute use
     use_gpu = torch.cuda.is_available()
     gpu_id = 0
     device = torch.device(f'cuda:{gpu_id}' if use_gpu else 'cpu')
+    num_threads = mp.cpu_count()
+
+    # wandb
+    wandb_entity = 'tars-alfred'
+    wandb_project = 'group-tars-alfred'
+
+    # general training
+    validation_freq = 10
 
     # basic dirs
     alfred_dir = os.path.join(Path(__file__).parents[1], 'alfred/')

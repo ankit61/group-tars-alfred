@@ -6,7 +6,7 @@ from vocab import Vocab
 
 
 class DatasetConfig(Config):
-    data_base_dir = os.path.join(MainConfig.alfred_dir, 'data/json_2.1.0')
+    data_base_dir = '/data/json_2.1.0' if os.path.exists('/data/json_2.1.0') else os.path.join(MainConfig.alfred_dir, 'data/json_2.1.0')
     splits_file = os.path.join(MainConfig.alfred_dir, 'data/splits/oct21.json')
 
     object_na = 0

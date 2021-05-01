@@ -1,8 +1,14 @@
 import itertools
+from numpy.core.fromnumeric import sort
 import torch
-from tars.auxilary_models.vision_module import VisionModule
-from tars.auxilary_models.context_module import ContextModule
-from tars.auxilary_models.action_module import ActionModule
+from torchvision import transforms
+from torch.utils.data.dataloader import DataLoader
+import torch.nn.utils.rnn as rnn_utils
+from tars.base.dataset import DatasetType
+from tars.datasets.imitation_dataset import ImitationDataset
+from tars.auxilary_models import VisionModule
+from tars.auxilary_models import ContextModule
+from tars.auxilary_models import ActionModule
 from tars.config.base.dataset_config import DatasetConfig
 from tars.base.policy import Policy
 
@@ -23,6 +29,8 @@ class TarsPolicy(Policy):
                                 self.context_module.action_emb,
                                 self.context_module.object_emb, self.conf
                             )
+
+        self.datasets = {}
 
         self.reset() # initializes all past trajectory info
 
@@ -85,8 +93,73 @@ class TarsPolicy(Policy):
 
         return action, int_mask, int_object
 
+    def get_img_transforms(self):
+        # forward to vision module
+        return transforms.Compose([
+            transforms.Resize(self.vision_module.detection_model.min_size),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225],
+            )
+        ])
+
+    def text_transform(self, sents, is_goal):
+        return self.action_module.context_emb_model.text_transforms(sents, is_goal)
+
+    def setup(self, stage):
+        for type in ['train', 'valid_seen', 'valid_unseen']:
+            self.datasets[type] = ImitationDataset(
+                                    type=type,
+                                    img_transforms=self.get_img_transforms(),
+                                    text_transforms=self.text_transform
+                                )
+
+    def train_dataloader(self):
+        return self.shared_dataloader('train')
+
+    def val_dataloader(self):
+        return [
+            self.shared_dataloader('valid_seen'),
+            self.shared_dataloader('valid_unseen')
+        ]
+
+    def shared_dataloader(self, type):
+        dataset = self.datasets[type]
+
+        def collate_fn(batch):
+            out = {}
+            sort_desc = (lambda x: sorted(x, key=lambda e: -e.shape[0]))
+            out['expert_actions'] = rnn_utils.pack_sequence(
+                                        sort_desc([b['expert_actions'] for b in batch])
+                                    )
+            out['expert_int_objects'] = rnn_utils.pack_sequence(
+                                        sort_desc([b['expert_int_objects'] for b in batch])
+                                    )
+
+            out['images'] = rnn_utils.pack_sequence(
+                                sort_desc([torch.stack(b['images']) for b in batch])
+                            )
+
+            out['goal_inst'] = \
+                self.action_module.context_emb_model.text_collate(
+                    [b['goal_inst'] for b in batch]
+                )
+
+            out['low_insts'] = \
+                self.action_module.context_emb_model.text_collate(
+                    [b['low_insts'] for b in batch]
+                )
+
+            return out
+
+        return DataLoader(
+                dataset, batch_size=self.conf.batch_size,
+                collate_fn=collate_fn, pin_memory=True
+            )
+
     def training_step(self, batch, batch_idx):
-        pass
+        self.reset()
 
     def find_instance_mask(self, img, int_object):
         # run instance segmentation
