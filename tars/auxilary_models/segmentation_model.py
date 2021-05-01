@@ -59,7 +59,7 @@ class SegmentationModel(Model):
         return SegmentationDataset(type, self.get_img_transforms())
 
     def setup(self, stage):
-        for t in [DatasetType.TRAIN]: # DatasetType.VALID_SEEN, DatasetType.VALID_UNSEEN]
+        for t in [DatasetType.TRAIN, DatasetType.VALID_SEEN, DatasetType.VALID_UNSEEN]:
             self.datasets[t] = self.get_dataset(t)
 
     def train_dataloader(self):
