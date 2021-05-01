@@ -58,5 +58,3 @@ class ContextEmbeddingModel(Model):
         '''
         batch = self.tokenizer.pad(features, padding=True, return_tensors="pt")
         return batch
-        
-        
