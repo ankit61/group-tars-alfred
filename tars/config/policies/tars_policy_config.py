@@ -20,7 +20,7 @@ class TarsPolicyConfig(Config):
     object_emb_dim = 64
     action_hist_emb_dim = context_size // 2
     int_hist_emb_dim = context_size // 2
-    word_emb_dim = 128
+    # word_emb_dim = 128
     vision_object_emb_dim = 128
 
     # LSTMs
