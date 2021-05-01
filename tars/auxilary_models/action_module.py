@@ -18,15 +18,15 @@ class ActionModule(Model):
         self.multi_attn_insts = nn.MultiheadAttention(
                                     embed_dim=conf.context_size + conf.vision_features_size,
                                     num_heads=conf.action_attn_heads,
-                                    kdim=conf.word_emb_dim,
-                                    vdim=conf.word_emb_dim
+                                    kdim=self.context_emb_model.hidden_size,
+                                    vdim=self.context_emb_model.hidden_size
                                 )
 
         self.multi_attn_goal = nn.MultiheadAttention(
                                 embed_dim=conf.context_size,
                                 num_heads=conf.action_attn_heads,
-                                kdim=conf.word_emb_dim,
-                                vdim=conf.word_emb_dim
+                                kdim=self.context_emb_model.hidden_size,
+                                vdim=self.context_emb_model.hidden_size
                             )
 
         self.inst_lstm = nn.LSTMCell(
@@ -53,10 +53,10 @@ class ActionModule(Model):
 
         # inst LSTM
         context_vision = torch.cat((context, vision_features), dim=1)
-        insts_attended, inst_attn_wts = self.multi_attn_insts(
-                                query=context_vision.unsqueeze(0), key=insts_embs,
-                                value=insts_embs, need_weights=False
-                            )
+        insts_attended, _ = self.multi_attn_insts(
+                            query=context_vision.unsqueeze(0), key=insts_embs,
+                            value=insts_embs, need_weights=False
+                        )
         insts_attended = insts_attended.squeeze(0)
 
         inst_lstm_in = torch.cat((insts_attended, context_vision), dim=1)
@@ -65,10 +65,11 @@ class ActionModule(Model):
         action_obj = self.predictor_fc(inst_hidden_cell[0])
 
         # goal LSTM
-        goal_attended, goal_attn_wts = self.multi_attn_goal(
-                    query=context.unsqueeze(0), key=goal_embs,
-                    value=goal_embs, need_weights=False
-                )
+        goal_attended, _ = self.multi_attn_goal(
+                            query=context.unsqueeze(0),
+                            key=goal_embs, value=goal_embs,
+                            need_weights=False
+                        )
         goal_attended = goal_attended.squeeze(0)
 
         action = action_obj[:, :self.num_actions]
