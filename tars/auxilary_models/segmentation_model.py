@@ -11,7 +11,7 @@ import pytorch_lightning.metrics as metrics
 
 
 class SegmentationModel(Model):
-    def __init__(self, encoder_name: str, model_load_path:str=None):
+    def __init__(self, encoder_name: str='resnet34', model_load_path:str=None):
         super(SegmentationModel, self).__init__()
         self.num_classes = len(DatasetConfig.objects_list)
         self.encoder_name = encoder_name
