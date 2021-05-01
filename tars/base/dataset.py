@@ -1,6 +1,6 @@
 import os
 import json
-import pickle
+from typing import Union
 from enum import Enum
 from vocab import Vocab
 from torch.utils import data
@@ -19,10 +19,10 @@ class DatasetType(Enum):
 
 
 class Dataset(Configurable, data.Dataset):
-    def __init__(self, type: DatasetType, splits_file=None):
+    def __init__(self, type: Union[str, DatasetType], splits_file=None):
         Configurable.__init__(self)
         data.Dataset.__init__(self)
-        self.type = type
+        self.type = type if isinstance(type, DatasetType) else DatasetType(type)
         self.data_dir = os.path.join(self.conf.data_base_dir, self.type.value)
         self.splits_file = self.conf.splits_file if splits_file is None else splits_file
         with open(self.splits_file, 'r') as f:
