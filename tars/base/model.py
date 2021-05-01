@@ -7,10 +7,10 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from tars.base.configurable import Configurable
 
 
-class Model(LightningModule, Configurable):
+class Model(Configurable, LightningModule):
     def __init__(self, *args, **kwargs):
-        LightningModule.__init__(self)
         Configurable.__init__(self)
+        LightningModule.__init__(self)
 
     def forward(self, *args, **kwargs):
         raise NotImplementedError
