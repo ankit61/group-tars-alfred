@@ -126,13 +126,6 @@ class TarsPolicy(Policy):
         metrics = self.shared_step(batch)
         metrics = {f'val_{k}': metrics[k] for k in metrics}
 
-        if dataloader_idx == 0: # val seen
-            loss_key = 'val_seen_loss'
-        else:
-            loss_key = 'val_unseen_loss'
-
-        metrics[loss_key] = metrics.pop('val_loss')
-
         self.log_dict(metrics)
 
     def trim_history(self, batch_size):

@@ -46,13 +46,8 @@ class SegmentationModel(Model):
         img, gt = batch
         pred = self(img)
 
-        if dataloader_idx == 0: # val seen
-            loss_key = 'val_seen_loss'
-        else:
-            loss_key = 'val_unseen_loss'
-
         self.log_dict({
-            loss_key: self.loss(pred, gt).item(),
+            'val_loss': self.loss(pred, gt).item(),
             'val_iou': self.iou_metric(pred.softmax(1), gt)
         })
 
