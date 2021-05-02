@@ -37810,18 +37810,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_and_place_with_movable_recep-AppleSliced-Bowl-Fridge-26/trial_T20190908_162237_908840"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_with_movable_recep-AppleSliced-Bowl-Fridge-26/trial_T20190908_162237_908840"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_with_movable_recep-AppleSliced-Bowl-Fridge-26/trial_T20190908_162237_908840"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_cool_then_place_in_recep-LettuceSliced-None-GarbageCan-30/trial_T20190908_211208_027116"
         },
         {
@@ -69722,18 +69710,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_clean_then_place_in_recep-Ladle-None-Drawer-4/trial_T20190909_161523_929674"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_clean_then_place_in_recep-Ladle-None-Drawer-4/trial_T20190909_161523_929674"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_clean_then_place_in_recep-Ladle-None-Drawer-4/trial_T20190909_161523_929674"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_two_obj_and_place-CreditCard-None-ArmChair-209/trial_T20190909_024857_897773"
         },
         {
@@ -85475,18 +85451,6 @@
         {
             "repeat_idx": 2,
             "task": "look_at_obj_in_light-Statue-None-FloorLamp-208/trial_T20190907_183239_515681"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_cool_then_place_in_recep-Apple-None-Microwave-19/trial_T20190906_210805_698141"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_cool_then_place_in_recep-Apple-None-Microwave-19/trial_T20190906_210805_698141"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_cool_then_place_in_recep-Apple-None-Microwave-19/trial_T20190906_210805_698141"
         },
         {
             "repeat_idx": 0,
