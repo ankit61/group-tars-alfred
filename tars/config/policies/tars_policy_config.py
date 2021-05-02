@@ -1,9 +1,8 @@
 import torch.optim as optim
-from tars.base.config import Config
-from tars.config.base.dataset_config import DatasetConfig
+from tars.config.base.model_config import ModelConfig
 
 
-class TarsPolicyConfig(Config):
+class TarsPolicyConfig(ModelConfig):
     use_mask = False
     batch_size = 32
 

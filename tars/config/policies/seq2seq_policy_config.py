@@ -1,7 +1,7 @@
 import os
-from tars.base.config import Config
+from tars.config.base.model_config import ModelConfig
 
 
-class Seq2SeqPolicyConfig(Config):
+class Seq2SeqPolicyConfig(ModelConfig):
     stop_literal = '<<stop>>' # different from AlfredEnvConfig.stop_action
     goal_literal = '<<goal>>'
