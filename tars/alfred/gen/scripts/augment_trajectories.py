@@ -2,6 +2,7 @@ import os
 import json
 import glob
 import os
+from tars.datasets.segmentation_dataset import SegmentationDataset
 from tars.alfred.gen import constants
 import cv2
 import shutil
@@ -26,8 +27,8 @@ HIGH_RES_IMAGES_FOLDER = "high_res_images"
 DEPTH_IMAGES_FOLDER = "depth_images"
 INSTANCE_MASKS_FOLDER = "instance_masks"
 
-IMAGE_WIDTH = 600
-IMAGE_HEIGHT = 600
+IMAGE_WIDTH = 320
+IMAGE_HEIGHT = 320
 
 render_settings = dict()
 render_settings['renderImage'] = True
@@ -67,7 +68,8 @@ def save_image(event, save_path):
     # masks
     mask_save_path = os.path.join(save_path, INSTANCE_MASKS_FOLDER)
     mask_image = event.instance_segmentation_frame
-        
+    mask_image = SegmentationDataset.clean_gt_color_data(mask_image, get_color_data(event))
+
     # dump images
     im_ind = get_image_index(rgb_save_path)
     cv2.imwrite(rgb_save_path + '/%09d.png' % im_ind, rgb_image)
@@ -87,6 +89,19 @@ def clear_and_create_dir(path):
     if os.path.exists(path):
         shutil.rmtree(path)
     os.mkdir(path)
+
+
+def get_color_data(event):
+    color_to_obj_id_type = {}
+    all_objects = event.metadata['objects']
+    for color, object_id in event.color_to_object_id.items():
+        for obj in all_objects:
+            if object_id == obj['objectId']:
+                color_to_obj_id_type[str(color)] = {
+                    'objectID': obj['objectId'],
+                    'objectType': obj['objectType']
+                }
+    return color_to_obj_id_type
 
 
 def augment_traj(env, json_file):
@@ -214,15 +229,7 @@ def augment_traj(env, json_file):
         save_image(env.last_event, root_dir)
 
     # store color to object type dictionary
-    color_to_obj_id_type = {}
-    all_objects = env.last_event.metadata['objects']
-    for color, object_id in env.last_event.color_to_object_id.items():
-        for obj in all_objects:
-            if object_id == obj['objectId']:
-                color_to_obj_id_type[str(color)] = {
-                    'objectID': obj['objectId'],
-                    'objectType': obj['objectType']
-                }
+    color_to_obj_id_type = get_color_data(env.last_event)
 
     augmented_traj_data = copy.deepcopy(traj_data)
     augmented_traj_data['scene']['color_to_object_type'] = color_to_obj_id_type
