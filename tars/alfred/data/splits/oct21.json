@@ -21054,18 +21054,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_cool_then_place_in_recep-LettuceSliced-None-SinkBasin-4/trial_T20190909_101847_813539"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_cool_then_place_in_recep-LettuceSliced-None-SinkBasin-4/trial_T20190909_101847_813539"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_cool_then_place_in_recep-LettuceSliced-None-SinkBasin-4/trial_T20190909_101847_813539"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_clean_then_place_in_recep-SoapBar-None-BathtubBasin-402/trial_T20190908_004423_301232"
         },
         {
@@ -21159,18 +21147,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_clean_then_place_in_recep-Fork-None-SideTable-21/trial_T20190909_041451_615253"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_two_obj_and_place-Candle-None-Shelf-422/trial_T20190906_192421_941599"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_two_obj_and_place-Candle-None-Shelf-422/trial_T20190906_192421_941599"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_two_obj_and_place-Candle-None-Shelf-422/trial_T20190906_192421_941599"
         },
         {
             "repeat_idx": 0,
@@ -22419,18 +22395,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_two_obj_and_place-CreditCard-None-Shelf-303/trial_T20190908_062004_513133"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_cool_then_place_in_recep-Pan-None-StoveBurner-23/trial_T20190906_215826_707811"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_cool_then_place_in_recep-Pan-None-StoveBurner-23/trial_T20190906_215826_707811"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_cool_then_place_in_recep-Pan-None-StoveBurner-23/trial_T20190906_215826_707811"
         },
         {
             "repeat_idx": 0,
@@ -26578,18 +26542,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_cool_then_place_in_recep-Tomato-None-GarbageCan-15/trial_T20190907_082803_736076"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_cool_then_place_in_recep-Tomato-None-GarbageCan-15/trial_T20190907_082803_736076"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_cool_then_place_in_recep-Tomato-None-GarbageCan-15/trial_T20190907_082803_736076"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_and_place_with_movable_recep-Fork-Cup-SinkBasin-6/trial_T20190908_085056_420282"
         },
         {
@@ -27583,18 +27535,6 @@
         {
             "repeat_idx": 2,
             "task": "look_at_obj_in_light-CellPhone-None-FloorLamp-203/trial_T20190908_062945_959823"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_cool_then_place_in_recep-Lettuce-None-SinkBasin-23/trial_T20190908_173530_026785"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_cool_then_place_in_recep-Lettuce-None-SinkBasin-23/trial_T20190908_173530_026785"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_cool_then_place_in_recep-Lettuce-None-SinkBasin-23/trial_T20190908_173530_026785"
         },
         {
             "repeat_idx": 0,
@@ -29310,18 +29250,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_cool_then_place_in_recep-PotatoSliced-None-CounterTop-19/trial_T20190909_053101_102010"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_cool_then_place_in_recep-PotatoSliced-None-CounterTop-19/trial_T20190909_053101_102010"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_cool_then_place_in_recep-PotatoSliced-None-CounterTop-19/trial_T20190909_053101_102010"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_two_obj_and_place-SoapBar-None-BathtubBasin-423/trial_T20190909_034155_743816"
         },
         {
@@ -30726,18 +30654,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_and_place_with_movable_recep-Spatula-Pan-DiningTable-28/trial_T20190907_222606_903630"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_with_movable_recep-Spatula-Pan-DiningTable-28/trial_T20190907_222606_903630"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_with_movable_recep-Spatula-Pan-DiningTable-28/trial_T20190907_222606_903630"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_clean_then_place_in_recep-LettuceSliced-None-Fridge-11/trial_T20190918_174139_904388"
         },
         {
@@ -32131,18 +32047,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_and_place_simple-Cloth-None-CounterTop-414/trial_T20190909_065011_738215"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_two_obj_and_place-SoapBar-None-BathtubBasin-422/trial_T20190909_133405_341380"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_two_obj_and_place-SoapBar-None-BathtubBasin-422/trial_T20190909_133405_341380"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_two_obj_and_place-SoapBar-None-BathtubBasin-422/trial_T20190909_133405_341380"
         },
         {
             "repeat_idx": 0,
@@ -35587,26 +35491,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_clean_then_place_in_recep-Kettle-None-CounterTop-15/trial_T20190908_085843_938560"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_heat_then_place_in_recep-PotatoSliced-None-SinkBasin-23/trial_T20190907_123248_978930"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_heat_then_place_in_recep-PotatoSliced-None-SinkBasin-23/trial_T20190907_123248_978930"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_heat_then_place_in_recep-PotatoSliced-None-SinkBasin-23/trial_T20190907_123248_978930"
-        },
-        {
-            "repeat_idx": 3,
-            "task": "pick_heat_then_place_in_recep-PotatoSliced-None-SinkBasin-23/trial_T20190907_123248_978930"
-        },
-        {
-            "repeat_idx": 4,
-            "task": "pick_heat_then_place_in_recep-PotatoSliced-None-SinkBasin-23/trial_T20190907_123248_978930"
         },
         {
             "repeat_idx": 0,
@@ -39727,18 +39611,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_clean_then_place_in_recep-SoapBar-None-BathtubBasin-422/trial_T20190907_003505_832853"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "look_at_obj_in_light-Pen-None-DeskLamp-316/trial_T20190908_061814_700195"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "look_at_obj_in_light-Pen-None-DeskLamp-316/trial_T20190908_061814_700195"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "look_at_obj_in_light-Pen-None-DeskLamp-316/trial_T20190908_061814_700195"
         },
         {
             "repeat_idx": 0,
@@ -48482,18 +48354,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_and_place_simple-ToiletPaper-None-ToiletPaperHanger-407/trial_T20190909_081822_309167"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_simple-ToiletPaper-None-ToiletPaperHanger-407/trial_T20190909_081822_309167"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_simple-ToiletPaper-None-ToiletPaperHanger-407/trial_T20190909_081822_309167"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_heat_then_place_in_recep-BreadSliced-None-DiningTable-7/trial_T20190906_200758_556616"
         },
         {
@@ -50791,18 +50651,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_clean_then_place_in_recep-AppleSliced-None-Microwave-6/trial_T20190908_100324_955906"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_clean_then_place_in_recep-Potato-None-DiningTable-4/trial_T20190909_113933_070196"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_clean_then_place_in_recep-Potato-None-DiningTable-4/trial_T20190909_113933_070196"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_clean_then_place_in_recep-Potato-None-DiningTable-4/trial_T20190909_113933_070196"
         },
         {
             "repeat_idx": 0,
@@ -63558,18 +63406,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_and_place_simple-SprayBottle-None-Toilet-422/trial_T20190909_124852_071149"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_simple-SprayBottle-None-Toilet-422/trial_T20190909_124852_071149"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_simple-SprayBottle-None-Toilet-422/trial_T20190909_124852_071149"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_heat_then_place_in_recep-TomatoSliced-None-GarbageCan-11/trial_T20190913_035937_718444"
         },
         {
@@ -64615,18 +64451,6 @@
         {
             "repeat_idx": 2,
             "task": "look_at_obj_in_light-TissueBox-None-FloorLamp-212/trial_T20190907_043405_860560"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_and_place_with_movable_recep-LettuceSliced-Pan-DiningTable-28/trial_T20190906_232604_097173"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_with_movable_recep-LettuceSliced-Pan-DiningTable-28/trial_T20190906_232604_097173"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_with_movable_recep-LettuceSliced-Pan-DiningTable-28/trial_T20190906_232604_097173"
         },
         {
             "repeat_idx": 0,
@@ -66694,18 +66518,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_cool_then_place_in_recep-PotatoSliced-None-GarbageCan-11/trial_T20190909_013637_168506"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_cool_then_place_in_recep-PotatoSliced-None-GarbageCan-11/trial_T20190909_013637_168506"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_cool_then_place_in_recep-PotatoSliced-None-GarbageCan-11/trial_T20190909_013637_168506"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_and_place_with_movable_recep-Knife-Mug-DiningTable-27/trial_T20190907_175400_807268"
         },
         {
@@ -67819,18 +67631,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_cool_then_place_in_recep-LettuceSliced-None-GarbageCan-6/trial_T20190907_210244_406018"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_heat_then_place_in_recep-Egg-None-Fridge-13/trial_T20190907_151643_465634"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_heat_then_place_in_recep-Egg-None-Fridge-13/trial_T20190907_151643_465634"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_heat_then_place_in_recep-Egg-None-Fridge-13/trial_T20190907_151643_465634"
         },
         {
             "repeat_idx": 0,
@@ -76354,18 +76154,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_and_place_with_movable_recep-LettuceSliced-Pot-DiningTable-21/trial_T20190907_160923_689765"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_with_movable_recep-LettuceSliced-Pot-DiningTable-21/trial_T20190907_160923_689765"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_with_movable_recep-LettuceSliced-Pot-DiningTable-21/trial_T20190907_160923_689765"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_two_obj_and_place-Book-None-Desk-302/trial_T20190906_181314_259738"
         },
         {
@@ -83986,18 +83774,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_cool_then_place_in_recep-Plate-None-Shelf-20/trial_T20190907_034714_802572"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_cool_then_place_in_recep-Plate-None-Shelf-20/trial_T20190907_034714_802572"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_cool_then_place_in_recep-Plate-None-Shelf-20/trial_T20190907_034714_802572"
-        },
-        {
-            "repeat_idx": 0,
             "task": "look_at_obj_in_light-Pillow-None-FloorLamp-221/trial_T20190907_103032_102765"
         },
         {
@@ -89942,26 +89718,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_and_place_with_movable_recep-Ladle-Bowl-SinkBasin-30/trial_T20190907_143416_683614"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_with_movable_recep-Ladle-Bowl-SinkBasin-30/trial_T20190907_143416_683614"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_with_movable_recep-Ladle-Bowl-SinkBasin-30/trial_T20190907_143416_683614"
-        },
-        {
-            "repeat_idx": 3,
-            "task": "pick_and_place_with_movable_recep-Ladle-Bowl-SinkBasin-30/trial_T20190907_143416_683614"
-        },
-        {
-            "repeat_idx": 4,
-            "task": "pick_and_place_with_movable_recep-Ladle-Bowl-SinkBasin-30/trial_T20190907_143416_683614"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_and_place_with_movable_recep-ButterKnife-Cup-SinkBasin-13/trial_T20190919_023458_696756"
         },
         {
@@ -94058,18 +93814,6 @@
         },
         {
             "repeat_idx": 0,
-            "task": "pick_and_place_with_movable_recep-Spoon-Bowl-SinkBasin-27/trial_T20190907_213616_713879"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_with_movable_recep-Spoon-Bowl-SinkBasin-27/trial_T20190907_213616_713879"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_with_movable_recep-Spoon-Bowl-SinkBasin-27/trial_T20190907_213616_713879"
-        },
-        {
-            "repeat_idx": 0,
             "task": "pick_two_obj_and_place-SoapBar-None-SinkBasin-420/trial_T20190908_182159_811957"
         },
         {
@@ -94139,18 +93883,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_two_obj_and_place-Cup-None-Cabinet-2/trial_T20190908_031003_719573"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_heat_then_place_in_recep-PotatoSliced-None-SinkBasin-14/trial_T20190910_120350_730711"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_heat_then_place_in_recep-PotatoSliced-None-SinkBasin-14/trial_T20190910_120350_730711"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_heat_then_place_in_recep-PotatoSliced-None-SinkBasin-14/trial_T20190910_120350_730711"
         },
         {
             "repeat_idx": 0,
@@ -94867,18 +94599,6 @@
         {
             "repeat_idx": 2,
             "task": "pick_clean_then_place_in_recep-Kettle-None-StoveBurner-30/trial_T20190906_200422_424090"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_and_place_with_movable_recep-Pen-Bowl-Dresser-311/trial_T20190908_170820_174380"
-        },
-        {
-            "repeat_idx": 1,
-            "task": "pick_and_place_with_movable_recep-Pen-Bowl-Dresser-311/trial_T20190908_170820_174380"
-        },
-        {
-            "repeat_idx": 2,
-            "task": "pick_and_place_with_movable_recep-Pen-Bowl-Dresser-311/trial_T20190908_170820_174380"
         },
         {
             "repeat_idx": 0,
