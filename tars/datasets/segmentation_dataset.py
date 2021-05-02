@@ -16,7 +16,7 @@ class SegmentationDataset(Dataset):
         img_lens = [len(os.listdir(os.path.join(t, self.conf.instance_mask_dir))) for t in self.unique_tasks]
         self.cum_img_lens = np.cumsum(img_lens)
 
-    @functools.lru_cache()
+    # @functools.lru_cache() # unbounded caching is too much
     def __getitem__(self, idx):
         task_idx = bisect.bisect(self.cum_img_lens, idx)
         im_idx = idx - self.cum_img_lens[task_idx - 1] if task_idx > 0 else idx
