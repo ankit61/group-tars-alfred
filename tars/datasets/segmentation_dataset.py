@@ -26,6 +26,10 @@ class SegmentationDataset(Dataset):
         rgb_im = self.img_transforms(self.get_img(task_dir, self.conf.high_res_img_dir, im_idx))
         gt_im = self.get_img(task_dir, self.conf.instance_mask_dir, im_idx) # already cleaned in augment trajectories
 
+        gt_im = torch.tensor(np.array(gt_im), dtype=int)
+
+        assert rgb_im.shape[-2:] == gt_im.shape
+
         # im_size = tuple(rgb_im.shape[2:])
         # gt_im = self.clean_raw_gt(gt_im, task_dir, im_size)
 
@@ -34,14 +38,14 @@ class SegmentationDataset(Dataset):
     def __len__(self):
         return self.cum_img_lens[-1]
 
-    def clean_raw_gt(self, gt_im, task_dir, img_size):
-        with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
-            color_data = json.load(f)['scene']['color_to_object_type']
+    #def clean_raw_gt(self, gt_im, task_dir, im_size):
+    #    with open(os.path.join(task_dir, self.conf.aug_traj_file), 'r') as f:
+    #        color_data = json.load(f)['scene']['color_to_object_type']
 
-        clean_gt = SegmentationDataset.clean_gt_color_data(gt_im, color_data)
-        pil_img = transforms.Resize(img_size)(Image.fromarray(clean_gt))
+    #    clean_gt = SegmentationDataset.clean_gt_color_data(gt_im, color_data)
+    #    pil_img = transforms.Resize(img_size)(Image.fromarray(clean_gt))
 
-        return torch.tensor(np.array(pil_img), dtype=int)
+    #    return torch.tensor(np.array(pil_img), dtype=int)
 
     @classmethod
     def clean_gt_color_data(cls, gt_im, color_data):
