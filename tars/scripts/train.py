@@ -11,12 +11,11 @@ from torch.cuda import is_available
 from tars.auxilary_models import *
 from tars.policies import *
 from tars.config.main_config import MainConfig
-import os
-import datetime
 
 def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument('--model', type=str, required=True, help='the class name of the model to train - can be auxilary model or a policy')
+    parser.add_argument('--resume', type=str, default=None)
 
     args, _ = parser.parse_known_args()
     return args
@@ -46,16 +45,6 @@ def main():
     init_args = get_init_args(model_class)
     model = model_class(**init_args)
 
-    # create directory where checkpoints will be saved
-    checkpoint_dirpath = os.path.dirname(os.path.realpath(__file__)) + "/"+datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    if not os.path.exists(checkpoint_dirpath):
-        os.makedirs(checkpoint_dirpath)
-    checkpoint_callback = ModelCheckpoint(dirpath=checkpoint_dirpath,
-                                          filename='sample-mnist-{epoch:02d}-{val_loss:.2f}',
-                                          monitor="val_loss",
-                                          period=1,
-                                          save_last=True)
-
     # Define logger
     logger = WandbLogger(
                 project=MainConfig.wandb_project,
@@ -77,8 +66,8 @@ def main():
     trainer = Trainer(
                 logger=logger, gpus=1 if torch.cuda.is_available() else 0,
                 check_val_every_n_epoch=MainConfig.validation_freq,
-                auto_lr_find=True, track_grad_norm=2, accumulate_grad_batches = accumulate_grad_batches,
-                callbacks=[checkpoint_callback]
+                auto_lr_find=True, resume_from_checkpoint=args.resume,
+                track_grad_norm=2, accumulate_grad_batches = accumulate_grad_batches,
             )
 
     trainer.fit(model)
