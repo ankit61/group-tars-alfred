@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import pdb
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from tars.base.model import Model
 from tars.auxilary_models.readout_transformer import ReadoutTransformer
 from tars.datasets.history_dataset import HistoryType, HistoryDataset
@@ -11,12 +11,11 @@ from typing import Union
 
 
 class EmbedAndReadout(Model):
-    def __init__(self, dict_size, embed_dim, out_dim, padding_idx, history_max_len, conf, use_pe=True, pretrain_type: Union[str, HistoryType] = None):
+    def __init__(self, dict_size, embed_dim, out_dim, padding_idx, history_max_len, policy_conf, use_pe=True, pretrain_type: Union[str, HistoryType] = None, model_load_path=None):
         super(EmbedAndReadout, self).__init__()
 
         self.history_max_len = history_max_len
         self.pretrain_type = pretrain_type if isinstance(type, HistoryType) else HistoryType(pretrain_type)
-        self.conf = conf
 
         self.embed = nn.Embedding(
             dict_size + 1, # +1 for SOS token for pretraining
@@ -27,8 +26,8 @@ class EmbedAndReadout(Model):
         self.readout_transformer = ReadoutTransformer(
             in_features=embed_dim,
             out_features=out_dim,
-            nhead=conf.transformer_num_heads,
-            num_layers=conf.transformer_num_layers,
+            nhead=policy_conf.transformer_num_heads,
+            num_layers=policy_conf.transformer_num_layers,
             max_len=history_max_len,
             use_pe=use_pe
         )
@@ -36,6 +35,9 @@ class EmbedAndReadout(Model):
         if self.pretrain_type:
             self.decoder = PretrainingDecoder(self.embed, out_dim)
             self.sos_token = dict_size
+
+        if model_load_path:
+            self.load_state_dict(torch.load(model_load_path))
     
 
     def forward(self, items):
@@ -59,6 +61,10 @@ class EmbedAndReadout(Model):
 
 
     def shared_step(self, batch):
+        '''
+            Args:
+                batch: tensor of shape [N, E] where N = batch size and E = longest item sequence in batch
+        '''
         loss_fct = nn.CrossEntropyLoss()
         item_history = None
         mini_steps = 0
@@ -67,7 +73,7 @@ class EmbedAndReadout(Model):
             item_history = self.update_item_history(item_history, mini_batch)
             decoder_hidden = self.forward(item_history)
             decoder_cell = torch.zeros_like(decoder_hidden)
-            decoder_input = torch.tensor([self.sos_token]).repeat(batch_size)
+            decoder_input = torch.tensor([self.sos_token]).repeat(batch_size).to(self.decoder.device)
             
             seq_len = item_history.shape[1]
             mini_batch_loss = 0
@@ -87,33 +93,30 @@ class EmbedAndReadout(Model):
 
 
     def training_step(self, train_batch, batch_idx):
-        '''
-            Args:
-                train_batch: tensor of shape [N, E] where N = batch size and E = longest item sequence in batch
-        '''
         loss = self.shared_step(train_batch)
-        self.log_dict({'train_loss': loss})
+        self.log('train_loss', loss)
         return loss
 
 
     def validation_step(self, val_batch, batch_idx, dataloader_idx):
         loss = self.shared_step(val_batch)
         if dataloader_idx == 0:
-            loss_key = 'val_seen_loss'
+            loss_key = 'valid_seen_loss'
         else:
-            loss_key = 'val_unseen_loss'
+            loss_key = 'valid_unseen_loss'
 
-        self.log_dict({loss_key: loss})
+        self.log(loss_key, loss)
 
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        optimizer = self.conf.get_optim(self.parameters())
         return optimizer
 
     
     def configure_callbacks(self):
         return [
-            ModelCheckpoint(monitor='val_seen_loss')
+            EarlyStopping(monitor='valid_seen_loss', patience=self.conf.patience),
+            ModelCheckpoint(monitor='valid_seen_loss')
         ]
 
 
@@ -121,9 +124,9 @@ class EmbedAndReadout(Model):
         dataset = HistoryDataset(type, self.pretrain_type)
         return DataLoader(
             dataset,
-            batch_size=4,
+            batch_size=self.conf.batch_size,
             collate_fn=dataset.collate,
-            num_workers=1
+            num_workers=self.conf.num_workers
         )
 
 
@@ -139,7 +142,7 @@ class EmbedAndReadout(Model):
 
         
 
-class PretrainingDecoder(nn.Module):
+class PretrainingDecoder(Model):
     def __init__(self, embed, hidden_dim):
         super(PretrainingDecoder, self).__init__()
         self.embed = embed

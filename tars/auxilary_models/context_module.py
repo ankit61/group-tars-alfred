@@ -2,35 +2,38 @@ import torch
 import torch.nn as nn
 from tars.base.model import Model
 from tars.auxilary_models.embed_and_readout import EmbedAndReadout
+from tars.datasets.history_dataset import HistoryType
 
 
 class ContextModule(Model):
-    def __init__(self, num_actions, num_objects, object_na_idx, conf):
+    def __init__(self, num_actions, num_objects, object_na_idx, policy_conf, pretrain=False):
         super(ContextModule, self).__init__()
 
         self.padding_action_idx = num_actions
 
         self.action_embed_and_readout = EmbedAndReadout(
             dict_size=num_actions + 1, # +1 for padding
-            embed_dim=conf.action_emb_dim,
-            out_dim=conf.action_hist_emb_dim,
+            embed_dim=policy_conf.action_emb_dim,
+            out_dim=policy_conf.action_hist_emb_dim,
             padding_idx=self.padding_action_idx,
-            max_len=conf.past_actions_len,
-            conf=conf
+            history_max_len=policy_conf.past_actions_len,
+            policy_conf=policy_conf,
+            pretrain_type=(HistoryType.ACTION if pretrain else None)
         )
 
         self.int_object_embed_and_readout = EmbedAndReadout(
             dict_size=num_objects, # object_na already included in num_objects
-            embed_dim=conf.object_emb_dim,
-            out_dim=conf.int_hist_emb_dim,
+            embed_dim=policy_conf.object_emb_dim,
+            out_dim=policy_conf.int_hist_emb_dim,
             padding_idx=object_na_idx,
-            max_len=conf.past_objects_len,
-            conf=conf
+            history_max_len=policy_conf.past_objects_len,
+            policy_conf=policy_conf,
+            pretrain_type=(HistoryType.OBJECT if pretrain else None)
         )
 
         self.context_mixer = nn.Linear(
-            conf.action_hist_emb_dim + conf.int_hist_emb_dim + conf.inst_hidden_size + conf.goal_hidden_size,
-            conf.context_size
+            policy_conf.action_hist_emb_dim + policy_conf.int_hist_emb_dim + policy_conf.inst_hidden_size + policy_conf.goal_hidden_size,
+            policy_conf.context_size
         )
 
 
