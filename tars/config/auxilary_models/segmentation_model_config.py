@@ -3,7 +3,7 @@ from tars.config.base.model_config import ModelConfig
 
 
 class SegmentationModelConfig(ModelConfig):
-    batch_size = 16
+    batch_size = 24
 
     def get_optim(self, parameters):
-        return optim.Adam(parameters, lr=1e-3)
+        return optim.SGD(parameters, lr=1e-3, momentum=0.9)
