@@ -100,12 +100,7 @@ class EmbedAndReadout(Model):
 
     def validation_step(self, val_batch, batch_idx, dataloader_idx):
         loss = self.shared_step(val_batch)
-        if dataloader_idx == 0:
-            loss_key = 'valid_seen_loss'
-        else:
-            loss_key = 'valid_unseen_loss'
-
-        self.log(loss_key, loss)
+        self.log('valid_loss', loss)
 
 
     def configure_optimizers(self):
@@ -115,8 +110,8 @@ class EmbedAndReadout(Model):
     
     def configure_callbacks(self):
         return [
-            EarlyStopping(monitor='valid_seen_loss', patience=self.conf.patience),
-            ModelCheckpoint(monitor='valid_seen_loss')
+            EarlyStopping(monitor='valid_loss/dataloader_idx_0', patience=self.conf.patience),
+            ModelCheckpoint(monitor='valid_loss/dataloader_idx_0')
         ]
 
 
