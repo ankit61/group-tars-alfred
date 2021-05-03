@@ -6,11 +6,13 @@ import torch
 from pytorch_lightning.trainer import Trainer
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+from pytorch_lightning.callbacks import ModelCheckpoint
 from torch.cuda import is_available
 from tars.auxilary_models import *
 from tars.policies import *
 from tars.config.main_config import MainConfig
-
+import os
+import datetime
 
 def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
@@ -44,16 +46,39 @@ def main():
     init_args = get_init_args(model_class)
     model = model_class(**init_args)
 
-    # add name
+    # create directory where checkpoints will be saved
+    checkpoint_dirpath = os.path.dirname(os.path.realpath(__file__)) + "/"+datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    if not os.path.exists(checkpoint_dirpath):
+        os.makedirs(checkpoint_dirpath)
+    checkpoint_callback = ModelCheckpoint(dirpath=checkpoint_dirpath,
+                                          filename='sample-mnist-{epoch:02d}-{val_loss:.2f}',
+                                          monitor="val_loss",
+                                          period=1,
+                                          save_last=True)
+
+    # Define logger
     logger = WandbLogger(
                 project=MainConfig.wandb_project,
                 entity=MainConfig.wandb_entity
             )
 
+    hyper_params = model.conf.get()
+    hyper_params["seg_model"] = model.model._get_name()
+    logger.log_hyperparams(hyper_params)
+
+    logger.log_metrics({"iou": model.iou_metric})
+
+    # check for gradient augmentation property
+    if hasattr(model.conf, "accumulate_grad_batches"):
+        accumulate_grad_batches = model.conf.accumulate_grad_batches
+    else:
+        accumulate_grad_batches = 1
+
     trainer = Trainer(
                 logger=logger, gpus=1 if torch.cuda.is_available() else 0,
                 check_val_every_n_epoch=MainConfig.validation_freq,
-                auto_lr_find=True
+                auto_lr_find=True, track_grad_norm=2, accumulate_grad_batches = accumulate_grad_batches,
+                callbacks=[checkpoint_callback]
             )
 
     trainer.fit(model)
