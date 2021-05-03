@@ -28,7 +28,7 @@ class SegmentationDataset(Dataset):
 
         gt_im = torch.tensor(np.array(gt_im), dtype=int)
 
-        assert rgb_im.shape[-2:] == gt_im.shape
+        assert rgb_im.shape[-2:] == gt_im.shape, f'{rgb_img.shape} does not match {gt_im.shape}'
 
         # im_size = tuple(rgb_im.shape[2:])
         # gt_im = self.clean_raw_gt(gt_im, task_dir, im_size)
