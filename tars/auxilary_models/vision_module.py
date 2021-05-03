@@ -4,11 +4,11 @@ from torchvision.models import resnet18
 from tars.base.model import Model
 from tars.auxilary_models.mask_rcnn import MaskRCNN
 from tars.auxilary_models import SegmentationModel
-from tars.auxilary_models.readout_transformer import ReadoutTransformer
+from tars.auxilary_models.embed_and_readout import EmbedAndReadout
 
 
 class VisionModule(Model):
-    def __init__(self, obj_dim, object_na_idx, conf):
+    def __init__(self, num_objects, object_na_idx, conf):
         super(VisionModule, self).__init__()
         self.max_img_objects = conf.max_img_objects
         self.raw_vision_features_size = conf.raw_vision_features_size
@@ -18,16 +18,15 @@ class VisionModule(Model):
         assert self.vision_cnn.fc.in_features == self.raw_vision_features_size
         self.vision_cnn.fc = nn.Sequential()
 
-        self.objects_transformer = ReadoutTransformer(
-                                    in_features=conf.object_emb_dim,
-                                    out_features=conf.vision_object_emb_dim,
-                                    nhead=conf.transformer_num_heads,
-                                    num_layers=conf.transformer_num_layers,
-                                    max_len=conf.max_img_objects,
-                                    use_pe=False
-                                )
-
-        self.object_embedding = obj_dim
+        self.object_embed_and_readout = EmbedAndReadout(
+            dict_size=num_objects,
+            embed_dim=conf.object_emb_dim,
+            out_dim=conf.vision_object_emb_dim,
+            padding_idx=object_na_idx,
+            max_len=conf.max_img_objects,
+            conf=conf,
+            use_pe=False
+        )
 
         self.use_instance_seg = conf.use_instance_seg
         if self.use_instance_seg:
@@ -71,8 +70,7 @@ class VisionModule(Model):
 
                 objects = torch.stack(objects)
 
-        objects = self.object_embedding(objects.int()).permute(1, 0, 2)
-        objects_readout = self.objects_transformer(objects)
+        objects_readout = self.object_embed_and_readout.forward(objects.int())
 
         out = self.vision_mixer(
                 torch.cat((objects_readout, raw_vision_features), dim=1)

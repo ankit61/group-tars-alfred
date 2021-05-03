@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from tars.base.model import Model
-from tars.auxilary_models.readout_transformer import ReadoutTransformer
 from tars.auxilary_models.embed_and_readout import EmbedAndReadout
 
 
@@ -12,7 +11,7 @@ class ContextModule(Model):
         self.padding_action_idx = num_actions
 
         self.action_embed_and_readout = EmbedAndReadout(
-            dict_size=num_actions + 1,
+            dict_size=num_actions + 1, # +1 for padding
             embed_dim=conf.action_emb_dim,
             out_dim=conf.action_hist_emb_dim,
             padding_idx=self.padding_action_idx,
@@ -20,8 +19,8 @@ class ContextModule(Model):
             conf=conf
         )
 
-        self.object_embed_and_readout = EmbedAndReadout(
-            dict_size=num_objects,
+        self.int_object_embed_and_readout = EmbedAndReadout(
+            dict_size=num_objects, # object_na already included in num_objects
             embed_dim=conf.object_emb_dim,
             out_dim=conf.int_hist_emb_dim,
             padding_idx=object_na_idx,
@@ -37,9 +36,9 @@ class ContextModule(Model):
 
     def forward(self, past_actions, past_objects, inst_lstm_cell, goal_lstm_cell):
         action_readout = self.action_embed_and_readout.forward(past_actions)
-        objects_readout = self.object_embed_and_readout.forward(past_objects)
+        int_objects_readout = self.int_object_embed_and_readout.forward(past_objects)
 
-        explicit_context = torch.cat((action_readout, objects_readout), dim=1)
+        explicit_context = torch.cat((action_readout, int_objects_readout), dim=1)
         implicit_context = torch.cat((inst_lstm_cell, goal_lstm_cell), dim=1)
 
         concated = torch.cat((explicit_context, implicit_context), 1)

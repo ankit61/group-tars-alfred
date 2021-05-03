@@ -47,12 +47,13 @@ class Dataset(Configurable, data.Dataset):
             assert l > 0
             return l
 
-    def get_all_expert_actions(self, task_dir):
+    def get_all_expert_actions(self, task_dir, int_obj_only=False):
         actions, objects = [], []
         for i in range(self.get_task_len(task_dir)):
             ac, obj = self.get_expert_action(task_dir, i)
             actions.append(ac)
-            objects.append(obj)
+            if (obj != self.conf.object_na_idx) or not int_obj_only:
+                objects.append(obj)
         return actions, objects
 
     def get_all_imgs(self, task_dir, img_dir):
