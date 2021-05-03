@@ -15,6 +15,7 @@ from tars.config.main_config import MainConfig
 def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument('--model', type=str, required=True, help='the class name of the model to train - can be auxilary model or a policy')
+    parser.add_argument('--resume', type=str, default=None)
 
     args, _ = parser.parse_known_args()
     return args
@@ -53,7 +54,7 @@ def main():
     trainer = Trainer(
                 logger=logger, gpus=1 if torch.cuda.is_available() else 0,
                 check_val_every_n_epoch=MainConfig.validation_freq,
-                auto_lr_find=True
+                auto_lr_find=True, resume_from_checkpoint=args.resume
             )
 
     trainer.fit(model)
