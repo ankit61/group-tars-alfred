@@ -21,7 +21,7 @@ class MainConfig(Config):
     wandb_project = 'group-tars-alfred'
 
     # general training
-    validation_freq = 10
+    validation_freq = 1
 
     # basic dirs
     alfred_dir = os.path.join(Path(__file__).parents[1], 'alfred/')

@@ -14,7 +14,7 @@ class ImitationDataset(Dataset):
         self.text_transforms = text_transforms
         self.text_collate = text_collate
 
-    @functools.lru_cache()
+    # @functools.lru_cache() # need a diff cache
     def __getitem__(self, task_idx):
         task_dir, lang_idx = self.get_task(task_idx)
 
