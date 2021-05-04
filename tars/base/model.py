@@ -19,15 +19,9 @@ class Model(Configurable, LightningModule):
 
     def configure_callbacks(self):
         # create directory where checkpoints will be saved
-        checkpoint_dirpath = os.path.dirname(os.path.realpath(__file__)) + "/" + datetime.datetime.now().strftime(
-            "%d/%m/%Y %H:%M:%S")
-        if not os.path.exists(checkpoint_dirpath):
-            os.makedirs(checkpoint_dirpath)
-
         return [
             EarlyStopping(monitor='val_loss/dataloader_idx_0', patience=self.conf.patience),
-            ModelCheckpoint(dirpath=checkpoint_dirpath,
-                            monitor="val_loss/dataloader_idx_0",
+            ModelCheckpoint(monitor="val_loss/dataloader_idx_0",
                             period=1,
                             save_top_k=-1) # saves every model
         ]
