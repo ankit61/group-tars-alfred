@@ -1,5 +1,5 @@
-from torch.utils.data.dataset import T
 import torch
+from tars.base.dataset import Dataset
 from tars.datasets.segmentation_dataset import SegmentationDataset
 
 
