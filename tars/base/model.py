@@ -29,9 +29,6 @@ class Model(Configurable, LightningModule):
         return self.conf.main.default_trainer_args
 
     # data stuff
-    def setup(self, stage):
-        raise NotImplementedError
-
     def train_dataloader(self):
         return self.shared_dataloader(DatasetType.TRAIN)
 
