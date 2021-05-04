@@ -27,10 +27,9 @@ class Model(Configurable, LightningModule):
         return [
             EarlyStopping(monitor='val_loss/dataloader_idx_0', patience=self.conf.patience),
             ModelCheckpoint(dirpath=checkpoint_dirpath,
-                            filename='sample-mnist-{epoch:02d}-{val_loss:.2f}',
-                            monitor="val_loss",
+                            monitor="val_loss/dataloader_idx_0",
                             period=1,
-                            save_last=True)
+                            save_top_k=-1) # saves every model
         ]
 
     def get_trainer_kwargs(self):
