@@ -11,9 +11,8 @@ class MultiLabelDataset(Dataset):
 
     def __getitem__(self, idx):
         img, gt = self.seg_dataset[idx]
-        labels = torch.zeros(gt.shape[0], self.num_classes, dtype=int)
-        for i in range(gt.shape[0]):
-            labels[i][gt[i].unique()] = 1
+        labels = torch.zeros(self.num_classes, dtype=int)
+        labels[gt.unique()] = 1
 
         return img, labels
 
