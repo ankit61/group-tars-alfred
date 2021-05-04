@@ -3,6 +3,7 @@ from numpy.core.fromnumeric import sort
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
+from tars.base.dataset import DatasetType
 from tars.datasets.imitation_dataset import ImitationDataset
 from tars.auxilary_models import VisionModule
 from tars.auxilary_models import ContextModule
@@ -142,7 +143,7 @@ class TarsPolicy(Policy):
     # data stuff
 
     def setup(self, stage):
-        for type in ['train', 'valid_seen', 'valid_unseen']:
+        for type in [DatasetType.TRAIN, DatasetType.VALID_SEEN, DatasetType.VALID_UNSEEN]:
             self.datasets[type] = ImitationDataset(
                                     type=type,
                                     img_transforms=self.get_img_transforms(),
@@ -155,15 +156,6 @@ class TarsPolicy(Policy):
 
     def text_transform(self, sents, is_goal):
         return self.action_module.context_emb_model.text_transforms(sents, is_goal)
-
-    def train_dataloader(self):
-        return self.shared_dataloader('train')
-
-    def val_dataloader(self):
-        return [
-            self.shared_dataloader('valid_seen'),
-            self.shared_dataloader('valid_unseen')
-        ]
 
     def shared_dataloader(self, type):
         return DataLoader(

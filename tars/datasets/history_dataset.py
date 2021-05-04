@@ -11,8 +11,8 @@ from enum import Enum
 class HistoryType(Enum):
     ACTION = 'action'
     OBJECT = 'object'
-    
-    
+
+
 class HistoryDataset(Dataset):
     def __init__(self, type: Union[str, DatasetType], history_type: Union[str, HistoryType], splits_file=None):
         super().__init__(type, splits_file=splits_file)
@@ -35,7 +35,7 @@ class HistoryDataset(Dataset):
         # sort by descending length
         sorted_idxs = np.argsort([-seq.shape[0] for seq in batch])
         return rnn_utils.pack_sequence(list(map(batch.__getitem__, sorted_idxs)))
-        
+
     @staticmethod
     def mini_batches(collated_batch):
         '''

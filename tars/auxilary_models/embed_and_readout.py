@@ -38,7 +38,7 @@ class EmbedAndReadout(Model):
 
         if model_load_path:
             self.load_state_dict(torch.load(model_load_path))
-    
+
 
     def forward(self, items):
         items_embed = self.embed(items).permute(1, 0, 2)
@@ -107,7 +107,7 @@ class EmbedAndReadout(Model):
         optimizer = self.conf.get_optim(self.parameters())
         return optimizer
 
-    
+
     def configure_callbacks(self):
         return [
             EarlyStopping(monitor='valid_loss/dataloader_idx_0', patience=self.conf.patience),
@@ -124,18 +124,6 @@ class EmbedAndReadout(Model):
             num_workers=self.conf.num_workers
         )
 
-
-    def train_dataloader(self):
-        return self.shared_dataloader('train')
-
-
-    def val_dataloader(self):
-        return [
-            self.shared_dataloader('valid_seen'),
-            self.shared_dataloader('valid_unseen')
-        ]
-
-        
 
 class PretrainingDecoder(Model):
     def __init__(self, embed, hidden_dim):

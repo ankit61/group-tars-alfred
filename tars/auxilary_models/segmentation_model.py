@@ -65,15 +65,6 @@ class SegmentationModel(Model):
         for t in [DatasetType.TRAIN, DatasetType.VALID_SEEN, DatasetType.VALID_UNSEEN]:
             self.datasets[t] = self.get_dataset(t)
 
-    def train_dataloader(self):
-        return self.shared_dataloader(DatasetType.TRAIN)
-
-    def val_dataloader(self):
-        return [
-            self.shared_dataloader(DatasetType.VALID_SEEN),
-            self.shared_dataloader(DatasetType.VALID_UNSEEN),
-        ]
-
     def shared_dataloader(self, type):
         return DataLoader(
             self.datasets[type], batch_size=self.conf.batch_size, pin_memory=True,

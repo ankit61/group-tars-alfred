@@ -1,9 +1,8 @@
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 from tars.base.configurable import Configurable
-from tars.base.config import Config
 from pytorch_lightning.core.lightning import LightningModule
-from pytorch_lightning.callbacks import EarlyStopping
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
+from tars.base.dataset import DatasetType
 from tars.base.configurable import Configurable
 import os
 import datetime
@@ -28,3 +27,19 @@ class Model(Configurable, LightningModule):
 
     def get_trainer_kwargs(self):
         return self.conf.main.default_trainer_args
+
+    # data stuff
+    def setup(self, stage):
+        raise NotImplementedError
+
+    def train_dataloader(self):
+        return self.shared_dataloader(DatasetType.TRAIN)
+
+    def val_dataloader(self):
+        return [
+            self.shared_dataloader(DatasetType.VALID_SEEN),
+            self.shared_dataloader(DatasetType.VALID_UNSEEN),
+        ]
+
+    def shared_dataloader(self, type: DatasetType):
+        raise NotImplementedError
