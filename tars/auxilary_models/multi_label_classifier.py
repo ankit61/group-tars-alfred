@@ -1,7 +1,9 @@
 import torch.nn as nn
 from torchvision import models, transforms
+from torch.utils.data import DataLoader
 from tars.base.model import Model
 from tars.config.base.dataset_config import DatasetConfig
+from tars.datasets.multi_label_dataset import MultiLabelDataset
 
 
 class MultiLabelClassifier(Model):
@@ -16,22 +18,27 @@ class MultiLabelClassifier(Model):
 
     def training_step(self, batch, batch_idx):
         pred = self(batch[0])
-        return {
-            'loss': self.loss(pred, batch[1]),
-            'acc': 0, # compute acc here - probably cant use default acc fuctions because this is multi-class classification
-        }
+        loss = self.loss(pred, batch[1])
+        self.log_dict({
+            'loss': loss.item(),
+            'train_acc': (pred.sigmoid().round() == batch[1]).sum() / pred.shape[0]
+        })
+        return loss
 
     def validation_step(self, batch, batch_idx, dataloader_idx):
         pred = self(batch[0])
         loss = self.loss(pred, batch[1])
-        return {
-            'loss': loss.item(),
-            'acc': 0 # # compute acc here - probably cant use default acc fuctions because this is multi-class classification
-        }
+        self.log_dict({
+            'val_loss': loss.item(),
+            'val_acc': (pred.sigmoid().round() == batch[1]).sum() / pred.shape[0]
+        })
 
-    # data stuff
     def shared_dataloader(self, type):
-        raise NotImplementedError
+        dataset = MultiLabelDataset(type, self.get_img_transforms())
+        return DataLoader(
+                dataset, batch_size=self.conf.batch_size, pin_memory=True,
+                num_workers=self.conf.main.num_threads - 1
+            )
 
     def get_img_transforms(self):
         return transforms.Compose([
