@@ -32,3 +32,6 @@ class Model(Configurable, LightningModule):
                             period=1,
                             save_last=True)
         ]
+
+    def get_trainer_kwargs(self):
+        return self.conf.main.default_trainer_args

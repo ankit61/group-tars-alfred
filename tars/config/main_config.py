@@ -21,7 +21,13 @@ class MainConfig(Config):
     wandb_project = 'group-tars-alfred'
 
     # general training
-    validation_freq = 1
+    default_trainer_args = {
+        'gpus': 1 if use_gpu else 0,
+        'check_val_every_n_epoch': 1,
+        'accumulate_grad_batches': 1,
+        'auto_lr_find': True,
+        # 'track_grad_norm': 2,
+    }
 
     # basic dirs
     alfred_dir = os.path.join(Path(__file__).parents[1], 'alfred/')
