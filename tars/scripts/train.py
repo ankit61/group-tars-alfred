@@ -55,7 +55,7 @@ def main():
     hyper_params["seg_model"] = model.model._get_name()
     logger.log_hyperparams(hyper_params)
 
-    logger.log_metrics({"iou": model.iou_metric})
+#     logger.log_metrics({"iou": model.iou_metric})
 
     # check for gradient augmentation property
     if hasattr(model.conf, "accumulate_grad_batches"):
