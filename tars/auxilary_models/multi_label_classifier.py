@@ -22,7 +22,7 @@ class MultiLabelClassifier(Model):
         loss = self.loss(pred, batch[1])
         self.log_dict({
             'loss': loss.item(),
-            'train_acc': (pred.sigmoid().round() == batch[1]).sum() / pred.shape[0]
+            'train_acc': (pred.sigmoid().round() == batch[1]).sum() / pred.numel()
         })
         return loss
 
@@ -34,7 +34,7 @@ class MultiLabelClassifier(Model):
         loss = self.loss(pred, batch[1])
         self.log_dict({
             'val_loss': loss.item(),
-            'val_acc': (pred.sigmoid().round() == batch[1]).sum() / pred.shape[0]
+            'val_acc': (pred.sigmoid().round() == batch[1]).sum() / pred.numel()
         })
 
     def shared_dataloader(self, type):
