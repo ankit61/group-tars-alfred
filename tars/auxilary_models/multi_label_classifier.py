@@ -26,6 +26,9 @@ class MultiLabelClassifier(Model):
         })
         return loss
 
+    def configure_optimizers(self):
+        return self.conf.get_optim(self.parameters())
+
     def validation_step(self, batch, batch_idx, dataloader_idx):
         pred = self(batch[0])
         loss = self.loss(pred, batch[1])
