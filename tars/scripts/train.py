@@ -58,10 +58,8 @@ def main():
         logger.log_hyperparams(hyperparams)
 
     trainer = Trainer(
-                logger=logger, gpus=1 if torch.cuda.is_available() else 0,
-                check_val_every_n_epoch=MainConfig.validation_freq,
-                auto_lr_find=True, resume_from_checkpoint=args.resume,
-                track_grad_norm=2, accumulate_grad_batches = accumulate_grad_batches,
+                logger=logger, resume_from_checkpoint=args.resume,
+                **model.get_trainer_kwargs()
             )
 
     trainer.fit(model)
