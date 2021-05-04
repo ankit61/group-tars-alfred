@@ -15,7 +15,8 @@ class SegmentationModel(Model):
         super(SegmentationModel, self).__init__()
         self.num_classes = len(DatasetConfig.objects_list)
         self.encoder_name = encoder_name
-        self.model = smp.Unet(
+        model_class = getattr(smp, self.conf.smp_model)
+        self.model = model_class(
             encoder_name=self.encoder_name,
             classes=self.num_classes
         )
@@ -50,6 +51,11 @@ class SegmentationModel(Model):
             'val_loss': self.loss(pred, gt).item(),
             'val_iou': self.iou_metric(pred.softmax(1), gt)
         })
+
+    def get_trainer_kwargs(self):
+        defaults = super().get_trainer_kwargs()
+        defaults['accumulate_grad_batches'] = self.conf.accumulate_grad_batches
+        return defaults
 
     # data stuff
     def get_dataset(self, type):
