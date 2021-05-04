@@ -1,8 +1,8 @@
 from torch import optim
-from tars.base.config import Config
+from tars.config.base.model_config import ModelConfig
 
 
-class MultiLabelClassifierConfig(Config):
+class MultiLabelClassifierConfig(ModelConfig):
     batch_size = 32
 
     def get_optim(self, parameters):
