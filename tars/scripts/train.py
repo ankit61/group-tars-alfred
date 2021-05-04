@@ -16,6 +16,7 @@ def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument('--model', type=str, required=True, help='the class name of the model to train - can be auxilary model or a policy')
     parser.add_argument('--resume', type=str, default=None)
+    parser.add_argument('--no-log', action='store_true')
 
     args, _ = parser.parse_known_args()
     return args
@@ -46,22 +47,15 @@ def main():
     model = model_class(**init_args)
 
     # Define logger
-    logger = WandbLogger(
-                project=MainConfig.wandb_project,
-                entity=MainConfig.wandb_entity
-            )
+    logger = False
+    if not args.no_log:
+        logger = WandbLogger(
+                    project=MainConfig.wandb_project,
+                    entity=MainConfig.wandb_entity
+                )
 
-    hyper_params = model.conf.get()
-    hyper_params["seg_model"] = model.model._get_name()
-    logger.log_hyperparams(hyper_params)
-
-#     logger.log_metrics({"iou": model.iou_metric})
-
-    # check for gradient augmentation property
-    if hasattr(model.conf, "accumulate_grad_batches"):
-        accumulate_grad_batches = model.conf.accumulate_grad_batches
-    else:
-        accumulate_grad_batches = 1
+        hyperparams = model.conf.get_all()
+        logger.log_hyperparams(hyperparams)
 
     trainer = Trainer(
                 logger=logger, gpus=1 if torch.cuda.is_available() else 0,
