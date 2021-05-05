@@ -19,3 +19,4 @@ transformers
 wordcloud
 ruamel.yaml
 git+https://github.com/qubvel/segmentation_models.pytorch
+editdistance

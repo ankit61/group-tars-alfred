@@ -18,5 +18,5 @@ class Model(Configurable, LightningModule):
     def configure_callbacks(self):
         return [
             EarlyStopping(monitor='val_loss/dataloader_idx_0', patience=self.conf.patience),
-            ModelCheckpoint()
+            ModelCheckpoint(monitor='val_loss/dataloader_idx_0')
         ]

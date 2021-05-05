@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import editdistance
 import pdb
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from tars.base.model import Model
@@ -60,7 +61,15 @@ class EmbedAndReadout(Model):
         return new_item_history
 
 
-    def shared_step(self, batch):
+    def update_preds(self, preds, new_pred):
+        batch_size = new_pred.shape[0]
+        if preds == None:
+            return new_pred.reshape(-1, 1)
+        else:
+            return torch.cat((preds, new_pred.reshape(-1, 1)), dim=1)
+
+
+    def shared_step(self, batch, mode='train'):
         '''
             Args:
                 batch: tensor of shape [N, E] where N = batch size and E = longest item sequence in batch
@@ -69,7 +78,11 @@ class EmbedAndReadout(Model):
         item_history = None
         mini_steps = 0
         loss = 0
+        if mode == 'eval':
+            acc = 0
+            edit_dist = 0
         for mini_batch, batch_size in HistoryDataset.mini_batches(batch):
+            batch_size = batch_size.item()
             item_history = self.update_item_history(item_history, mini_batch)
             decoder_hidden = self.forward(item_history)
             decoder_cell = torch.zeros_like(decoder_hidden)
@@ -77,19 +90,49 @@ class EmbedAndReadout(Model):
             
             seq_len = item_history.shape[1]
             mini_batch_loss = 0
+            if mode == 'eval':
+                mini_batch_correct = 0
+                mini_batch_pred = None
 
             for di in range(seq_len):
                 decoder_logits, decoder_hidden, decoder_cell = self.decoder.forward(decoder_input, decoder_hidden, decoder_cell)
                 _, top_item = decoder_logits.topk(1)
                 decoder_input = top_item.reshape(-1).detach()
                 mini_batch_loss += loss_fct(decoder_logits, item_history[:, di])
-            
+                if mode == 'eval':
+                    mini_batch_correct += torch.eq(decoder_input, item_history[:, di]).sum()
+                    if mini_batch_pred == None:
+                        mini_batch_pred = decoder_input.reshape(-1, 1)
+                    else:
+                        mini_batch_pred = torch.cat((mini_batch_pred, decoder_input.reshape(-1, 1)), dim=1)
+
             loss += (mini_batch_loss / seq_len)
+
+            if mode == 'eval':
+                acc += (mini_batch_correct / (batch_size * seq_len))
+                assert(mini_batch_pred.shape == item_history.shape)
+                mini_batch_edit_dist_sum = 0
+                for i in range(batch_size):
+                    pred = mini_batch_pred[i].tolist()
+                    target = item_history[i].tolist()
+                    mini_batch_edit_dist_sum += editdistance.eval(pred, target)
+                
+                edit_dist += (mini_batch_edit_dist_sum / batch_size)
+                
+            pdb.set_trace()
+
             mini_steps += 1
         
         if mini_steps > 1:
-            loss = loss / mini_steps
-        return loss
+            loss /= mini_steps
+            if mode == 'eval':
+                acc /= mini_steps
+                edit_dist /= mini_steps
+
+        if mode == 'eval':
+            return loss, acc, edit_dist
+        else:
+            return loss
 
 
     def training_step(self, train_batch, batch_idx):
@@ -99,8 +142,8 @@ class EmbedAndReadout(Model):
 
 
     def validation_step(self, val_batch, batch_idx, dataloader_idx):
-        loss = self.shared_step(val_batch)
-        self.log('valid_loss', loss)
+        loss, acc, edit_dist = self.shared_step(val_batch, mode='eval')
+        self.log('val_loss', loss)
 
 
     def configure_optimizers(self):
@@ -108,12 +151,6 @@ class EmbedAndReadout(Model):
         return optimizer
 
     
-    def configure_callbacks(self):
-        return [
-            EarlyStopping(monitor='valid_loss/dataloader_idx_0', patience=self.conf.patience),
-            ModelCheckpoint(monitor='valid_loss/dataloader_idx_0')
-        ]
-
 
     def shared_dataloader(self, type):
         dataset = HistoryDataset(type, self.pretrain_type)
