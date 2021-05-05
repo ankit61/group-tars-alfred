@@ -1,7 +1,12 @@
 import torch
+import torch
+import wandb
 import torch.nn as nn
 import editdistance
 import pdb
+import pytorch_lightning as pl
+
+from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from tars.base.model import Model
 from tars.auxilary_models.readout_transformer import ReadoutTransformer
@@ -81,6 +86,8 @@ class EmbedAndReadout(Model):
         if val:
             score = 0
             edit_dist = 0
+            target_item_counts = torch.zeros(self.decoder.embed.num_embeddings).to(self.decoder.device)
+            pred_item_counts = torch.zeros_like(target_item_counts)
         for mini_batch, batch_size in HistoryDataset.mini_batches(batch):
             batch_size = batch_size.item()
             item_history = self.update_item_history(item_history, mini_batch)
@@ -92,7 +99,7 @@ class EmbedAndReadout(Model):
             mini_batch_loss = 0
             if val:
                 mini_batch_correct = 0
-                mini_batch_pred = None
+                pred_item_history = None
 
             for di in range(seq_len):
                 decoder_logits, decoder_hidden, decoder_cell = self.decoder.forward(decoder_input, decoder_hidden, decoder_cell)
@@ -101,24 +108,29 @@ class EmbedAndReadout(Model):
                 mini_batch_loss += loss_fct(decoder_logits, item_history[:, di])
                 if val:
                     mini_batch_correct += torch.eq(decoder_input, item_history[:, di]).sum()
-                    if mini_batch_pred == None:
-                        mini_batch_pred = decoder_input.reshape(-1, 1)
+                    if pred_item_history == None:
+                        pred_item_history = decoder_input.reshape(-1, 1)
                     else:
-                        mini_batch_pred = torch.cat((mini_batch_pred, decoder_input.reshape(-1, 1)), dim=1)
+                        pred_item_history = torch.cat((pred_item_history, decoder_input.reshape(-1, 1)), dim=1)
 
             loss += (mini_batch_loss / seq_len)
 
             if val:
                 score += (mini_batch_correct / (batch_size * seq_len))
-                assert(mini_batch_pred.shape == item_history.shape)
+                assert(pred_item_history.shape == item_history.shape)
                 mini_batch_edit_dist_sum = 0
                 for i in range(batch_size):
-                    pred = mini_batch_pred[i].tolist()
+                    pred = pred_item_history[i].tolist()
                     target = item_history[i].tolist()
                     mini_batch_edit_dist_sum += editdistance.eval(pred, target)
                 
                 edit_dist += (mini_batch_edit_dist_sum / batch_size)
-                
+                mb_target_items, mb_target_counts = torch.unique(item_history, return_counts=True)
+                target_item_counts[mb_target_items] += mb_target_counts
+
+                mb_pred_items, mb_pred_counts = torch.unique(pred_item_history, return_counts=True)
+                pred_item_counts[mb_pred_items] += mb_pred_counts
+
             mini_steps += 1
         
         if mini_steps > 1:
@@ -128,7 +140,10 @@ class EmbedAndReadout(Model):
                 edit_dist /= mini_steps
 
         if val:
-            return loss, score, edit_dist
+            assert(pred_item_counts.sum() == target_item_counts.sum())
+            pred_distrib = (pred_item_counts / pred_item_counts.sum())
+            pred_bias = ((pred_item_counts + 1) / (target_item_counts + 1))
+            return loss, score, edit_dist, pred_distrib, pred_bias
         else:
             return loss
 
@@ -136,14 +151,21 @@ class EmbedAndReadout(Model):
     def training_step(self, train_batch, batch_idx):
         loss = self.shared_step(train_batch)
         self.log('train_loss', loss)
+        self.log_dict({'train_loss': loss})
+        self.log
         return loss
 
 
     def validation_step(self, val_batch, batch_idx, dataloader_idx):
-        loss, score, edit_dist = self.shared_step(val_batch, val=True)
-        self.log('val_loss', loss)
-        self.log('val_score', score)
-        self.log('val_edit_dist', edit_dist)
+        loss, score, edit_dist, pred_distrib, pred_bias = self.shared_step(val_batch, val=True)
+        metrics_dict = {
+            'val_loss': loss,
+            'val_score': score,
+            'val_edit_dist': edit_dist,
+            'val_pred_distrib': pred_distrib,
+            'val_pred_bias': pred_bias
+        }
+        self.log_dict(metrics_dict)
 
 
     def configure_optimizers(self):
@@ -182,3 +204,8 @@ class PretrainingDecoder(Model):
         logits = self.out.forward(next_hidden)
         return logits, next_hidden, next_cell
 
+
+# class WandbDistribCallback(pl.Callback):
+#     def __init__(self, val_samples):
+#         super().__init__()
+#         _, _, _, self.val_pred_distribs, self.val_pred_biases = val_samples
