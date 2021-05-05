@@ -6,16 +6,17 @@ import torch
 from pytorch_lightning.trainer import Trainer
 from pytorch_lightning.loggers import WandbLogger
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+from pytorch_lightning.callbacks import ModelCheckpoint
 from torch.cuda import is_available
 from tars.auxilary_models import *
 from tars.policies import *
 from tars.config.main_config import MainConfig
 
-
 def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument('--model', type=str, required=True, help='the class name of the model to train - can be auxilary model or a policy')
     parser.add_argument('--resume', type=str, default=None)
+    parser.add_argument('--no-log', action='store_true')
 
     args, _ = parser.parse_known_args()
     return args
@@ -45,16 +46,20 @@ def main():
     init_args = get_init_args(model_class)
     model = model_class(**init_args)
 
-    # add name
-    logger = WandbLogger(
-                project=MainConfig.wandb_project,
-                entity=MainConfig.wandb_entity
-            )
+    # Define logger
+    logger = False
+    if not args.no_log:
+        logger = WandbLogger(
+                    project=MainConfig.wandb_project,
+                    entity=MainConfig.wandb_entity
+                )
+
+        hyperparams = model.conf.get_all()
+        logger.log_hyperparams(hyperparams)
 
     trainer = Trainer(
-                logger=logger, gpus=1 if torch.cuda.is_available() else 0,
-                check_val_every_n_epoch=MainConfig.validation_freq,
-                auto_lr_find=True, resume_from_checkpoint=args.resume
+                logger=logger, resume_from_checkpoint=args.resume,
+                **model.get_trainer_kwargs()
             )
 
     trainer.fit(model)

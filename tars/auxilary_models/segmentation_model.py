@@ -15,7 +15,8 @@ class SegmentationModel(Model):
         super(SegmentationModel, self).__init__()
         self.num_classes = len(DatasetConfig.objects_list)
         self.encoder_name = encoder_name
-        self.model = smp.Unet(
+        model_class = getattr(smp, self.conf.smp_model)
+        self.model = model_class(
             encoder_name=self.encoder_name,
             classes=self.num_classes
         )
@@ -51,6 +52,11 @@ class SegmentationModel(Model):
             'val_iou': self.iou_metric(pred.softmax(1), gt)
         })
 
+    def get_trainer_kwargs(self):
+        defaults = super().get_trainer_kwargs()
+        defaults['accumulate_grad_batches'] = self.conf.accumulate_grad_batches
+        return defaults
+
     # data stuff
     def get_dataset(self, type):
         return SegmentationDataset(type, self.get_img_transforms())
@@ -58,15 +64,6 @@ class SegmentationModel(Model):
     def setup(self, stage):
         for t in [DatasetType.TRAIN, DatasetType.VALID_SEEN, DatasetType.VALID_UNSEEN]:
             self.datasets[t] = self.get_dataset(t)
-
-    def train_dataloader(self):
-        return self.shared_dataloader(DatasetType.TRAIN)
-
-    def val_dataloader(self):
-        return [
-            self.shared_dataloader(DatasetType.VALID_SEEN),
-            self.shared_dataloader(DatasetType.VALID_UNSEEN),
-        ]
 
     def shared_dataloader(self, type):
         return DataLoader(
