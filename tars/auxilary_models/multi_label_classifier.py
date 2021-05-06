@@ -17,25 +17,39 @@ class MultiLabelClassifier(Model):
     def forward(self, img):
         return self.model(img)
 
-    def training_step(self, batch, batch_idx):
-        pred = self(batch[0])
-        loss = self.loss(pred, batch[1])
-        self.log_dict({
-            'loss': loss.item(),
-            'train_acc': (pred.sigmoid().round() == batch[1]).sum() / pred.numel()
-        })
-        return loss
-
     def configure_optimizers(self):
         return self.conf.get_optim(self.parameters())
 
-    def validation_step(self, batch, batch_idx, dataloader_idx):
+    def shared_step(self, batch, metric_prefix):
         pred = self(batch[0])
         loss = self.loss(pred, batch[1])
-        self.log_dict({
-            'val_loss': loss.item(),
-            'val_acc': (pred.sigmoid().round() == batch[1]).sum() / pred.numel()
-        })
+        metrics = self.get_metrics(pred, batch[1])
+        assert 'loss' not in metrics
+        metrics['loss'] = loss
+        metrics = {f'{metric_prefix}_{k}': metrics[k] for k in metrics}
+        return metrics
+
+    def get_metrics(self, pred, gt):
+        class_pred = pred.sigmoid().round()
+        pred_positives = class_pred[class_pred == 1]
+        gt_positives = gt[class_pred == 1]
+        true_positives = (pred_positives == gt_positives).sum()
+
+        return {
+            'acc': (class_pred == gt).sum().item() / class_pred.numel(),
+            'num_positives': pred_positives.numel() / class_pred.numel(),
+            'recall': true_positives / gt_positives.numel()
+        }
+
+    def training_step(self, batch, batch_idx):
+        metrics = self.shared_step(batch, metric_prefix='train')
+        metrics['loss'] = metrics.pop('train_loss')
+        self.log_dict(metrics)
+        return metrics['loss']
+
+    def validation_step(self, batch, batch_idx, dataloader_idx):
+        metrics = self.shared_step(batch, metric_prefix='val')
+        self.log_dict(metrics)
 
     def shared_dataloader(self, type):
         dataset = MultiLabelDataset(type, self.get_img_transforms())
