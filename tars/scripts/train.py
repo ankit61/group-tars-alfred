@@ -17,7 +17,7 @@ def get_args():
     parser.add_argument('--model', type=str, required=True, help='the class name of the model to train - can be auxilary model or a policy')
     parser.add_argument('--resume', type=str, default=None)
     parser.add_argument('--no-log', action='store_true')
-
+    parser.add_argument('--mode', type=str, default='train', choices=['train', 'validate'])
     args, _ = parser.parse_known_args()
     return args
 
@@ -57,12 +57,25 @@ def main():
         hyperparams = model.conf.get_all()
         logger.log_hyperparams(hyperparams)
 
-    trainer = Trainer(
+    if args.mode == 'train':
+        trainer = Trainer(
                 logger=logger, resume_from_checkpoint=args.resume,
                 **model.get_trainer_kwargs()
             )
+        trainer.fit(model)
+    elif args.mode == 'validate':
+        assert args.resume is not None, 'Why do you want to validate a untrained model? Are you sleepy?'
 
-    trainer.fit(model)
+        trainer_args = model.get_trainer_kwargs()
+        trainer_args['max_epochs'] = 0
+        trainer_args['num_sanity_val_steps'] = -1
+
+        trainer = Trainer(
+                logger=logger, resume_from_checkpoint=args.resume,
+                **trainer_args
+            )
+
+        trainer.fit(model)
 
 if __name__ == '__main__':
     main()
