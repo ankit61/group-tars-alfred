@@ -67,7 +67,7 @@ def main():
         assert args.resume is not None, 'Why do you want to validate a untrained model? Are you sleepy?'
 
         trainer_args = model.get_trainer_kwargs()
-        trainer_args['max_epochs'] = 0
+        trainer_args['limit_train_batches'] = 0
         trainer_args['num_sanity_val_steps'] = -1
 
         trainer = Trainer(
