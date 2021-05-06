@@ -1,5 +1,6 @@
 import torch.optim as optim
 from tars.config.base.model_config import ModelConfig
+from tars.config.policies.moca_policy_config import MocaPolicyConfig
 
 
 class TarsPolicyConfig(ModelConfig):
@@ -41,6 +42,9 @@ class TarsPolicyConfig(ModelConfig):
 
     # contextual embedding model
     context_emb_model_name_or_path = "albert-base-v2"
+
+    # mask rcnn
+    mask_rcnn_path = MocaPolicyConfig.mask_rcnn_path
 
     def get_optim(self, parameters):
         return optim.Adam(parameters, lr=1e-3)

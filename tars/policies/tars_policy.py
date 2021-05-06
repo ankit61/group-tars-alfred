@@ -1,5 +1,5 @@
 import itertools
-from numpy.core.fromnumeric import sort
+from torchvision.models.detection import maskrcnn_resnet50_fpn
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
@@ -29,6 +29,11 @@ class TarsPolicy(Policy):
                                 self.context_module.int_object_embed_and_readout.embed, 
                                 self.conf
                             )
+
+        self.maskrcnn = maskrcnn_resnet50_fpn(num_classes=self.num_objects)
+        self.maskrcnn.eval()
+        self.maskrcnn.load_state_dict(torch.load(self.conf.mask_rcnn_path, map_location=self.conf.main.device))
+        self.maskrcnn = self.maskrcnn.to(self.conf.main.device)
 
         self.datasets = {}
 
@@ -165,6 +170,14 @@ class TarsPolicy(Policy):
             )
 
     def find_instance_mask(self, img, int_object):
+        '''
+            Args:
+                img: [N, C, H, W]
+                int_object:
+                    Each element in the tensor of shape [N] is an index
+                    of the class
+        '''
+        # use self.maskrcnn
         # run instance segmentation
         # argmax over channels
         # keep only mask over int_object
