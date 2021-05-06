@@ -57,25 +57,17 @@ def main():
         hyperparams = model.conf.get_all()
         logger.log_hyperparams(hyperparams)
 
-    if args.mode == 'train':
-        trainer = Trainer(
+    trainer = Trainer(
                 logger=logger, resume_from_checkpoint=args.resume,
                 **model.get_trainer_kwargs()
             )
+
+    if args.mode == 'train':
         trainer.fit(model)
     elif args.mode == 'validate':
         assert args.resume is not None, 'Why do you want to validate a untrained model? Are you sleepy?'
 
-        trainer_args = model.get_trainer_kwargs()
-        trainer_args['limit_train_batches'] = 0
-        trainer_args['num_sanity_val_steps'] = -1
-
-        trainer = Trainer(
-                logger=logger, resume_from_checkpoint=args.resume,
-                **trainer_args
-            )
-
-        trainer.fit(model)
+        trainer.test(model, test_dataloaders=model.val_dataloader())
 
 if __name__ == '__main__':
     main()
