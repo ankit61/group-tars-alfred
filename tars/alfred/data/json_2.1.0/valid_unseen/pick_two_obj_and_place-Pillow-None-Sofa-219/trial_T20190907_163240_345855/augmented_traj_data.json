@@ -1,0 +1,2887 @@
+{
+    "images": [
+        {
+            "high_idx": 0,
+            "image_name": "000000000.png",
+            "low_idx": 0
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000001.png",
+            "low_idx": 1
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000002.png",
+            "low_idx": 2
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000003.png",
+            "low_idx": 3
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000004.png",
+            "low_idx": 4
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000005.png",
+            "low_idx": 5
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000006.png",
+            "low_idx": 6
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000007.png",
+            "low_idx": 7
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000008.png",
+            "low_idx": 8
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000009.png",
+            "low_idx": 9
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000010.png",
+            "low_idx": 10
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000011.png",
+            "low_idx": 11
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000012.png",
+            "low_idx": 12
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000013.png",
+            "low_idx": 13
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000014.png",
+            "low_idx": 14
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000015.png",
+            "low_idx": 15
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000016.png",
+            "low_idx": 16
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000017.png",
+            "low_idx": 17
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000018.png",
+            "low_idx": 18
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000019.png",
+            "low_idx": 19
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000020.png",
+            "low_idx": 20
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000021.png",
+            "low_idx": 21
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000022.png",
+            "low_idx": 22
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000023.png",
+            "low_idx": 23
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000024.png",
+            "low_idx": 24
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000025.png",
+            "low_idx": 25
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000026.png",
+            "low_idx": 26
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000027.png",
+            "low_idx": 27
+        },
+        {
+            "high_idx": 0,
+            "image_name": "000000028.png",
+            "low_idx": 28
+        },
+        {
+            "high_idx": 1,
+            "image_name": "000000029.png",
+            "low_idx": 29
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000030.png",
+            "low_idx": 30
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000031.png",
+            "low_idx": 31
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000032.png",
+            "low_idx": 32
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000033.png",
+            "low_idx": 33
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000034.png",
+            "low_idx": 34
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000035.png",
+            "low_idx": 35
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000036.png",
+            "low_idx": 36
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000037.png",
+            "low_idx": 37
+        },
+        {
+            "high_idx": 2,
+            "image_name": "000000038.png",
+            "low_idx": 38
+        },
+        {
+            "high_idx": 3,
+            "image_name": "000000039.png",
+            "low_idx": 39
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000040.png",
+            "low_idx": 40
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000041.png",
+            "low_idx": 41
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000042.png",
+            "low_idx": 42
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000043.png",
+            "low_idx": 43
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000044.png",
+            "low_idx": 44
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000045.png",
+            "low_idx": 45
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000046.png",
+            "low_idx": 46
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000047.png",
+            "low_idx": 47
+        },
+        {
+            "high_idx": 4,
+            "image_name": "000000048.png",
+            "low_idx": 48
+        },
+        {
+            "high_idx": 5,
+            "image_name": "000000049.png",
+            "low_idx": 49
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000050.png",
+            "low_idx": 50
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000051.png",
+            "low_idx": 51
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000052.png",
+            "low_idx": 52
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000053.png",
+            "low_idx": 53
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000054.png",
+            "low_idx": 54
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000055.png",
+            "low_idx": 55
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000056.png",
+            "low_idx": 56
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000057.png",
+            "low_idx": 57
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000058.png",
+            "low_idx": 58
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000059.png",
+            "low_idx": 59
+        },
+        {
+            "high_idx": 6,
+            "image_name": "000000060.png",
+            "low_idx": 60
+        },
+        {
+            "high_idx": 7,
+            "image_name": "000000061.png",
+            "low_idx": 61
+        }
+    ],
+    "pddl_params": {
+        "mrecep_target": "",
+        "object_sliced": false,
+        "object_target": "Pillow",
+        "parent_target": "Sofa",
+        "toggle_target": ""
+    },
+    "plan": {
+        "high_pddl": [
+            {
+                "discrete_action": {
+                    "action": "GotoLocation",
+                    "args": [
+                        "armchair"
+                    ]
+                },
+                "high_idx": 0,
+                "planner_action": {
+                    "action": "GotoLocation",
+                    "location": "loc|-8|15|0|60"
+                }
+            },
+            {
+                "discrete_action": {
+                    "action": "PickupObject",
+                    "args": [
+                        "pillow"
+                    ]
+                },
+                "high_idx": 1,
+                "planner_action": {
+                    "action": "PickupObject",
+                    "coordinateObjectId": [
+                        "Pillow",
+                        [
+                            -8.12429048,
+                            -8.12429048,
+                            17.68692972,
+                            17.68692972,
+                            2.672,
+                            2.672
+                        ]
+                    ],
+                    "coordinateReceptacleObjectId": [
+                        "ArmChair",
+                        [
+                            -7.34,
+                            -7.34,
+                            18.02,
+                            18.02,
+                            -0.056,
+                            -0.056
+                        ]
+                    ],
+                    "forceVisible": true,
+                    "objectId": "Pillow|-02.03|+00.67|+04.42"
+                }
+            },
+            {
+                "discrete_action": {
+                    "action": "GotoLocation",
+                    "args": [
+                        "sofa"
+                    ]
+                },
+                "high_idx": 2,
+                "planner_action": {
+                    "action": "GotoLocation",
+                    "location": "loc|-8|11|1|60"
+                }
+            },
+            {
+                "discrete_action": {
+                    "action": "PutObject",
+                    "args": [
+                        "pillow",
+                        "sofa"
+                    ]
+                },
+                "high_idx": 3,
+                "planner_action": {
+                    "action": "PutObject",
+                    "coordinateObjectId": [
+                        "Pillow",
+                        [
+                            -8.12429048,
+                            -8.12429048,
+                            17.68692972,
+                            17.68692972,
+                            2.672,
+                            2.672
+                        ]
+                    ],
+                    "coordinateReceptacleObjectId": [
+                        "Sofa",
+                        [
+                            -2.952,
+                            -2.952,
+                            11.012,
+                            11.012,
+                            0.0,
+                            0.0
+                        ]
+                    ],
+                    "forceVisible": true,
+                    "objectId": "Pillow|-02.03|+00.67|+04.42",
+                    "receptacleObjectId": "Sofa|-00.74|+00.00|+02.75"
+                }
+            },
+            {
+                "discrete_action": {
+                    "action": "GotoLocation",
+                    "args": [
+                        "armchair"
+                    ]
+                },
+                "high_idx": 4,
+                "planner_action": {
+                    "action": "GotoLocation",
+                    "location": "loc|-6|15|0|60"
+                }
+            },
+            {
+                "discrete_action": {
+                    "action": "PickupObject",
+                    "args": [
+                        "pillow"
+                    ]
+                },
+                "high_idx": 5,
+                "planner_action": {
+                    "action": "PickupObject",
+                    "coordinateObjectId": [
+                        "Pillow",
+                        [
+                            -6.33831788,
+                            -6.33831788,
+                            16.845464,
+                            16.845464,
+                            2.67333412,
+                            2.67333412
+                        ]
+                    ],
+                    "coordinateReceptacleObjectId": [
+                        "ArmChair",
+                        [
+                            -7.34,
+                            -7.34,
+                            18.02,
+                            18.02,
+                            -0.056,
+                            -0.056
+                        ]
+                    ],
+                    "forceVisible": true,
+                    "objectId": "Pillow|-01.58|+00.67|+04.21"
+                }
+            },
+            {
+                "discrete_action": {
+                    "action": "GotoLocation",
+                    "args": [
+                        "sofa"
+                    ]
+                },
+                "high_idx": 6,
+                "planner_action": {
+                    "action": "GotoLocation",
+                    "location": "loc|-8|11|1|60"
+                }
+            },
+            {
+                "discrete_action": {
+                    "action": "PutObject",
+                    "args": [
+                        "pillow",
+                        "sofa"
+                    ]
+                },
+                "high_idx": 7,
+                "planner_action": {
+                    "action": "PutObject",
+                    "coordinateObjectId": [
+                        "Pillow",
+                        [
+                            -6.33831788,
+                            -6.33831788,
+                            16.845464,
+                            16.845464,
+                            2.67333412,
+                            2.67333412
+                        ]
+                    ],
+                    "coordinateReceptacleObjectId": [
+                        "Sofa",
+                        [
+                            -2.952,
+                            -2.952,
+                            11.012,
+                            11.012,
+                            0.0,
+                            0.0
+                        ]
+                    ],
+                    "forceVisible": true,
+                    "objectId": "Pillow|-01.58|+00.67|+04.21",
+                    "receptacleObjectId": "Sofa|-00.74|+00.00|+02.75"
+                }
+            },
+            {
+                "discrete_action": {
+                    "action": "NoOp",
+                    "args": []
+                },
+                "high_idx": 8,
+                "planner_action": {
+                    "action": "End",
+                    "value": 1
+                }
+            }
+        ],
+        "low_actions": [
+            {
+                "api_action": {
+                    "action": "LookDown",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "LookDown_15",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "RotateLeft",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateLeft_90",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "RotateLeft",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateLeft_90",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "LookDown",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "LookDown_15",
+                    "args": {}
+                },
+                "high_idx": 0
+            },
+            {
+                "api_action": {
+                    "action": "PickupObject",
+                    "objectId": "Pillow|-02.03|+00.67|+04.42"
+                },
+                "discrete_action": {
+                    "action": "PickupObject",
+                    "args": {
+                        "bbox": [
+                            91,
+                            91,
+                            193,
+                            154
+                        ],
+                        "mask": [
+                            [
+                                27142,
+                                3
+                            ],
+                            [
+                                27420,
+                                45
+                            ],
+                            [
+                                27710,
+                                66
+                            ],
+                            [
+                                28005,
+                                76
+                            ],
+                            [
+                                28302,
+                                82
+                            ],
+                            [
+                                28602,
+                                83
+                            ],
+                            [
+                                28901,
+                                84
+                            ],
+                            [
+                                29200,
+                                86
+                            ],
+                            [
+                                29500,
+                                86
+                            ],
+                            [
+                                29799,
+                                88
+                            ],
+                            [
+                                30099,
+                                89
+                            ],
+                            [
+                                30398,
+                                90
+                            ],
+                            [
+                                30698,
+                                91
+                            ],
+                            [
+                                30997,
+                                92
+                            ],
+                            [
+                                31296,
+                                94
+                            ],
+                            [
+                                31596,
+                                94
+                            ],
+                            [
+                                31896,
+                                94
+                            ],
+                            [
+                                32195,
+                                96
+                            ],
+                            [
+                                32495,
+                                96
+                            ],
+                            [
+                                32794,
+                                97
+                            ],
+                            [
+                                33094,
+                                98
+                            ],
+                            [
+                                33394,
+                                98
+                            ],
+                            [
+                                33693,
+                                99
+                            ],
+                            [
+                                33993,
+                                100
+                            ],
+                            [
+                                34293,
+                                100
+                            ],
+                            [
+                                34593,
+                                100
+                            ],
+                            [
+                                34892,
+                                101
+                            ],
+                            [
+                                35192,
+                                101
+                            ],
+                            [
+                                35492,
+                                102
+                            ],
+                            [
+                                35792,
+                                102
+                            ],
+                            [
+                                36092,
+                                102
+                            ],
+                            [
+                                36392,
+                                102
+                            ],
+                            [
+                                36692,
+                                102
+                            ],
+                            [
+                                36992,
+                                102
+                            ],
+                            [
+                                37291,
+                                103
+                            ],
+                            [
+                                37591,
+                                103
+                            ],
+                            [
+                                37891,
+                                103
+                            ],
+                            [
+                                38191,
+                                103
+                            ],
+                            [
+                                38491,
+                                103
+                            ],
+                            [
+                                38791,
+                                103
+                            ],
+                            [
+                                39091,
+                                103
+                            ],
+                            [
+                                39391,
+                                103
+                            ],
+                            [
+                                39692,
+                                102
+                            ],
+                            [
+                                39992,
+                                101
+                            ],
+                            [
+                                40292,
+                                101
+                            ],
+                            [
+                                40592,
+                                101
+                            ],
+                            [
+                                40892,
+                                101
+                            ],
+                            [
+                                41192,
+                                101
+                            ],
+                            [
+                                41492,
+                                101
+                            ],
+                            [
+                                41793,
+                                99
+                            ],
+                            [
+                                42093,
+                                99
+                            ],
+                            [
+                                42393,
+                                99
+                            ],
+                            [
+                                42693,
+                                98
+                            ],
+                            [
+                                42994,
+                                97
+                            ],
+                            [
+                                43294,
+                                97
+                            ],
+                            [
+                                43594,
+                                96
+                            ],
+                            [
+                                43895,
+                                95
+                            ],
+                            [
+                                44195,
+                                95
+                            ],
+                            [
+                                44495,
+                                94
+                            ],
+                            [
+                                44797,
+                                90
+                            ],
+                            [
+                                45101,
+                                83
+                            ],
+                            [
+                                45407,
+                                70
+                            ],
+                            [
+                                45715,
+                                55
+                            ],
+                            [
+                                46025,
+                                35
+                            ]
+                        ],
+                        "point": [
+                            142,
+                            121
+                        ]
+                    }
+                },
+                "high_idx": 1
+            },
+            {
+                "api_action": {
+                    "action": "LookUp",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "LookUp_15",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "RotateRight",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateRight_90",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "RotateRight",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateRight_90",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "RotateLeft",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateLeft_90",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "LookDown",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "LookDown_15",
+                    "args": {}
+                },
+                "high_idx": 2
+            },
+            {
+                "api_action": {
+                    "action": "PutObject",
+                    "forceAction": true,
+                    "objectId": "Pillow|-02.03|+00.67|+04.42",
+                    "placeStationary": true,
+                    "receptacleObjectId": "Sofa|-00.74|+00.00|+02.75"
+                },
+                "discrete_action": {
+                    "action": "PutObject",
+                    "args": {
+                        "bbox": [
+                            0,
+                            1,
+                            299,
+                            169
+                        ],
+                        "mask": [
+                            [
+                                0,
+                                47547
+                            ],
+                            [
+                                47552,
+                                270
+                            ],
+                            [
+                                47875,
+                                233
+                            ],
+                            [
+                                48190,
+                                207
+                            ],
+                            [
+                                48501,
+                                187
+                            ],
+                            [
+                                48811,
+                                169
+                            ],
+                            [
+                                49119,
+                                154
+                            ],
+                            [
+                                49427,
+                                138
+                            ],
+                            [
+                                49734,
+                                66
+                            ],
+                            [
+                                50098,
+                                2
+                            ],
+                            [
+                                50399,
+                                1
+                            ],
+                            [
+                                50699,
+                                1
+                            ]
+                        ],
+                        "point": [
+                            149,
+                            84
+                        ]
+                    }
+                },
+                "high_idx": 3
+            },
+            {
+                "api_action": {
+                    "action": "LookUp",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "LookUp_15",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "RotateLeft",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateLeft_90",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "LookDown",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "LookDown_15",
+                    "args": {}
+                },
+                "high_idx": 4
+            },
+            {
+                "api_action": {
+                    "action": "PickupObject",
+                    "objectId": "Pillow|-01.58|+00.67|+04.21"
+                },
+                "discrete_action": {
+                    "action": "PickupObject",
+                    "args": {
+                        "bbox": [
+                            71,
+                            129,
+                            184,
+                            205
+                        ],
+                        "mask": [
+                            [
+                                38529,
+                                2
+                            ],
+                            [
+                                38807,
+                                44
+                            ],
+                            [
+                                39097,
+                                64
+                            ],
+                            [
+                                39389,
+                                81
+                            ],
+                            [
+                                39686,
+                                87
+                            ],
+                            [
+                                39985,
+                                90
+                            ],
+                            [
+                                40284,
+                                92
+                            ],
+                            [
+                                40583,
+                                93
+                            ],
+                            [
+                                40882,
+                                95
+                            ],
+                            [
+                                41182,
+                                95
+                            ],
+                            [
+                                41481,
+                                97
+                            ],
+                            [
+                                41781,
+                                97
+                            ],
+                            [
+                                42080,
+                                99
+                            ],
+                            [
+                                42380,
+                                99
+                            ],
+                            [
+                                42679,
+                                101
+                            ],
+                            [
+                                42979,
+                                101
+                            ],
+                            [
+                                43278,
+                                102
+                            ],
+                            [
+                                43578,
+                                103
+                            ],
+                            [
+                                43877,
+                                104
+                            ],
+                            [
+                                44177,
+                                104
+                            ],
+                            [
+                                44476,
+                                106
+                            ],
+                            [
+                                44776,
+                                106
+                            ],
+                            [
+                                45076,
+                                106
+                            ],
+                            [
+                                45375,
+                                108
+                            ],
+                            [
+                                45675,
+                                108
+                            ],
+                            [
+                                45974,
+                                109
+                            ],
+                            [
+                                46274,
+                                109
+                            ],
+                            [
+                                46574,
+                                110
+                            ],
+                            [
+                                46874,
+                                110
+                            ],
+                            [
+                                47173,
+                                111
+                            ],
+                            [
+                                47473,
+                                111
+                            ],
+                            [
+                                47773,
+                                111
+                            ],
+                            [
+                                48073,
+                                111
+                            ],
+                            [
+                                48372,
+                                112
+                            ],
+                            [
+                                48672,
+                                113
+                            ],
+                            [
+                                48972,
+                                113
+                            ],
+                            [
+                                49272,
+                                113
+                            ],
+                            [
+                                49572,
+                                113
+                            ],
+                            [
+                                49872,
+                                113
+                            ],
+                            [
+                                50172,
+                                113
+                            ],
+                            [
+                                50472,
+                                113
+                            ],
+                            [
+                                50771,
+                                114
+                            ],
+                            [
+                                51071,
+                                114
+                            ],
+                            [
+                                51371,
+                                114
+                            ],
+                            [
+                                51671,
+                                114
+                            ],
+                            [
+                                51971,
+                                114
+                            ],
+                            [
+                                52271,
+                                114
+                            ],
+                            [
+                                52571,
+                                114
+                            ],
+                            [
+                                52871,
+                                113
+                            ],
+                            [
+                                53171,
+                                113
+                            ],
+                            [
+                                53471,
+                                113
+                            ],
+                            [
+                                53771,
+                                113
+                            ],
+                            [
+                                54071,
+                                113
+                            ],
+                            [
+                                54371,
+                                113
+                            ],
+                            [
+                                54671,
+                                113
+                            ],
+                            [
+                                54971,
+                                112
+                            ],
+                            [
+                                55272,
+                                111
+                            ],
+                            [
+                                55572,
+                                111
+                            ],
+                            [
+                                55872,
+                                111
+                            ],
+                            [
+                                56172,
+                                110
+                            ],
+                            [
+                                56472,
+                                110
+                            ],
+                            [
+                                56772,
+                                110
+                            ],
+                            [
+                                57073,
+                                109
+                            ],
+                            [
+                                57373,
+                                108
+                            ],
+                            [
+                                57673,
+                                108
+                            ],
+                            [
+                                57973,
+                                108
+                            ],
+                            [
+                                58274,
+                                106
+                            ],
+                            [
+                                58574,
+                                106
+                            ],
+                            [
+                                58874,
+                                106
+                            ],
+                            [
+                                59174,
+                                105
+                            ],
+                            [
+                                59475,
+                                104
+                            ],
+                            [
+                                59777,
+                                100
+                            ],
+                            [
+                                60080,
+                                93
+                            ],
+                            [
+                                60385,
+                                83
+                            ],
+                            [
+                                60691,
+                                71
+                            ],
+                            [
+                                60998,
+                                57
+                            ],
+                            [
+                                61308,
+                                37
+                            ]
+                        ],
+                        "point": [
+                            127,
+                            166
+                        ]
+                    }
+                },
+                "high_idx": 5
+            },
+            {
+                "api_action": {
+                    "action": "LookUp",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "LookUp_15",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "RotateLeft",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateLeft_90",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "RotateLeft",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateLeft_90",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "MoveAhead",
+                    "forceAction": true,
+                    "moveMagnitude": 0.25
+                },
+                "discrete_action": {
+                    "action": "MoveAhead_25",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "RotateLeft",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "RotateLeft_90",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "LookDown",
+                    "forceAction": true
+                },
+                "discrete_action": {
+                    "action": "LookDown_15",
+                    "args": {}
+                },
+                "high_idx": 6
+            },
+            {
+                "api_action": {
+                    "action": "PutObject",
+                    "forceAction": true,
+                    "objectId": "Pillow|-01.58|+00.67|+04.21",
+                    "placeStationary": true,
+                    "receptacleObjectId": "Sofa|-00.74|+00.00|+02.75"
+                },
+                "discrete_action": {
+                    "action": "PutObject",
+                    "args": {
+                        "bbox": [
+                            0,
+                            1,
+                            299,
+                            169
+                        ],
+                        "mask": [
+                            [
+                                0,
+                                7341
+                            ],
+                            [
+                                7359,
+                                275
+                            ],
+                            [
+                                7665,
+                                265
+                            ],
+                            [
+                                7970,
+                                256
+                            ],
+                            [
+                                8273,
+                                252
+                            ],
+                            [
+                                8574,
+                                249
+                            ],
+                            [
+                                8876,
+                                246
+                            ],
+                            [
+                                9177,
+                                245
+                            ],
+                            [
+                                9477,
+                                244
+                            ],
+                            [
+                                9777,
+                                244
+                            ],
+                            [
+                                10078,
+                                243
+                            ],
+                            [
+                                10378,
+                                242
+                            ],
+                            [
+                                10679,
+                                241
+                            ],
+                            [
+                                10979,
+                                240
+                            ],
+                            [
+                                11279,
+                                240
+                            ],
+                            [
+                                11580,
+                                239
+                            ],
+                            [
+                                11880,
+                                238
+                            ],
+                            [
+                                12180,
+                                238
+                            ],
+                            [
+                                12481,
+                                237
+                            ],
+                            [
+                                12781,
+                                237
+                            ],
+                            [
+                                13081,
+                                236
+                            ],
+                            [
+                                13381,
+                                236
+                            ],
+                            [
+                                13682,
+                                235
+                            ],
+                            [
+                                13982,
+                                235
+                            ],
+                            [
+                                14282,
+                                235
+                            ],
+                            [
+                                14582,
+                                234
+                            ],
+                            [
+                                14882,
+                                234
+                            ],
+                            [
+                                15183,
+                                233
+                            ],
+                            [
+                                15483,
+                                233
+                            ],
+                            [
+                                15783,
+                                233
+                            ],
+                            [
+                                16083,
+                                233
+                            ],
+                            [
+                                16383,
+                                233
+                            ],
+                            [
+                                16683,
+                                232
+                            ],
+                            [
+                                16983,
+                                232
+                            ],
+                            [
+                                17283,
+                                232
+                            ],
+                            [
+                                17583,
+                                232
+                            ],
+                            [
+                                17883,
+                                232
+                            ],
+                            [
+                                18183,
+                                232
+                            ],
+                            [
+                                18483,
+                                232
+                            ],
+                            [
+                                18783,
+                                232
+                            ],
+                            [
+                                19083,
+                                232
+                            ],
+                            [
+                                19383,
+                                232
+                            ],
+                            [
+                                19683,
+                                232
+                            ],
+                            [
+                                19983,
+                                232
+                            ],
+                            [
+                                20283,
+                                233
+                            ],
+                            [
+                                20583,
+                                233
+                            ],
+                            [
+                                20883,
+                                233
+                            ],
+                            [
+                                21183,
+                                233
+                            ],
+                            [
+                                21483,
+                                233
+                            ],
+                            [
+                                21783,
+                                233
+                            ],
+                            [
+                                22083,
+                                233
+                            ],
+                            [
+                                22383,
+                                233
+                            ],
+                            [
+                                22682,
+                                235
+                            ],
+                            [
+                                22982,
+                                235
+                            ],
+                            [
+                                23282,
+                                235
+                            ],
+                            [
+                                23582,
+                                235
+                            ],
+                            [
+                                23882,
+                                235
+                            ],
+                            [
+                                24181,
+                                237
+                            ],
+                            [
+                                24481,
+                                237
+                            ],
+                            [
+                                24781,
+                                238
+                            ],
+                            [
+                                25080,
+                                240
+                            ],
+                            [
+                                25379,
+                                243
+                            ],
+                            [
+                                25676,
+                                249
+                            ],
+                            [
+                                25974,
+                                256
+                            ],
+                            [
+                                26269,
+                                267
+                            ],
+                            [
+                                26563,
+                                284
+                            ],
+                            [
+                                26852,
+                                20695
+                            ],
+                            [
+                                47552,
+                                270
+                            ],
+                            [
+                                47875,
+                                233
+                            ],
+                            [
+                                48190,
+                                207
+                            ],
+                            [
+                                48501,
+                                187
+                            ],
+                            [
+                                48811,
+                                169
+                            ],
+                            [
+                                49119,
+                                154
+                            ],
+                            [
+                                49427,
+                                138
+                            ],
+                            [
+                                49734,
+                                66
+                            ],
+                            [
+                                50098,
+                                2
+                            ],
+                            [
+                                50399,
+                                1
+                            ],
+                            [
+                                50699,
+                                1
+                            ]
+                        ],
+                        "point": [
+                            146,
+                            89
+                        ]
+                    }
+                },
+                "high_idx": 7
+            }
+        ]
+    },
+    "scene": {
+        "color_to_object_type": {
+            "(1, 250, 184)": {
+                "objectID": "Shelf|-05.24|+01.97|+00.09",
+                "objectType": "Shelf"
+            },
+            "(10, 101, 19)": {
+                "objectID": "Shelf|-00.22|+00.58|+01.00",
+                "objectType": "Shelf"
+            },
+            "(101, 138, 144)": {
+                "objectID": "KeyChain|-01.84|+00.59|+04.21",
+                "objectType": "KeyChain"
+            },
+            "(101, 31, 182)": {
+                "objectID": "TissueBox|-03.71|+00.21|+04.40",
+                "objectType": "TissueBox"
+            },
+            "(104, 152, 233)": {
+                "objectID": "HousePlant|-03.97|+01.64|+00.14",
+                "objectType": "HousePlant"
+            },
+            "(106, 51, 179)": {
+                "objectID": "Shelf|-05.24|+01.78|+00.07",
+                "objectType": "Shelf"
+            },
+            "(124, 155, 148)": {
+                "objectID": "SideTable|-05.02|-00.01|+00.27",
+                "objectType": "SideTable"
+            },
+            "(128, 199, 42)": {
+                "objectID": "Cabinet|-02.70|+00.56|+04.20",
+                "objectType": "Cabinet"
+            },
+            "(128, 210, 19)": {
+                "objectID": "Watch|-01.19|+00.59|+00.26",
+                "objectType": "Watch"
+            },
+            "(131, 205, 203)": {
+                "objectID": "FloorLamp|-05.60|+00.00|+04.64",
+                "objectType": "FloorLamp"
+            },
+            "(14, 254, 47)": {
+                "objectID": "Shelf|-00.26|+00.07|+01.00",
+                "objectType": "Shelf"
+            },
+            "(140, 240, 181)": {
+                "objectID": "Laptop|-03.39|+01.10|+04.49",
+                "objectType": "Laptop"
+            },
+            "(142, 31, 75)": {
+                "objectID": "TissueBox|-04.67|+00.21|+04.46",
+                "objectType": "TissueBox"
+            },
+            "(146, 86, 155)": {
+                "objectID": "Pillow|-01.58|+00.67|+04.21",
+                "objectType": "Pillow"
+            },
+            "(152, 133, 74)": {
+                "objectID": "Drawer|-03.57|+01.01|+04.30",
+                "objectType": "Drawer"
+            },
+            "(157, 154, 189)": {
+                "objectID": "Drawer|-05.02|+00.88|+00.37",
+                "objectType": "Drawer"
+            },
+            "(16, 143, 20)": {
+                "objectID": "Shelf|-05.24|+01.58|+00.07",
+                "objectType": "Shelf"
+            },
+            "(165, 241, 108)": {
+                "objectID": "Newspaper|-05.53|+01.05|+00.17",
+                "objectType": "Newspaper"
+            },
+            "(168, 168, 229)": {
+                "objectID": "Lamp|-04.65|+01.03|+00.27",
+                "objectType": "Lamp"
+            },
+            "(185, 176, 3)": {
+                "objectID": "Dresser|-03.86|00.00|+04.59",
+                "objectType": "Dresser"
+            },
+            "(188, 183, 116)": {
+                "objectID": "ArmChair|-01.84|-00.01|+04.51",
+                "objectType": "ArmChair"
+            },
+            "(188, 205, 97)": {
+                "objectID": "Shelf|-00.23|+01.09|+01.00",
+                "objectType": "Shelf"
+            },
+            "(189, 169, 75)": {
+                "objectID": "Drawer|-04.74|+01.01|+04.30",
+                "objectType": "Drawer"
+            },
+            "(190, 20, 208)": {
+                "objectID": "Shelf|-01.29|+01.58|+00.27",
+                "objectType": "Shelf"
+            },
+            "(194, 32, 210)": {
+                "objectID": "GarbageCan|-05.80|+00.00|+04.07",
+                "objectType": "GarbageCan"
+            },
+            "(196, 223, 182)": {
+                "objectID": "Statue|-02.35|+00.04|+00.37",
+                "objectType": "Statue"
+            },
+            "(198, 122, 58)": {
+                "objectID": "Shelf|-01.29|+00.58|+00.22",
+                "objectType": "Shelf"
+            },
+            "(213, 24, 145)": {
+                "objectID": "Painting|-06.02|+01.80|+04.18",
+                "objectType": "Painting"
+            },
+            "(213, 51, 222)": {
+                "objectID": "Cabinet|-05.02|+00.56|+04.20",
+                "objectType": "Cabinet"
+            },
+            "(22, 72, 23)": {
+                "objectID": "Pillow|-02.03|+00.67|+04.42",
+                "objectType": "Pillow"
+            },
+            "(224, 64, 77)": {
+                "objectID": "Shelf|-01.29|+01.09|+00.23",
+                "objectType": "Shelf"
+            },
+            "(23, 234, 205)": {
+                "objectID": "Shelf|-05.24|+01.39|+00.09",
+                "objectType": "Shelf"
+            },
+            "(231, 110, 92)": {
+                "objectID": "KeyChain|-05.36|+01.04|+00.50",
+                "objectType": "KeyChain"
+            },
+            "(236, 19, 113)": {
+                "objectID": "Lamp|-02.81|+01.10|+04.52",
+                "objectType": "Lamp"
+            },
+            "(239, 38, 1)": {
+                "objectID": "Watch|-04.18|+01.11|+04.39",
+                "objectType": "Watch"
+            },
+            "(245, 254, 223)": {
+                "objectID": "FloorLamp|-00.65|+00.27|+04.43",
+                "objectType": "FloorLamp"
+            },
+            "(246, 212, 17)": {
+                "objectID": "Safe|-02.30|-00.01|+00.27",
+                "objectType": "Safe"
+            },
+            "(25, 88, 184)": {
+                "objectID": "Shelf|-00.27|+01.58|+00.99",
+                "objectType": "Shelf"
+            },
+            "(252, 189, 145)": {
+                "objectID": "Watch|-03.86|+01.11|+04.69",
+                "objectType": "Watch"
+            },
+            "(29, 190, 250)": {
+                "objectID": "Statue|-04.51|+01.12|+04.49",
+                "objectType": "Statue"
+            },
+            "(34, 89, 248)": {
+                "objectID": "RemoteControl|-02.09|+00.59|+04.21",
+                "objectType": "RemoteControl"
+            },
+            "(40, 100, 41)": {
+                "objectID": "Cabinet|-03.85|+00.56|+04.20",
+                "objectType": "Cabinet"
+            },
+            "(52, 233, 183)": {
+                "objectID": "Television|-03.35|+00.70|+00.13",
+                "objectType": "Television"
+            },
+            "(52, 56, 209)": {
+                "objectID": "Box|-03.86|+01.33|+04.49",
+                "objectType": "Box"
+            },
+            "(53, 129, 119)": {
+                "objectID": "Sofa|-00.74|+00.00|+02.75",
+                "objectType": "Sofa"
+            },
+            "(58, 237, 229)": {
+                "objectID": "Drawer|-04.16|+01.01|+04.30",
+                "objectType": "Drawer"
+            },
+            "(59, 75, 235)": {
+                "objectID": "CreditCard|-05.19|+01.04|+00.17",
+                "objectType": "CreditCard"
+            },
+            "(60, 101, 119)": {
+                "objectID": "Box|-03.57|+00.43|+04.59",
+                "objectType": "Box"
+            },
+            "(74, 156, 138)": {
+                "objectID": "LightSwitch|-06.00|+01.35|+03.40",
+                "objectType": "LightSwitch"
+            },
+            "(77, 85, 163)": {
+                "objectID": "CellPhone|-00.26|+00.59|+01.01",
+                "objectType": "CellPhone"
+            },
+            "(80, 135, 141)": {
+                "objectID": "Cabinet|-03.87|+00.56|+04.20",
+                "objectType": "Cabinet"
+            },
+            "(80, 237, 111)": {
+                "objectID": "Shelf|-01.29|+00.07|+00.26",
+                "objectType": "Shelf"
+            },
+            "(88, 47, 196)": {
+                "objectID": "Drawer|-02.99|+01.01|+04.30",
+                "objectType": "Drawer"
+            },
+            "(88, 85, 159)": {
+                "objectID": "Vase|-02.35|+00.04|+00.16",
+                "objectType": "Vase"
+            },
+            "(9, 88, 34)": {
+                "objectID": "Newspaper|-01.10|+01.60|+00.38",
+                "objectType": "Newspaper"
+            },
+            "(93, 217, 50)": {
+                "objectID": "Box|-04.22|+00.42|+04.34",
+                "objectType": "Box"
+            }
+        },
+        "dirty_and_empty": false,
+        "floor_plan": "FloorPlan219",
+        "init_action": {
+            "action": "TeleportFull",
+            "horizon": 30,
+            "rotateOnTeleport": true,
+            "rotation": 180,
+            "x": -5.75,
+            "y": 0.9010564,
+            "z": 1.25
+        },
+        "object_poses": [
+            {
+                "objectName": "TissueBox_9870a435",
+                "position": {
+                    "x": -4.6735363,
+                    "y": 0.205463246,
+                    "z": 4.45957851
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 89.99983,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Newspaper_d7bf2217",
+                "position": {
+                    "x": -5.534712,
+                    "y": 1.04548132,
+                    "z": 0.173595488
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Statue_d5fcbcb8",
+                "position": {
+                    "x": -4.50536633,
+                    "y": 1.11707771,
+                    "z": 4.49020863
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 89.99983,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Watch_612e947d",
+                "position": {
+                    "x": -1.18526542,
+                    "y": 0.593219161,
+                    "z": 0.25850907
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": -5.46415067e-05,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Watch_612e947d",
+                "position": {
+                    "x": -3.86400032,
+                    "y": 1.10843229,
+                    "z": 4.68779
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 89.99983,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "KeyChain_c760328c",
+                "position": {
+                    "x": -5.364626,
+                    "y": 1.03983569,
+                    "z": 0.5046067
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Box_6bf17402",
+                "position": {
+                    "x": -4.22304058,
+                    "y": 0.42122972,
+                    "z": 4.342753
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 179.999832,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Box_6bf17402",
+                "position": {
+                    "x": -3.86399984,
+                    "y": 1.33294666,
+                    "z": 4.49021053
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 89.99983,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Pillow_f6ab0ce7",
+                "position": {
+                    "x": -1.58457947,
+                    "y": 0.66833353,
+                    "z": 4.211366
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Box_6bf17402",
+                "position": {
+                    "x": -3.57082772,
+                    "y": 0.42552045,
+                    "z": 4.58773661
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": -0.000160509444,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Watch_612e947d",
+                "position": {
+                    "x": -4.184683,
+                    "y": 1.11192989,
+                    "z": 4.39142036
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 89.99983,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Pillow_f6ab0ce7",
+                "position": {
+                    "x": -2.03107262,
+                    "y": 0.668,
+                    "z": 4.42173243
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "TissueBox_9870a435",
+                "position": {
+                    "x": -3.70638418,
+                    "y": 0.205463246,
+                    "z": 4.39550352
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 89.99983,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Newspaper_d7bf2217",
+                "position": {
+                    "x": -1.09771407,
+                    "y": 1.59796047,
+                    "z": 0.376390636
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": -5.46415067e-05,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "CreditCard_fdd77625",
+                "position": {
+                    "x": -5.19453955,
+                    "y": 1.03899586,
+                    "z": 0.173595488
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "KeyChain_c760328c",
+                "position": {
+                    "x": -1.835,
+                    "y": 0.59083575,
+                    "z": 4.211366
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "CellPhone_b2fd26f3",
+                "position": {
+                    "x": -0.2585089,
+                    "y": 0.593190849,
+                    "z": 1.01018357
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 270.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Statue_d5fcbcb8",
+                "position": {
+                    "x": -2.35141754,
+                    "y": 0.0393711068,
+                    "z": 0.369563133
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 89.9998245,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Laptop_b52a5340",
+                "position": {
+                    "x": -3.393373,
+                    "y": 1.10418987,
+                    "z": 4.492851
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 191.867981,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "RemoteControl_8bd10912",
+                "position": {
+                    "x": -2.08542061,
+                    "y": 0.5927072,
+                    "z": 4.211366
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                }
+            },
+            {
+                "objectName": "Vase_23b546a6",
+                "position": {
+                    "x": -2.35141683,
+                    "y": 0.0375593044,
+                    "z": 0.160516039
+                },
+                "rotation": {
+                    "x": 0.0,
+                    "y": 89.9998245,
+                    "z": 0.0
+                }
+            }
+        ],
+        "object_toggles": [],
+        "random_seed": 3543694840,
+        "scene_num": 219
+    },
+    "task": {
+        "reward_upper_bound": 36.999999999999986,
+        "rewards": [
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            4.2,
+            -0.1,
+            -0.1,
+            2,
+            -0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            4.2,
+            -0.1,
+            -0.1,
+            2,
+            -0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            4.2,
+            -0.1,
+            -0.1,
+            2,
+            -0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            0.2,
+            4.2,
+            -0.1,
+            -0.1,
+            7
+        ]
+    },
+    "task_id": "trial_T20190907_163240_345855",
+    "task_type": "pick_two_obj_and_place",
+    "turk_annotations": {
+        "anns": [
+            {
+                "assignment_id": "A1MKCTVKE7J0ZP_3A4TN5196NZKOVTOYT6SKKY798YHCZ",
+                "high_descs": [
+                    "Turn left, go straight, turn left, to face the blue chair.",
+                    "Pick up the left most pillow on the blue chair.",
+                    "Turn around, move forward, then turn left to face the sofa.",
+                    "Put the pillow on the center of the sofa.",
+                    "Turn left to return to the blue chair.",
+                    "Pick up the pillow on the blue chair.",
+                    "Turn around, move forward, then turn left to face the sofa.",
+                    "Put the pillow on the right cushion of the sofa."
+                ],
+                "task_desc": "Put two pillows on the sofa.",
+                "votes": [
+                    1,
+                    1
+                ]
+            },
+            {
+                "assignment_id": "A36DK84J5YJ942_3MAOD8E57TR01PQUSNXS3HGDW1JNX2",
+                "high_descs": [
+                    "Move to the arm chair to the left of the couch",
+                    "Pick up a pillow from the chair",
+                    "Move to the middle of the couch",
+                    "Put the pillow on the couch",
+                    "Move to the arm chair to the left of the couch",
+                    "Pick up a pillow from the chair",
+                    "Move to the middle of the couch",
+                    "Put the pillow on the couch"
+                ],
+                "task_desc": "Put two pillows on a couch.",
+                "votes": [
+                    1,
+                    1
+                ]
+            },
+            {
+                "assignment_id": "AKW57KYG90X61_3TPZPLC3M3TOOCVTOD3W0QW4PMQ3PN",
+                "high_descs": [
+                    "turn around and locate the chair",
+                    "pick up the pillow from the chair",
+                    "turn right and head for the sofa",
+                    "drop the pillow on the sofa",
+                    "turn left and head for the chair",
+                    "pick up the other pillow",
+                    "turn right towards the sofa",
+                    "place the pillow on the sofa"
+                ],
+                "task_desc": "place the two pillows on the sofa",
+                "votes": [
+                    1,
+                    1
+                ]
+            }
+        ]
+    }
+}
