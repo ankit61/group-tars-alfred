@@ -28,6 +28,10 @@ class Model(Configurable, LightningModule):
     def get_trainer_kwargs(self):
         return self.conf.main.default_trainer_args
 
+    def test_step(self, *args, **kwargs):
+        # temporary fix to make validation work
+        return self.validation_step(*args, **kwargs)
+
     # data stuff
     def train_dataloader(self):
         return self.shared_dataloader(DatasetType.TRAIN)
