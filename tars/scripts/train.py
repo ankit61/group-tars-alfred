@@ -17,7 +17,7 @@ def get_args():
     parser.add_argument('--model', type=str, required=True, help='the class name of the model to train - can be auxilary model or a policy')
     parser.add_argument('--resume', type=str, default=None)
     parser.add_argument('--no-log', action='store_true')
-
+    parser.add_argument('--mode', type=str, default='train', choices=['train', 'validate'])
     args, _ = parser.parse_known_args()
     return args
 
@@ -62,7 +62,12 @@ def main():
                 **model.get_trainer_kwargs()
             )
 
-    trainer.fit(model)
+    if args.mode == 'train':
+        trainer.fit(model)
+    elif args.mode == 'validate':
+        assert args.resume is not None, 'Why do you want to validate a untrained model? Are you sleepy?'
+
+        trainer.test(model, test_dataloaders=model.val_dataloader())
 
 if __name__ == '__main__':
     main()

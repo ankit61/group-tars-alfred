@@ -1,5 +1,5 @@
 import itertools
-from numpy.core.fromnumeric import sort
+from torchvision.models.detection import maskrcnn_resnet50_fpn
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
@@ -30,32 +30,39 @@ class TarsPolicy(Policy):
                                 self.conf
                             )
 
+        if self.conf.use_mask:
+            self.maskrcnn = maskrcnn_resnet50_fpn(num_classes=self.num_objects)
+            self.maskrcnn.eval()
+            self.maskrcnn.load_state_dict(torch.load(self.conf.mask_rcnn_path, map_location=self.conf.main.device))
+            self.maskrcnn = self.maskrcnn.to(self.conf.main.device)
+
         self.datasets = {}
 
-        self.action_loss = nn.CrossEntropyLoss()
-        self.object_loss = nn.CrossEntropyLoss()
+        self.action_loss = nn.CrossEntropyLoss(reduction='sum') # meaned at end
+        self.object_loss = nn.CrossEntropyLoss(reduction='sum') # meaned at end
 
         self.reset() # initializes all past trajectory info
 
     def reset(self):
         self.past_actions = torch.full(
                             (self.conf.batch_size, self.conf.past_actions_len),
-                            self.num_actions
+                            self.num_actions, device=self.conf.main.device
                         )
 
         self.past_objects = torch.full(
                             (self.conf.batch_size, self.conf.past_objects_len),
-                            self.object_na_idx
+                            self.object_na_idx, device=self.conf.main.device
+
                         )
 
         self.actions_itr = itertools.cycle(range(self.past_actions.shape[1]))
         self.objects_itr = [itertools.cycle(range(self.past_objects.shape[1]))] * self.conf.batch_size
 
-        self.inst_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size)
-        self.inst_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size)
+        self.inst_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size, device=self.conf.main.device)
+        self.inst_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size, device=self.conf.main.device)
 
-        self.goal_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size)
-        self.goal_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size)
+        self.goal_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
+        self.goal_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
 
     def forward(self, img, goal_inst, low_insts):
         '''
@@ -66,8 +73,8 @@ class TarsPolicy(Policy):
                 low_inst: [S', N]
         '''
         context = self.context_module(
-                    self.past_actions,
-                    self.past_objects,
+                    self.past_actions.clone(),
+                    self.past_objects.clone(),
                     self.inst_lstm_cell,
                     self.goal_lstm_cell
                 )
@@ -102,6 +109,7 @@ class TarsPolicy(Policy):
         self.reset()
 
         ac_loss, obj_loss = 0, 0
+        seq_len = 0
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
             action, _, int_object = self(
@@ -111,18 +119,23 @@ class TarsPolicy(Policy):
                                     )
             ac_loss += self.action_loss(action, mini_batch['expert_actions'])
             obj_loss += self.object_loss(int_object, mini_batch['expert_int_objects'])
+            seq_len += batch_size
 
         return {
-            'loss': ac_loss + obj_loss,
-            'action_loss': ac_loss.item(),
-            'object_loss': obj_loss.item()
+            'loss': (ac_loss + obj_loss) / seq_len,
+            'action_loss': ac_loss.item() / seq_len,
+            'object_loss': obj_loss.item() / seq_len
         }
 
     def configure_optimizers(self):
         return self.conf.get_optim(self.parameters())
 
     def training_step(self, batch, batch_idx):
-        return self.shared_step(batch)
+        metrics = self.shared_step(batch)
+        metrics = {f'train_{k}': metrics[k] for k in metrics}
+        self.log_dict(metrics)
+        metrics['loss'] = metrics.pop('train_loss')
+        return metrics['loss']
 
     def validation_step(self, batch, batch_idx, dataloader_idx):
         metrics = self.shared_step(batch)
@@ -165,6 +178,14 @@ class TarsPolicy(Policy):
             )
 
     def find_instance_mask(self, img, int_object):
+        '''
+            Args:
+                img: [N, C, H, W]
+                int_object:
+                    Each element in the tensor of shape [N] is an index
+                    of the class
+        '''
+        # use self.maskrcnn
         # run instance segmentation
         # argmax over channels
         # keep only mask over int_object
