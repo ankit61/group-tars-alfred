@@ -38,8 +38,8 @@ class TarsPolicy(Policy):
 
         self.datasets = {}
 
-        self.action_loss = nn.CrossEntropyLoss()
-        self.object_loss = nn.CrossEntropyLoss()
+        self.action_loss = nn.CrossEntropyLoss(reduction='sum') # meaned at end
+        self.object_loss = nn.CrossEntropyLoss(reduction='sum') # meaned at end
 
         self.reset() # initializes all past trajectory info
 
@@ -73,8 +73,8 @@ class TarsPolicy(Policy):
                 low_inst: [S', N]
         '''
         context = self.context_module(
-                    self.past_actions,
-                    self.past_objects,
+                    self.past_actions.clone(),
+                    self.past_objects.clone(),
                     self.inst_lstm_cell,
                     self.goal_lstm_cell
                 )
@@ -109,6 +109,7 @@ class TarsPolicy(Policy):
         self.reset()
 
         ac_loss, obj_loss = 0, 0
+        seq_len = 0
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
             action, _, int_object = self(
@@ -118,11 +119,12 @@ class TarsPolicy(Policy):
                                     )
             ac_loss += self.action_loss(action, mini_batch['expert_actions'])
             obj_loss += self.object_loss(int_object, mini_batch['expert_int_objects'])
+            seq_len += batch_size
 
         return {
-            'loss': ac_loss + obj_loss,
-            'action_loss': ac_loss.item(),
-            'object_loss': obj_loss.item()
+            'loss': (ac_loss + obj_loss) / seq_len,
+            'action_loss': ac_loss.item() / seq_len,
+            'object_loss': obj_loss.item() / seq_len
         }
 
     def configure_optimizers(self):
