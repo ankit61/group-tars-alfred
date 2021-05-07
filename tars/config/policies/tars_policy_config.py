@@ -5,11 +5,11 @@ from tars.config.policies.moca_policy_config import MocaPolicyConfig
 
 class TarsPolicyConfig(ModelConfig):
     use_mask = False
-    batch_size = 2
+    batch_size = 1
 
     # feature sizes
-    context_size = 512
-    vision_features_size = 512
+    context_size = 128
+    vision_features_size = 128
     raw_vision_features_size = 512
 
     # history
@@ -26,7 +26,7 @@ class TarsPolicyConfig(ModelConfig):
 
     # LSTMs
     inst_hidden_size = 256
-    goal_hidden_size = 256
+    goal_hidden_size = 128
 
     # vision module
     use_instance_seg = False
