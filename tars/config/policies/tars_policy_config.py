@@ -5,7 +5,7 @@ from tars.config.policies.moca_policy_config import MocaPolicyConfig
 
 class TarsPolicyConfig(ModelConfig):
     use_mask = False
-    batch_size = 1
+    batch_size = 2
 
     # feature sizes
     context_size = 512
