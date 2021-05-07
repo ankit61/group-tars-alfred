@@ -8,7 +8,7 @@ class TarsPolicyConfig(ModelConfig):
     batch_size = 1
 
     # feature sizes
-    context_size = 128
+    context_size = 512
     vision_features_size = 128
     raw_vision_features_size = 512
 

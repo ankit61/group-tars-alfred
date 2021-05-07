@@ -17,14 +17,11 @@ from typing import Union
 
 
 class EmbedAndReadout(Model):
-    def __init__(self, dict_size, embed_dim, out_dim, padding_idx, history_max_len, policy_conf, use_pe=True, pretrain_type: Union[str, HistoryType] = None, model_load_path=None):
+    def __init__(self, dict_size, embed_dim, out_dim, padding_idx, history_max_len, policy_conf, use_pe=True, pretrain_type: Union[str, HistoryType] = None):
         super(EmbedAndReadout, self).__init__()
 
         self.history_max_len = history_max_len
-        self.pretrain_type = None
-        if pretrain_type:
-            self.pretrain_type = pretrain_type if isinstance(type, HistoryType) else HistoryType(pretrain_type)
-
+        
         self.embed = nn.Embedding(
             dict_size + 1, # +1 for SOS token for pretraining
             embed_dim,
@@ -40,12 +37,14 @@ class EmbedAndReadout(Model):
             use_pe=use_pe
         )
 
-        if self.pretrain_type:
-            self.decoder = PretrainingDecoder(self.embed, out_dim)
-            self.sos_token = dict_size
+        self.decoder = PretrainingDecoder(self.embed, out_dim)
 
-        if model_load_path:
-            self.load_state_dict(torch.load(model_load_path))
+        if pretrain_type:
+            self.pretrain_type = pretrain_type if isinstance(type, HistoryType) else HistoryType(pretrain_type)
+            self.sos_token = dict_size
+        else:
+            self.pretrain_type = None
+            self.decoder = None
 
 
     def forward(self, items):
@@ -167,30 +166,6 @@ class EmbedAndReadout(Model):
         }
         self.log_dict(metrics_dict)
 
-        # return {
-        #     'val_pred_distrib': pred_distrib,
-        #     'val_pred_bias': pred_bias
-        # }
-
-    
-    # def validation_epoch_end(self, val_outs):
-    #     if not self.trainer.running_sanity_check:
-    #         for dataloader_idx, dataloader_outs in enumerate(val_outs):
-    #             val_pred_distrib_outs = [dataloader_out['val_pred_distrib'] for dataloader_out in dataloader_outs]
-    #             val_pred_distrib_epoch = sum(val_pred_distrib_outs) / len(val_pred_distrib_outs)
-
-    #             val_pred_bias_outs = [dataloader_out['val_pred_bias'] for dataloader_out in dataloader_outs]
-    #             val_pred_bias_epoch = sum(val_pred_bias_outs) / len(val_pred_bias_outs)
-
-
-    #             for data_tensor, data_name, title, ylabel in [(val_pred_distrib_epoch, "val_pred_distrib", "Distribution of predicted classes", "relative freq"), (val_pred_bias_epoch, "val_bias_distrib", "Distribution of prediction bias", "pred relative freq / target relative freq")]:
-    #                 data = [[class_label, value] for [class_label, value] in enumerate(data_tensor.tolist())]
-    #                 table = wandb.Table(data=data, columns=["class label", ylabel])
-
-    #                 # self.logger.experiment.log({f"{data_name}/dataloader_idx_{dataloader_idx}": wandb.plot.bar(table, "class label", ylabel, title=title)})
-
-           
-
 
     def configure_optimizers(self):
         optimizer = self.conf.get_optim(self.parameters())
@@ -228,8 +203,3 @@ class PretrainingDecoder(Model):
         logits = self.out.forward(next_hidden)
         return logits, next_hidden, next_cell
 
-
-# class WandbDistribCallback(pl.Callback):
-#     def __init__(self, val_samples):
-#         super().__init__()
-#         _, _, _, self.val_pred_distribs, self.val_pred_biases = val_samples

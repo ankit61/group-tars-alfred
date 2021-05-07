@@ -6,29 +6,29 @@ from tars.datasets.history_dataset import HistoryType
 
 
 class ContextModule(Model):
-    def __init__(self, num_actions, num_objects, object_na_idx, policy_conf, pretrain=False):
+    def __init__(self, num_actions, num_objects, object_na_idx, policy_conf):
         super(ContextModule, self).__init__()
 
         self.padding_action_idx = num_actions
 
-        self.action_embed_and_readout = EmbedAndReadout(
+        self.action_embed_and_readout = EmbedAndReadout.load_from_checkpoint(
+            policy_conf.action_readout_path,
             dict_size=num_actions + 1, # +1 for padding
             embed_dim=policy_conf.action_emb_dim,
             out_dim=policy_conf.action_hist_emb_dim,
             padding_idx=self.padding_action_idx,
             history_max_len=policy_conf.past_actions_len,
-            policy_conf=policy_conf,
-            pretrain_type=(HistoryType.ACTION if pretrain else None)
+            policy_conf=policy_conf
         )
 
-        self.int_object_embed_and_readout = EmbedAndReadout(
+        self.int_object_embed_and_readout = EmbedAndReadout.load_from_checkpoint(
+            policy_conf.object_readout_path,
             dict_size=num_objects, # object_na already included in num_objects
             embed_dim=policy_conf.object_emb_dim,
             out_dim=policy_conf.int_hist_emb_dim,
             padding_idx=object_na_idx,
             history_max_len=policy_conf.past_objects_len,
-            policy_conf=policy_conf,
-            pretrain_type=(HistoryType.OBJECT if pretrain else None)
+            policy_conf=policy_conf
         )
 
         self.context_mixer = nn.Linear(
