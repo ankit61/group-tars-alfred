@@ -28,6 +28,10 @@ class TarsPolicyConfig(ModelConfig):
     inst_hidden_size = 256
     goal_hidden_size = 128
 
+    # context module
+    action_readout_path = '/data/best_models/action_history.ckpt'
+    int_object_readout_path = '/data/best_models/int_object_history.ckpt'
+
     # vision module
     use_instance_seg = False
     detection_model_path = '/data/best_models/multi_label_classifier.ckpt'

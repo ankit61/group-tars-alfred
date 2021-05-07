@@ -1,3 +1,4 @@
+from tars import policies
 import torch
 import torch.nn as nn
 from tars.base.model import Model
@@ -22,7 +23,7 @@ class ContextModule(Model):
         )
 
         self.int_object_embed_and_readout = EmbedAndReadout.load_from_checkpoint(
-            policy_conf.object_readout_path,
+            policy_conf.int_object_readout_path,
             dict_size=num_objects, # object_na already included in num_objects
             embed_dim=policy_conf.object_emb_dim,
             out_dim=policy_conf.int_hist_emb_dim,
@@ -38,8 +39,9 @@ class ContextModule(Model):
 
 
     def forward(self, past_actions, past_objects, inst_lstm_cell, goal_lstm_cell):
-        action_readout = self.action_embed_and_readout.forward(past_actions)
-        int_objects_readout = self.int_object_embed_and_readout.forward(past_objects)
+        with torch.no_grad():
+            action_readout = self.action_embed_and_readout.forward(past_actions)
+            int_objects_readout = self.int_object_embed_and_readout.forward(past_objects)
 
         explicit_context = torch.cat((action_readout, int_objects_readout), dim=1)
         implicit_context = torch.cat((inst_lstm_cell, goal_lstm_cell), dim=1)
