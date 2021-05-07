@@ -161,11 +161,33 @@ class EmbedAndReadout(Model):
         metrics_dict = {
             'val_loss': loss,
             'val_score': score,
-            'val_edit_dist': edit_dist,
-            'val_pred_distrib': pred_distrib,
-            'val_pred_bias': pred_bias
+            'val_edit_dist': edit_dist
         }
         self.log_dict(metrics_dict)
+
+        # return {
+        #     'val_pred_distrib': pred_distrib,
+        #     'val_pred_bias': pred_bias
+        # }
+
+    
+    # def validation_epoch_end(self, val_outs):
+    #     if not self.trainer.running_sanity_check:
+    #         for dataloader_idx, dataloader_outs in enumerate(val_outs):
+    #             val_pred_distrib_outs = [dataloader_out['val_pred_distrib'] for dataloader_out in dataloader_outs]
+    #             val_pred_distrib_epoch = sum(val_pred_distrib_outs) / len(val_pred_distrib_outs)
+
+    #             val_pred_bias_outs = [dataloader_out['val_pred_bias'] for dataloader_out in dataloader_outs]
+    #             val_pred_bias_epoch = sum(val_pred_bias_outs) / len(val_pred_bias_outs)
+
+
+    #             for data_tensor, data_name, title, ylabel in [(val_pred_distrib_epoch, "val_pred_distrib", "Distribution of predicted classes", "relative freq"), (val_pred_bias_epoch, "val_bias_distrib", "Distribution of prediction bias", "pred relative freq / target relative freq")]:
+    #                 data = [[class_label, value] for [class_label, value] in enumerate(data_tensor.tolist())]
+    #                 table = wandb.Table(data=data, columns=["class label", ylabel])
+
+    #                 # self.logger.experiment.log({f"{data_name}/dataloader_idx_{dataloader_idx}": wandb.plot.bar(table, "class label", ylabel, title=title)})
+
+           
 
 
     def configure_optimizers(self):
