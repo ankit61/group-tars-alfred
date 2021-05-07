@@ -48,8 +48,9 @@ class ActionModule(Model):
         self, goal_inst, low_insts, vision_features,
         context, inst_hidden_cell=None, goal_hidden_cell=None
     ):
-        goal_embs = self.context_emb_model(goal_inst)
-        insts_embs = self.context_emb_model(low_insts)
+        with torch.no_grad():
+            goal_embs = self.context_emb_model(goal_inst)
+            insts_embs = self.context_emb_model(low_insts)
 
         # inst LSTM
         context_vision = torch.cat((context, vision_features), dim=1)
