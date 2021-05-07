@@ -1,4 +1,3 @@
-from tars import policies
 import torch
 import torch.nn as nn
 from tars.base.model import Model
