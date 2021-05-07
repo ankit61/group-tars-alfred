@@ -15,7 +15,9 @@ class EmbedAndReadout(Model):
         super(EmbedAndReadout, self).__init__()
 
         self.history_max_len = history_max_len
-        self.pretrain_type = pretrain_type if isinstance(type, HistoryType) else HistoryType(pretrain_type)
+        self.pretrain_type = None
+        if pretrain_type:
+            self.pretrain_type = pretrain_type if isinstance(type, HistoryType) else HistoryType(pretrain_type)
 
         self.embed = nn.Embedding(
             dict_size + 1, # +1 for SOS token for pretraining

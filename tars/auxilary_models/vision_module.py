@@ -22,8 +22,8 @@ class VisionModule(Model):
             embed_dim=conf.object_emb_dim,
             out_dim=conf.vision_object_emb_dim,
             padding_idx=object_na_idx,
-            max_len=conf.max_img_objects,
-            conf=conf,
+            history_max_len=conf.max_img_objects,
+            policy_conf=conf,
             use_pe=False
         )
 
@@ -43,6 +43,7 @@ class VisionModule(Model):
             torch.Size([img.shape[0], self.raw_vision_features_size])
 
         with torch.no_grad():
+            self.detection_model.eval()
             detected_objs = self.detection_model.predict_classes(self.detection_model(img))
             vals, obj_idxs = detected_objs.topk(k=self.max_img_objects, dim=1)
             mask = (vals > 0)

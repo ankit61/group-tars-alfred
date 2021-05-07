@@ -45,22 +45,23 @@ class TarsPolicy(Policy):
     def reset(self):
         self.past_actions = torch.full(
                             (self.conf.batch_size, self.conf.past_actions_len),
-                            self.num_actions
+                            self.num_actions, device=self.conf.main.device
                         )
 
         self.past_objects = torch.full(
                             (self.conf.batch_size, self.conf.past_objects_len),
-                            self.object_na_idx
+                            self.object_na_idx, device=self.conf.main.device
+
                         )
 
         self.actions_itr = itertools.cycle(range(self.past_actions.shape[1]))
         self.objects_itr = [itertools.cycle(range(self.past_objects.shape[1]))] * self.conf.batch_size
 
-        self.inst_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size)
-        self.inst_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size)
+        self.inst_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size, device=self.conf.main.device)
+        self.inst_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size, device=self.conf.main.device)
 
-        self.goal_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size)
-        self.goal_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size)
+        self.goal_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
+        self.goal_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
 
     def forward(self, img, goal_inst, low_insts):
         '''

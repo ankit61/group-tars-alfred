@@ -5,7 +5,7 @@ from tars.config.policies.moca_policy_config import MocaPolicyConfig
 
 class TarsPolicyConfig(ModelConfig):
     use_mask = False
-    batch_size = 32
+    batch_size = 1
 
     # feature sizes
     context_size = 512
@@ -30,7 +30,7 @@ class TarsPolicyConfig(ModelConfig):
 
     # vision module
     use_instance_seg = False
-    detection_model_path = None
+    detection_model_path = '/data/best_models/multi_label_classifier.ckpt'
     max_img_objects = 10
 
     # readout transformer

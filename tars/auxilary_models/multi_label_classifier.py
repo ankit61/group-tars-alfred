@@ -7,16 +7,16 @@ from tars.datasets.multi_label_dataset import MultiLabelDataset
 
 
 class MultiLabelClassifier(Model):
-    def __init__(self, model_save_path=None):
+    def __init__(self, model_load_path=None):
         super(MultiLabelClassifier, self).__init__()
         self.num_classes = len(DatasetConfig.objects_list)
-        self.model_save_path = model_save_path
+        self.model_load_path = model_load_path
 
         self.model = models.resnet34(pretrained=True)
         self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
         self.loss = nn.BCEWithLogitsLoss()
 
-        if self.model_save_path is not None:
+        if self.model_load_path is not None:
             self.load_from_checkpoint(
                 self.model_load_path,
                 map_location=self.conf.main.device
