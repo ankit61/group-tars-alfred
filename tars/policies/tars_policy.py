@@ -131,7 +131,11 @@ class TarsPolicy(Policy):
         return self.conf.get_optim(self.parameters())
 
     def training_step(self, batch, batch_idx):
-        return self.shared_step(batch)
+        metrics = self.shared_step(batch)
+        metrics = {f'train_{k}': metrics[k] for k in metrics}
+        self.log_dict(metrics)
+        metrics['loss'] = metrics.pop('train_loss')
+        return metrics['loss']
 
     def validation_step(self, batch, batch_idx, dataloader_idx):
         metrics = self.shared_step(batch)
