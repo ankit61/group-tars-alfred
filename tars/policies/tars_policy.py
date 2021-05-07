@@ -30,10 +30,11 @@ class TarsPolicy(Policy):
                                 self.conf
                             )
 
-        self.maskrcnn = maskrcnn_resnet50_fpn(num_classes=self.num_objects)
-        self.maskrcnn.eval()
-        self.maskrcnn.load_state_dict(torch.load(self.conf.mask_rcnn_path, map_location=self.conf.main.device))
-        self.maskrcnn = self.maskrcnn.to(self.conf.main.device)
+        if self.conf.use_mask:
+            self.maskrcnn = maskrcnn_resnet50_fpn(num_classes=self.num_objects)
+            self.maskrcnn.eval()
+            self.maskrcnn.load_state_dict(torch.load(self.conf.mask_rcnn_path, map_location=self.conf.main.device))
+            self.maskrcnn = self.maskrcnn.to(self.conf.main.device)
 
         self.datasets = {}
 
