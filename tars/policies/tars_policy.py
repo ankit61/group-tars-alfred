@@ -26,7 +26,7 @@ class TarsPolicy(Policy):
         self.vision_module = VisionModule(self.num_objects, self.object_na_idx, self.conf)
         self.action_module = ActionModule(
                                 self.context_module.action_embed_and_readout.embed,
-                                self.context_module.int_object_embed_and_readout.embed, 
+                                self.context_module.int_object_embed_and_readout.embed,
                                 self.conf
                             )
 

@@ -1,3 +1,4 @@
+from tars import policies
 import torch
 import torch.nn as nn
 from tars.base.model import Model
@@ -18,7 +19,8 @@ class ContextModule(Model):
             padding_idx=self.padding_action_idx,
             history_max_len=policy_conf.past_actions_len,
             policy_conf=policy_conf,
-            pretrain_type=(HistoryType.ACTION if pretrain else None)
+            pretrain_type=(HistoryType.ACTION if pretrain else None),
+            model_load_path=(policy_conf.action_readout_path if not pretrain else None)
         )
 
         self.int_object_embed_and_readout = EmbedAndReadout(
@@ -28,7 +30,8 @@ class ContextModule(Model):
             padding_idx=object_na_idx,
             history_max_len=policy_conf.past_objects_len,
             policy_conf=policy_conf,
-            pretrain_type=(HistoryType.OBJECT if pretrain else None)
+            pretrain_type=(HistoryType.OBJECT if pretrain else None),
+            model_load_path=(policy_conf.object_readout_path if not pretrain else None)
         )
 
         self.context_mixer = nn.Linear(
@@ -38,8 +41,9 @@ class ContextModule(Model):
 
 
     def forward(self, past_actions, past_objects, inst_lstm_cell, goal_lstm_cell):
-        action_readout = self.action_embed_and_readout.forward(past_actions)
-        int_objects_readout = self.int_object_embed_and_readout.forward(past_objects)
+        with torch.no_grad():
+            action_readout = self.action_embed_and_readout.forward(past_actions)
+            int_objects_readout = self.int_object_embed_and_readout.forward(past_objects)
 
         explicit_context = torch.cat((action_readout, int_objects_readout), dim=1)
         implicit_context = torch.cat((inst_lstm_cell, goal_lstm_cell), dim=1)
