@@ -1,5 +1,6 @@
 import itertools
 from torchvision.models.detection import maskrcnn_resnet50_fpn
+from torchvision.transforms.functional import to_tensor
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
@@ -10,6 +11,8 @@ from tars.auxilary_models import ContextModule
 from tars.auxilary_models import ActionModule
 from tars.config.base.dataset_config import DatasetConfig
 from tars.base.policy import Policy
+import numpy as np
+import tars.alfred.gen.constants as constants
 
 
 class TarsPolicy(Policy):
@@ -101,7 +104,7 @@ class TarsPolicy(Policy):
         if not self.conf.remove_goal_lstm:
             self.goal_lstm_hidden, self.goal_lstm_cell = goal_hidden_cell
 
-        self.update_history(action, int_object)
+        #self.update_history(action, int_object)
 
         int_mask = self.find_instance_mask(img, int_object) if self.conf.use_mask else None
 
@@ -121,7 +124,7 @@ class TarsPolicy(Policy):
         self.reset()
 
         ac_loss, obj_loss = 0, 0
-        seq_len = 0
+        ac_seq_len, obj_seq_len = 0, 0
         pred_actions, pred_objects = [], []
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
@@ -136,12 +139,13 @@ class TarsPolicy(Policy):
             expert_objs = mini_batch['expert_int_objects']
             object_mask = (expert_objs != self.object_na_idx)
             obj_loss += self.object_loss(int_object[object_mask], expert_objs[object_mask])
-            seq_len += batch_size
+            ac_seq_len += batch_size
+            obj_seq_len += object_mask.sum()
 
         return {
-            'loss': (ac_loss + obj_loss) / seq_len,
-            'action_loss': ac_loss.item() / seq_len,
-            'object_loss': obj_loss.item() / seq_len,
+            'loss': ac_loss / ac_seq_len + obj_loss / obj_seq_len,
+            'action_loss': ac_loss.item() / ac_seq_len,
+            'object_loss': obj_loss.item() / obj_seq_len,
             'pred_action_std': torch.tensor(pred_actions).std(),
             'pred_object_std': torch.tensor(pred_objects).std()
         }
@@ -199,7 +203,7 @@ class TarsPolicy(Policy):
                 num_workers=self.conf.main.num_threads, shuffle=(type == DatasetType.TRAIN)
             )
 
-    def find_instance_mask(self, img, int_object):
+    def find_instance_mask(self, imgs, int_objects):
         '''
             Args:
                 img: [N, C, H, W]
@@ -213,4 +217,42 @@ class TarsPolicy(Policy):
         # keep only mask over int_object
         # identify which instance to use using MOCA's style
         # return img with seg map over predicted instance only
-        pass
+        prev_class = 0
+        prev_center = torch.zeros(2)
+
+        predicted_masks = [] # size N list containing mask
+
+        for img, int_object in zip(imgs, int_objects):
+
+            pred_class = int_object
+
+            # mask generation
+            with torch.no_grad():
+                out = self.maskrcnn([to_tensor(img).to('cuda' if self.conf.main.use_gpu else 'cpu')])[0]
+                for k in out:
+                    out[k] = out[k].detach().cpu()
+
+            if sum(out['labels'] == pred_class) == 0:
+                mask = np.zeros((constants.SCREEN_WIDTH,constants.SCREEN_HEIGHT))
+
+            else:
+                masks = out['masks'][out['labels'] == pred_class].detach().cpu()
+                scores = out['scores'][out['labels'] == pred_class].detach().cpu()
+
+                # Instance selection based on the minimum distance between the prev. and cur. instance of a same class.
+                if prev_class != pred_class:
+                    scores, indices = scores.sort(descending=True)
+                    masks = masks[indices]
+                    prev_class = pred_class
+                    prev_center = masks[0].squeeze(dim=0).nonzero().double().mean(dim=0)
+                else:
+                    cur_centers = torch.stack([m.nonzero().double().mean(dim=0) for m in masks.squeeze(dim=1)])
+                    distances = ((cur_centers - prev_center) ** 2).sum(dim=1)
+                    distances, indices = distances.sort()
+                    masks = masks[indices]
+                    prev_center = cur_centers[0]
+
+                mask = np.squeeze(masks[0].numpy(), axis=0)
+            predicted_masks.append(mask)
+
+        return predicted_masks
