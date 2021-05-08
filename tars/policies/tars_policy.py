@@ -64,8 +64,11 @@ class TarsPolicy(Policy):
         self.inst_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size, device=self.conf.main.device)
         self.inst_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size, device=self.conf.main.device)
 
-        self.goal_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
-        self.goal_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
+        if not self.conf.remove_goal_lstm:
+            self.goal_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
+            self.goal_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
+        else:
+            self.goal_lstm_hidden, self.goal_lstm_cell = None, None
 
     def forward(self, img, goal_inst, low_insts):
         '''
@@ -95,7 +98,8 @@ class TarsPolicy(Policy):
             )
 
         self.inst_lstm_hidden, self.inst_lstm_cell = inst_hidden_cell
-        self.goal_lstm_hidden, self.goal_lstm_cell = goal_hidden_cell
+        if not self.conf.remove_goal_lstm:
+            self.goal_lstm_hidden, self.goal_lstm_cell = goal_hidden_cell
 
         self.update_history(action, int_object)
 
@@ -167,10 +171,11 @@ class TarsPolicy(Policy):
         self.inst_lstm_hidden = self.inst_lstm_hidden[:batch_size]
         self.inst_lstm_cell = self.inst_lstm_cell[:batch_size]
 
-        self.goal_lstm_hidden = self.goal_lstm_hidden[:batch_size]
-        self.goal_lstm_cell = self.goal_lstm_cell[:batch_size]
+        if not self.conf.remove_goal_lstm:
+            self.goal_lstm_hidden = self.goal_lstm_hidden[:batch_size]
+            self.goal_lstm_cell = self.goal_lstm_cell[:batch_size]
 
-    # data stuff
+    ### data stuff
 
     def setup(self, stage):
         for type in [DatasetType.TRAIN, DatasetType.VALID_SEEN, DatasetType.VALID_UNSEEN]:

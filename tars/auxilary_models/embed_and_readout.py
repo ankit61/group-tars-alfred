@@ -21,7 +21,7 @@ class EmbedAndReadout(Model):
         super(EmbedAndReadout, self).__init__()
 
         self.history_max_len = history_max_len
-        
+
         self.embed = nn.Embedding(
             dict_size + 1, # +1 for SOS token for pretraining
             embed_dim,

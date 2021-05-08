@@ -29,8 +29,8 @@ class VisionModule(Model):
                 use_pe=False
             )
 
-        self.detection_model = MultiLabelClassifier(model_load_path=conf.detection_model_path)
-        self.detection_model.eval()
+            self.detection_model = MultiLabelClassifier(model_load_path=conf.detection_model_path)
+            self.detection_model.eval()
 
         self.vision_mixer = nn.Linear(
                             conf.raw_vision_features_size + (0 if self.remove_vision_readout else conf.vision_object_emb_dim),

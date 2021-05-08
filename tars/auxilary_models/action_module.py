@@ -10,6 +10,7 @@ class ActionModule(Model):
         self.num_actions = action_emb.num_embeddings
         self.num_objects = obj_emb.num_embeddings
         self.remove_goal_lstm = conf.remove_goal_lstm
+        self.remove_context = conf.remove_context
 
         self.action_emb = action_emb
         self.obj_emb = obj_emb
@@ -56,10 +57,10 @@ class ActionModule(Model):
             insts_embs = self.context_emb_model(low_insts)
 
         # inst LSTM
-        if context is not None:
-            context_vision = torch.cat((context, vision_features), dim=1)
-        else:
+        if self.remove_context:
             context_vision = vision_features
+        else:
+            context_vision = torch.cat((context, vision_features), dim=1)
 
         insts_attended, _ = self.multi_attn_insts(
                             query=context_vision.unsqueeze(0), key=insts_embs,
@@ -72,6 +73,9 @@ class ActionModule(Model):
 
         action_obj = self.predictor_fc(inst_hidden_cell[0])
 
+        action = action_obj[:, :self.num_actions]
+        obj = action_obj[:, self.num_actions:]
+
         # goal LSTM
         if not self.remove_goal_lstm:
             goal_attended, _ = self.multi_attn_goal(
@@ -80,9 +84,6 @@ class ActionModule(Model):
                                 need_weights=False
                             )
             goal_attended = goal_attended.squeeze(0)
-
-            action = action_obj[:, :self.num_actions]
-            obj = action_obj[:, self.num_actions:]
 
             action_emb = self.action_emb(action.argmax(1))
             obj_emb = self.obj_emb(obj.argmax(1))
