@@ -15,6 +15,10 @@ class VisionModule(Model):
         self.remove_vision_readout = conf.remove_vision_readout
 
         self.vision_cnn = resnet18(pretrained=True)
+        for n, p in self.vision_cnn.named_parameters():
+            if n.startswith('layer1') or n.startswith('layer2'):
+                p.requires_grad = False
+
         assert self.vision_cnn.fc.in_features == self.raw_vision_features_size
         self.vision_cnn.fc = nn.Sequential()
 
