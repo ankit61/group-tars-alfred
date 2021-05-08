@@ -23,7 +23,7 @@ class ActionModule(Model):
                                     vdim=self.context_emb_model.hidden_size
                                 )
 
-        if self.remove_goal_lstm:
+        if not self.remove_goal_lstm:
             self.multi_attn_goal = nn.MultiheadAttention(
                                     embed_dim=conf.context_size,
                                     num_heads=conf.action_attn_heads,
@@ -31,15 +31,15 @@ class ActionModule(Model):
                                     vdim=self.context_emb_model.hidden_size
                                 )
 
-            self.inst_lstm = nn.LSTMCell(
-                                2 * (conf.context_size + conf.vision_features_size),
-                                conf.inst_hidden_size
-                            )
-
             self.goal_lstm = nn.LSTMCell(
                         conf.context_size + conf.action_emb_dim + conf.object_emb_dim,
                         conf.goal_hidden_size
                     )
+
+        self.inst_lstm = nn.LSTMCell(
+                            2 * (conf.context_size + conf.vision_features_size),
+                            conf.inst_hidden_size
+                        )
 
         self.predictor_fc = nn.Linear(
                                 conf.inst_hidden_size,
