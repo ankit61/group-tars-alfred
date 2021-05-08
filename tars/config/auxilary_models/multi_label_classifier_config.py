@@ -3,7 +3,7 @@ from tars.config.base.model_config import ModelConfig
 
 
 class MultiLabelClassifierConfig(ModelConfig):
-    batch_size = 64
+    batch_size = 32
     pred_threshold = 0.5
     model_name = 'resnet34'
 
