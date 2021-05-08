@@ -39,9 +39,8 @@ class ContextModule(Model):
 
 
     def forward(self, past_actions, past_objects, inst_lstm_cell, goal_lstm_cell):
-        with torch.no_grad():
-            action_readout = self.action_embed_and_readout.forward(past_actions)
-            int_objects_readout = self.int_object_embed_and_readout.forward(past_objects)
+        action_readout = self.action_embed_and_readout.forward(past_actions)
+        int_objects_readout = self.int_object_embed_and_readout.forward(past_objects)
 
         explicit_context = torch.cat((action_readout, int_objects_readout), dim=1)
         implicit_context = torch.cat((inst_lstm_cell, goal_lstm_cell), dim=1)
