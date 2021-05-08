@@ -16,26 +16,29 @@ class ImitationDataset(Dataset):
 
     # @functools.lru_cache() # need a diff cache
     def __getitem__(self, task_idx):
-        task_dir, lang_idx = self.get_task(task_idx)
+        try:
+            task_dir, lang_idx = self.get_task(task_idx)
 
-        feat = {}
+            feat = {}
 
-        goal_inst, low_insts = self.get_transformed_insts(task_dir, lang_idx)
+            goal_inst, low_insts = self.get_transformed_insts(task_dir, lang_idx)
 
-        feat['goal_inst'] = goal_inst
-        feat['low_insts'] = low_insts
-        feat['expert_actions'], feat['expert_int_objects'] = self.get_all_expert_actions(task_dir)
-        feat['expert_actions'] = torch.tensor(feat['expert_actions'])
-        feat['expert_int_objects'] = torch.tensor(feat['expert_int_objects'])
+            feat['goal_inst'] = goal_inst
+            feat['low_insts'] = low_insts
+            feat['expert_actions'], feat['expert_int_objects'] = self.get_all_expert_actions(task_dir)
+            feat['expert_actions'] = torch.tensor(feat['expert_actions'])
+            feat['expert_int_objects'] = torch.tensor(feat['expert_int_objects'])
 
-        feat['images'] = self.get_all_imgs(task_dir, self.conf.high_res_img_dir)
-        assert len(feat['images']) == len(feat['expert_actions']) and \
+            feat['images'] = self.get_all_imgs(task_dir, self.conf.high_res_img_dir)
+            assert len(feat['images']) == len(feat['expert_actions']) and \
                 len(feat['expert_actions']) == len(feat['expert_int_objects'])
 
-        for i in range(len(feat['images'])):
-            feat['images'][i] = self.img_transforms(feat['images'][i])
+            for i in range(len(feat['images'])):
+                feat['images'][i] = self.img_transforms(feat['images'][i])
 
-        return feat
+            return feat
+        except:
+            return self[(task_idx + 1) % len(self)]
 
     def get_transformed_insts(self, task_dir, lang_idx):
         goal_inst, low_insts = self.get_insts(task_dir, lang_idx)
