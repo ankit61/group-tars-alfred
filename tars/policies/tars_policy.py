@@ -110,6 +110,7 @@ class TarsPolicy(Policy):
 
         ac_loss, obj_loss = 0, 0
         seq_len = 0
+        pred_actions, pred_objects = [], []
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
             action, _, int_object = self(
@@ -117,14 +118,20 @@ class TarsPolicy(Policy):
                                         mini_batch['goal_inst'],
                                         mini_batch['low_insts']
                                     )
+            pred_actions.append(action.argmax(1).float().mean())
+            pred_objects.append(int_object.argmax(1).float().mean())
             ac_loss += self.action_loss(action, mini_batch['expert_actions'])
-            obj_loss += self.object_loss(int_object, mini_batch['expert_int_objects'])
+            expert_objs = mini_batch['expert_int_objects']
+            object_mask = (expert_objs != self.object_na_idx)
+            obj_loss += self.object_loss(int_object[object_mask], expert_objs[object_mask])
             seq_len += batch_size
 
         return {
             'loss': (ac_loss + obj_loss) / seq_len,
             'action_loss': ac_loss.item() / seq_len,
-            'object_loss': obj_loss.item() / seq_len
+            'object_loss': obj_loss.item() / seq_len,
+            'pred_action_std': torch.tensor(pred_actions).std(),
+            'pred_object_std': torch.tensor(pred_objects).std()
         }
 
     def configure_optimizers(self):
@@ -174,7 +181,7 @@ class TarsPolicy(Policy):
         return DataLoader(
                 self.datasets[type], batch_size=self.conf.batch_size,
                 collate_fn=self.datasets[type].collate, pin_memory=True,
-                num_workers=self.conf.main.num_threads
+                num_workers=self.conf.main.num_threads, shuffle=True
             )
 
     def find_instance_mask(self, img, int_object):
