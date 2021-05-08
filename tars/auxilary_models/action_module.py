@@ -42,6 +42,8 @@ class ActionModule(Model):
                             conf.inst_hidden_size
                         )
 
+        self.inst_lstm_dropout = nn.Dropout(conf.inst_lstm_dropout)
+
         self.predictor_fc = nn.Linear(
                                 conf.inst_hidden_size,
                                 self.num_actions + self.num_objects
@@ -71,7 +73,9 @@ class ActionModule(Model):
         inst_lstm_in = torch.cat((insts_attended, context_vision), dim=1)
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
 
-        action_obj = self.predictor_fc(inst_hidden_cell[0])
+        action_obj = self.predictor_fc(
+                        self.inst_lstm_dropout(inst_hidden_cell[0])
+                    )
 
         action = action_obj[:, :self.num_actions]
         obj = action_obj[:, self.num_actions:]

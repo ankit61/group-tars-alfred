@@ -31,11 +31,14 @@ class TarsPolicyConfig(ModelConfig):
     # context module
     action_readout_path = '/data/best_models/action_history.ckpt'
     int_object_readout_path = '/data/best_models/int_object_history.ckpt'
+    action_readout_dropout = 0.3
+    obj_readout_dropout = 0.3
 
     # vision module
     use_instance_seg = False
     detection_model_path = '/data/best_models/multi_label_classifier.ckpt'
     max_img_objects = 10
+    vision_readout_dropout = 0.3
 
     # readout transformer
     transformer_num_heads = 8
@@ -43,6 +46,7 @@ class TarsPolicyConfig(ModelConfig):
 
     # action module
     action_attn_heads = 4
+    inst_lstm_dropout = 0.3
 
     # contextual embedding model
     context_emb_model_name_or_path = "albert-base-v2"

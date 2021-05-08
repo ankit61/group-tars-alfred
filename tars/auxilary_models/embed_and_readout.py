@@ -17,7 +17,11 @@ from typing import Union
 
 
 class EmbedAndReadout(Model):
-    def __init__(self, dict_size, embed_dim, out_dim, padding_idx, history_max_len, policy_conf, use_pe=True, pretrain_type: Union[str, HistoryType] = None):
+    def __init__(
+        self, dict_size, embed_dim, out_dim, padding_idx, history_max_len,
+        dropout, policy_conf, use_pe=True,
+        pretrain_type: Union[str, HistoryType] = None
+    ):
         super(EmbedAndReadout, self).__init__()
 
         self.history_max_len = history_max_len
@@ -37,6 +41,8 @@ class EmbedAndReadout(Model):
             use_pe=use_pe
         )
 
+        self.dropout = nn.Dropout(dropout)
+
         self.decoder = PretrainingDecoder(self.embed, out_dim)
 
         if pretrain_type:
@@ -50,7 +56,7 @@ class EmbedAndReadout(Model):
     def forward(self, items):
         items_embed = self.embed(items).permute(1, 0, 2)
         readout = self.readout_transformer(items_embed)
-        return readout
+        return self.dropout(readout)
 
 
 # ======================== PRETRAINING CODE ========================

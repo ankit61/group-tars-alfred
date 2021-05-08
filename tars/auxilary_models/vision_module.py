@@ -25,6 +25,7 @@ class VisionModule(Model):
                 out_dim=conf.vision_object_emb_dim,
                 padding_idx=object_na_idx,
                 history_max_len=conf.max_img_objects,
+                dropout=conf.vision_readout_dropout,
                 policy_conf=conf,
                 use_pe=False
             )
