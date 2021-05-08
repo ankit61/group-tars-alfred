@@ -43,7 +43,7 @@ class MultiLabelClassifier(Model):
         gt_positives = gt[class_pred == 1]
         true_positives = (pred_positives == gt_positives).sum()
         negative_pred = (class_pred == 0).int() # that is the predictions the model said no to
-        false_negatives = (negative_pred == gt).sum()
+        false_negatives = gt[negative_pred == 1].sum()
 
         return {
             'acc': (class_pred == gt).sum().item() / class_pred.numel(),
