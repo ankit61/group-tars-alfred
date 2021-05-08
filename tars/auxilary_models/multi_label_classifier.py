@@ -42,11 +42,14 @@ class MultiLabelClassifier(Model):
         pred_positives = class_pred[class_pred == 1]
         gt_positives = gt[class_pred == 1]
         true_positives = (pred_positives == gt_positives).sum()
+        negative_pred = (class_pred == 0).int() # that is the predictions the model said no to
+        false_negatives = (negative_pred == gt).sum()
 
         return {
             'acc': (class_pred == gt).sum().item() / class_pred.numel(),
             'num_positives': pred_positives.numel() / class_pred.numel(),
-            'recall': true_positives / gt_positives.numel()
+            # 'recall': true_positives / gt_positives.numel()
+            'recall': true_positives / (true_positives + false_negatives)
         }
 
     def predict_classes(self, pred):
