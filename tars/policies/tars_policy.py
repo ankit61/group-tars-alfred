@@ -135,7 +135,9 @@ class TarsPolicy(Policy):
         }
 
     def configure_optimizers(self):
-        return self.conf.get_optim(self.parameters())
+        optim = self.conf.get_optim(self.parameters())
+        scheduler = self.conf.get_lr_scheduler(optim)
+        return (optim if scheduler is None else [optim], [scheduler])
 
     def training_step(self, batch, batch_idx):
         metrics = self.shared_step(batch)

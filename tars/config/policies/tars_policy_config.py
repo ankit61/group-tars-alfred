@@ -19,8 +19,8 @@ class TarsPolicyConfig(ModelConfig):
     # embeddings
     action_emb_dim = 64
     object_emb_dim = 64
-    action_hist_emb_dim = context_size // 2
-    int_hist_emb_dim = context_size // 2
+    action_hist_emb_dim = 256
+    int_hist_emb_dim = 256
     # word_emb_dim = 128
     vision_object_emb_dim = 128
 
@@ -51,4 +51,8 @@ class TarsPolicyConfig(ModelConfig):
     mask_rcnn_path = MocaPolicyConfig.mask_rcnn_path
 
     def get_optim(self, parameters):
-        return optim.Adam(parameters, lr=1e-3)
+        return optim.Adam(parameters, lr=1e-2)
+
+    def get_lr_scheduler(self, opt):
+        return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)
+
