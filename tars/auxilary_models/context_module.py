@@ -19,6 +19,7 @@ class ContextModule(Model):
             out_dim=policy_conf.action_hist_emb_dim,
             padding_idx=self.padding_action_idx,
             history_max_len=policy_conf.past_actions_len,
+            dropout=policy_conf.action_readout_dropout,
             policy_conf=policy_conf
         )
 
@@ -29,6 +30,7 @@ class ContextModule(Model):
             out_dim=policy_conf.int_hist_emb_dim,
             padding_idx=object_na_idx,
             history_max_len=policy_conf.past_objects_len,
+            dropout=policy_conf.obj_readout_dropout,
             policy_conf=policy_conf
         )
 
