@@ -100,11 +100,12 @@ class TarsPolicy(Policy):
                 context
             )
 
+
         self.inst_lstm_hidden, self.inst_lstm_cell = inst_hidden_cell
         if not self.conf.remove_goal_lstm:
             self.goal_lstm_hidden, self.goal_lstm_cell = goal_hidden_cell
 
-        #self.update_history(action, int_object)
+        self.update_history(action, int_object)
 
         int_mask = self.find_instance_mask(img, int_object) if self.conf.use_mask else None
 
