@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 from torchvision import models, transforms
 from torch.utils.data import DataLoader
@@ -39,18 +40,20 @@ class MultiLabelClassifier(Model):
 
     def get_metrics(self, pred, gt):
         class_pred = self.predict_classes(pred)
-        pred_positives = class_pred[class_pred == 1]
-        gt_positives = gt[class_pred == 1]
-        true_positives = (pred_positives == gt_positives).sum()
-        negative_pred = (class_pred == 0).int() # that is the predictions the model said no to
-        false_negatives = (negative_pred == gt).sum()
-
+        class_pred = class_pred.reshape(-1).float()
+        gt = gt.reshape(-1)
+        
+        true_pos = torch.dot(class_pred, gt)
+        precision = true_pos / class_pred.sum()
+        recall = true_pos / gt.sum()
+        f_score = 2 * ((precision * recall) / (precision + recall))
+        
         return {
-            'acc': (class_pred == gt).sum().item() / class_pred.numel(),
-            'num_positives': pred_positives.numel() / class_pred.numel(),
-            # 'recall': true_positives / gt_positives.numel()
-            'recall': true_positives / (true_positives + false_negatives)
+            'precision': precision,
+            'recall': recall,
+            'f_score': f_score
         }
+        
 
     def predict_classes(self, pred):
         return (pred.sigmoid() > self.conf.pred_threshold).int()
