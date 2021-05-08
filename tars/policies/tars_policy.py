@@ -101,7 +101,7 @@ class TarsPolicy(Policy):
         if not self.conf.remove_goal_lstm:
             self.goal_lstm_hidden, self.goal_lstm_cell = goal_hidden_cell
 
-        self.update_history(action, int_object)
+        #self.update_history(action, int_object)
 
         int_mask = self.find_instance_mask(img, int_object) if self.conf.use_mask else None
 
@@ -121,7 +121,7 @@ class TarsPolicy(Policy):
         self.reset()
 
         ac_loss, obj_loss = 0, 0
-        seq_len = 0
+        ac_seq_len, obj_seq_len = 0, 0
         pred_actions, pred_objects = [], []
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
@@ -136,12 +136,13 @@ class TarsPolicy(Policy):
             expert_objs = mini_batch['expert_int_objects']
             object_mask = (expert_objs != self.object_na_idx)
             obj_loss += self.object_loss(int_object[object_mask], expert_objs[object_mask])
-            seq_len += batch_size
+            ac_seq_len += batch_size
+            obj_seq_len += object_mask.sum()
 
         return {
-            'loss': (ac_loss + obj_loss) / seq_len,
-            'action_loss': ac_loss.item() / seq_len,
-            'object_loss': obj_loss.item() / seq_len,
+            'loss': ac_loss / ac_seq_len + obj_loss / obj_seq_len,
+            'action_loss': ac_loss.item() / ac_seq_len,
+            'object_loss': obj_loss.item() / obj_seq_len,
             'pred_action_std': torch.tensor(pred_actions).std(),
             'pred_object_std': torch.tensor(pred_objects).std()
         }
