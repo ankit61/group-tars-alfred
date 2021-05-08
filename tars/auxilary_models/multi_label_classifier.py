@@ -53,7 +53,7 @@ class MultiLabelClassifier(Model):
             'recall': recall,
             'f_score': f_score
         }
-        
+
 
     def predict_classes(self, pred):
         return (pred.sigmoid() > self.conf.pred_threshold).int()

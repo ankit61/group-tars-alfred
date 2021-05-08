@@ -19,6 +19,9 @@ class TarsPolicy(Policy):
         self.num_objects = len(DatasetConfig.objects_list)
         self.object_na_idx = DatasetConfig.object_na_idx
 
+        if self.conf.remove_context:
+            assert self.conf.remove_goal_lstm, 'if there is no context, goal lstm cannot exist'
+
         self.context_module = ContextModule(
                                 self.num_actions, self.num_objects,
                                 self.object_na_idx, self.conf
@@ -72,12 +75,14 @@ class TarsPolicy(Policy):
                 goal_inst: [S, N]
                 low_inst: [S', N]
         '''
-        context = self.context_module(
-                    self.past_actions.clone(),
-                    self.past_objects.clone(),
-                    self.inst_lstm_cell,
-                    self.goal_lstm_cell
-                )
+        context = None
+        if not self.conf.remove_context:
+            context = self.context_module(
+                        self.past_actions.clone(),
+                        self.past_objects.clone(),
+                        self.inst_lstm_cell,
+                        self.goal_lstm_cell
+                    )
 
         vision_features = self.vision_module(img)
 
@@ -92,16 +97,19 @@ class TarsPolicy(Policy):
         self.inst_lstm_hidden, self.inst_lstm_cell = inst_hidden_cell
         self.goal_lstm_hidden, self.goal_lstm_cell = goal_hidden_cell
 
-        # update history
+        self.update_history(action, int_object)
+
+        int_mask = self.find_instance_mask(img, int_object) if self.conf.use_mask else None
+
+        return action, int_mask, int_object
+
+    def update_history(self, action, int_object):
         self.past_actions[:, next(self.actions_itr)] = action.argmax(1)
         int_obj_idxs = int_object.argmax(1)
         for i in range(int_obj_idxs.shape[0]):
             if int_obj_idxs[i] != self.object_na_idx:
                 self.past_objects[i, next(self.objects_itr[i])] = int_obj_idxs[i]
 
-        int_mask = self.find_instance_mask(img, int_object) if self.conf.use_mask else None
-
-        return action, int_mask, int_object
 
     def shared_step(self, batch):
         # FIXME: Features needed:

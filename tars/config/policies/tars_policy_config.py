@@ -50,6 +50,13 @@ class TarsPolicyConfig(ModelConfig):
     # mask rcnn
     mask_rcnn_path = MocaPolicyConfig.mask_rcnn_path
 
+    # ablations
+    remove_context = False
+    remove_vision_readout = False
+    remove_goal_lstm = False
+
+    # training tricks
+
     def get_optim(self, parameters):
         return optim.SGD(parameters, lr=1e-3, momentum=0.9)
 
