@@ -9,6 +9,7 @@ class ActionModule(Model):
         super(ActionModule, self).__init__()
         self.num_actions = action_emb.num_embeddings
         self.num_objects = obj_emb.num_embeddings
+        self.remove_goal_lstm = conf.remove_goal_lstm
 
         self.action_emb = action_emb
         self.obj_emb = obj_emb
@@ -16,28 +17,29 @@ class ActionModule(Model):
         self.context_emb_model = ContextEmbeddingModel(conf.context_emb_model_name_or_path)
 
         self.multi_attn_insts = nn.MultiheadAttention(
-                                    embed_dim=conf.context_size + conf.vision_features_size,
+                                    embed_dim=conf.vision_features_size + (0 if conf.remove_context else conf.context_size),
                                     num_heads=conf.action_attn_heads,
                                     kdim=self.context_emb_model.hidden_size,
                                     vdim=self.context_emb_model.hidden_size
                                 )
 
-        self.multi_attn_goal = nn.MultiheadAttention(
-                                embed_dim=conf.context_size,
-                                num_heads=conf.action_attn_heads,
-                                kdim=self.context_emb_model.hidden_size,
-                                vdim=self.context_emb_model.hidden_size
+        if self.remove_goal_lstm:
+            self.multi_attn_goal = nn.MultiheadAttention(
+                                    embed_dim=conf.context_size,
+                                    num_heads=conf.action_attn_heads,
+                                    kdim=self.context_emb_model.hidden_size,
+                                    vdim=self.context_emb_model.hidden_size
+                                )
+
+            self.inst_lstm = nn.LSTMCell(
+                                2 * (conf.context_size + conf.vision_features_size),
+                                conf.inst_hidden_size
                             )
 
-        self.inst_lstm = nn.LSTMCell(
-                            2 * (conf.context_size + conf.vision_features_size),
-                            conf.inst_hidden_size
-                        )
-
-        self.goal_lstm = nn.LSTMCell(
-                            conf.context_size + conf.action_emb_dim + conf.object_emb_dim,
-                            conf.goal_hidden_size
-                        )
+            self.goal_lstm = nn.LSTMCell(
+                        conf.context_size + conf.action_emb_dim + conf.object_emb_dim,
+                        conf.goal_hidden_size
+                    )
 
         self.predictor_fc = nn.Linear(
                                 conf.inst_hidden_size,
@@ -49,11 +51,16 @@ class ActionModule(Model):
         context, inst_hidden_cell=None, goal_hidden_cell=None
     ):
         with torch.no_grad():
-            goal_embs = self.context_emb_model(goal_inst)
+            if not self.remove_goal_lstm:
+                goal_embs = self.context_emb_model(goal_inst)
             insts_embs = self.context_emb_model(low_insts)
 
         # inst LSTM
-        context_vision = torch.cat((context, vision_features), dim=1)
+        if context is not None:
+            context_vision = torch.cat((context, vision_features), dim=1)
+        else:
+            context_vision = vision_features
+
         insts_attended, _ = self.multi_attn_insts(
                             query=context_vision.unsqueeze(0), key=insts_embs,
                             value=insts_embs, need_weights=False
@@ -66,20 +73,22 @@ class ActionModule(Model):
         action_obj = self.predictor_fc(inst_hidden_cell[0])
 
         # goal LSTM
-        goal_attended, _ = self.multi_attn_goal(
-                            query=context.unsqueeze(0),
-                            key=goal_embs, value=goal_embs,
-                            need_weights=False
-                        )
-        goal_attended = goal_attended.squeeze(0)
+        goal_hidden_cell = None, None
+        if not self.remove_goal_lstm:
+            goal_attended, _ = self.multi_attn_goal(
+                                query=context.unsqueeze(0),
+                                key=goal_embs, value=goal_embs,
+                                need_weights=False
+                            )
+            goal_attended = goal_attended.squeeze(0)
 
-        action = action_obj[:, :self.num_actions]
-        obj = action_obj[:, self.num_actions:]
+            action = action_obj[:, :self.num_actions]
+            obj = action_obj[:, self.num_actions:]
 
-        action_emb = self.action_emb(action.argmax(1))
-        obj_emb = self.obj_emb(obj.argmax(1))
+            action_emb = self.action_emb(action.argmax(1))
+            obj_emb = self.obj_emb(obj.argmax(1))
 
-        goal_lstm_in = torch.cat((goal_attended, action_emb, obj_emb), dim=1)
-        goal_hidden_cell = self.goal_lstm(goal_lstm_in, goal_hidden_cell)
+            goal_lstm_in = torch.cat((goal_attended, action_emb, obj_emb), dim=1)
+            goal_hidden_cell = self.goal_lstm(goal_lstm_in, goal_hidden_cell)
 
         return action, obj, inst_hidden_cell, goal_hidden_cell

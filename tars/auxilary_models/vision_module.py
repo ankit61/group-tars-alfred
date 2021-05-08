@@ -12,6 +12,7 @@ class VisionModule(Model):
         self.max_img_objects = conf.max_img_objects
         self.raw_vision_features_size = conf.raw_vision_features_size
         self.object_na_idx = object_na_idx
+        self.remove_vision_readout = conf.remove_vision_readout
 
         self.vision_cnn = resnet18(pretrained=True)
         assert self.vision_cnn.fc.in_features == self.raw_vision_features_size
@@ -31,7 +32,7 @@ class VisionModule(Model):
         self.detection_model.eval()
 
         self.vision_mixer = nn.Linear(
-                            conf.raw_vision_features_size + conf.vision_object_emb_dim,
+                            conf.raw_vision_features_size + (0 if self.remove_vision_readout else conf.vision_object_emb_dim ),
                             conf.vision_features_size
                         )
 
@@ -42,18 +43,21 @@ class VisionModule(Model):
         assert raw_vision_features.shape == \
             torch.Size([img.shape[0], self.raw_vision_features_size])
 
-        with torch.no_grad():
-            self.detection_model.eval()
-            detected_objs = self.detection_model.predict_classes(self.detection_model(img))
-            vals, obj_idxs = detected_objs.topk(k=self.max_img_objects, dim=1)
-            mask = (vals > 0)
-            objects = obj_idxs * mask + self.object_na_idx * (~mask)
+        if self.remove_vision_readout:
+            with torch.no_grad():
+                self.detection_model.eval()
+                detected_objs = self.detection_model.predict_classes(self.detection_model(img))
+                vals, obj_idxs = detected_objs.topk(k=self.max_img_objects, dim=1)
+                mask = (vals > 0)
+                objects = obj_idxs * mask + self.object_na_idx * (~mask)
 
-        objects_readout = self.object_embed_and_readout.forward(objects.int())
+            objects_readout = self.object_embed_and_readout.forward(objects.int())
 
-        out = self.vision_mixer(
-                torch.cat((objects_readout, raw_vision_features), dim=1)
-            )
+            out = self.vision_mixer(
+                    torch.cat((objects_readout, raw_vision_features), dim=1)
+                )
+        else:
+            out = self.vision_mixer(raw_vision_features)
 
         return out
 
