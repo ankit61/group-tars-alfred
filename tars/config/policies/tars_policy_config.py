@@ -8,7 +8,7 @@ class TarsPolicyConfig(ModelConfig):
     batch_size = 1
 
     # feature sizes
-    context_size = 512
+    context_size = 256
     vision_features_size = 128
     raw_vision_features_size = 512
 
@@ -51,7 +51,7 @@ class TarsPolicyConfig(ModelConfig):
     mask_rcnn_path = MocaPolicyConfig.mask_rcnn_path
 
     def get_optim(self, parameters):
-        return optim.Adam(parameters, lr=1e-2)
+        return optim.SGD(parameters, lr=1e-3, momentum=0.9)
 
     def get_lr_scheduler(self, opt):
         return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)

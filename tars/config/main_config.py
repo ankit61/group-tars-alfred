@@ -24,9 +24,11 @@ class MainConfig(Config):
     default_trainer_args = {
         'gpus': 1 if use_gpu else 0,
         'check_val_every_n_epoch': 1,
+        'num_sanity_val_steps': 0,
         'accumulate_grad_batches': 1,
         'auto_lr_find': True,
-        # 'track_grad_norm': 2,
+        'track_grad_norm': 2,
+        'log_every_n_steps': 50
     }
 
     # basic dirs

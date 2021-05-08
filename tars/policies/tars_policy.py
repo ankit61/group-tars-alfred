@@ -183,7 +183,7 @@ class TarsPolicy(Policy):
         return DataLoader(
                 self.datasets[type], batch_size=self.conf.batch_size,
                 collate_fn=self.datasets[type].collate, pin_memory=True,
-                num_workers=self.conf.main.num_threads, shuffle=True
+                num_workers=self.conf.main.num_threads, shuffle=(type == DatasetType.TRAIN)
             )
 
     def find_instance_mask(self, img, int_object):
