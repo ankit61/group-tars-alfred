@@ -38,7 +38,7 @@ class ActionModule(Model):
                     )
 
         self.inst_lstm = nn.LSTMCell(
-                            2 * (conf.context_size + conf.vision_features_size),
+                            2 * ((0 if self.remove_context else conf.context_size) + conf.vision_features_size),
                             conf.inst_hidden_size
                         )
 

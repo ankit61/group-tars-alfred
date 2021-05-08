@@ -63,4 +63,4 @@ class VisionModule(Model):
         return out
 
     def get_img_transforms(self):
-        return self.detection_model.get_img_transforms()
+        return MultiLabelClassifier.get_img_transforms()

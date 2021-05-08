@@ -77,7 +77,8 @@ class MultiLabelClassifier(Model):
                 num_workers=self.conf.main.num_threads - 1
             )
 
-    def get_img_transforms(self):
+    @classmethod
+    def get_img_transforms(cls):
         return transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize(
