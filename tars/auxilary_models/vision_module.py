@@ -18,21 +18,22 @@ class VisionModule(Model):
         assert self.vision_cnn.fc.in_features == self.raw_vision_features_size
         self.vision_cnn.fc = nn.Sequential()
 
-        self.object_embed_and_readout = EmbedAndReadout(
-            dict_size=num_objects,
-            embed_dim=conf.object_emb_dim,
-            out_dim=conf.vision_object_emb_dim,
-            padding_idx=object_na_idx,
-            history_max_len=conf.max_img_objects,
-            policy_conf=conf,
-            use_pe=False
-        )
+        if not self.remove_vision_readout:
+            self.object_embed_and_readout = EmbedAndReadout(
+                dict_size=num_objects,
+                embed_dim=conf.object_emb_dim,
+                out_dim=conf.vision_object_emb_dim,
+                padding_idx=object_na_idx,
+                history_max_len=conf.max_img_objects,
+                policy_conf=conf,
+                use_pe=False
+            )
 
         self.detection_model = MultiLabelClassifier(model_load_path=conf.detection_model_path)
         self.detection_model.eval()
 
         self.vision_mixer = nn.Linear(
-                            conf.raw_vision_features_size + (0 if self.remove_vision_readout else conf.vision_object_emb_dim ),
+                            conf.raw_vision_features_size + (0 if self.remove_vision_readout else conf.vision_object_emb_dim),
                             conf.vision_features_size
                         )
 
@@ -43,7 +44,7 @@ class VisionModule(Model):
         assert raw_vision_features.shape == \
             torch.Size([img.shape[0], self.raw_vision_features_size])
 
-        if self.remove_vision_readout:
+        if not self.remove_vision_readout:
             with torch.no_grad():
                 self.detection_model.eval()
                 detected_objs = self.detection_model.predict_classes(self.detection_model(img))
