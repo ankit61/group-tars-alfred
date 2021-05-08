@@ -73,7 +73,6 @@ class ActionModule(Model):
         action_obj = self.predictor_fc(inst_hidden_cell[0])
 
         # goal LSTM
-        goal_hidden_cell = None, None
         if not self.remove_goal_lstm:
             goal_attended, _ = self.multi_attn_goal(
                                 query=context.unsqueeze(0),
@@ -90,5 +89,7 @@ class ActionModule(Model):
 
             goal_lstm_in = torch.cat((goal_attended, action_emb, obj_emb), dim=1)
             goal_hidden_cell = self.goal_lstm(goal_lstm_in, goal_hidden_cell)
+        else:
+            goal_hidden_cell = None, None
 
         return action, obj, inst_hidden_cell, goal_hidden_cell
