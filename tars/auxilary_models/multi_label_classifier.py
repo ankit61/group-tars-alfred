@@ -12,7 +12,7 @@ class MultiLabelClassifier(Model):
         self.num_classes = len(DatasetConfig.objects_list)
         self.model_load_path = model_load_path
 
-        self.model = models.resnet34(pretrained=True)
+        self.model = getattr(models, self.conf.model_name)(pretrained=True)
         self.model.fc = nn.Linear(self.model.fc.in_features, self.num_classes)
         self.loss = nn.BCEWithLogitsLoss()
 
