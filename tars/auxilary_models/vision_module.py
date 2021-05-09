@@ -14,7 +14,7 @@ class VisionModule(Model):
         self.object_na_idx = object_na_idx
         self.remove_vision_readout = conf.remove_vision_readout
 
-        self.vision_cnn = models.resnet50(pretrained=True)
+        self.vision_cnn = models.resnet18(pretrained=True)
         for n, p in self.vision_cnn.named_parameters():
             if n.startswith('layer1') or n.startswith('layer2') or n.startswith('layer3'):
                 p.requires_grad = False

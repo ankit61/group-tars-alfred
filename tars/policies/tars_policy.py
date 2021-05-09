@@ -154,7 +154,7 @@ class TarsPolicy(Policy):
     def configure_optimizers(self):
         optim = self.conf.get_optim(self.parameters())
         scheduler = self.conf.get_lr_scheduler(optim)
-        return (optim if scheduler is None else [optim], [scheduler])
+        return (optim if scheduler is None else ([optim], [scheduler]))
 
     def training_step(self, batch, batch_idx):
         metrics = self.shared_step(batch)
@@ -203,6 +203,12 @@ class TarsPolicy(Policy):
                 collate_fn=self.datasets[type].collate, pin_memory=True,
                 num_workers=self.conf.main.num_threads, shuffle=(type == DatasetType.TRAIN)
             )
+
+
+    def get_trainer_kwargs(self):
+        trainer_kwargs = self.conf.main.get_trainer_kwargs()
+        trainer_kwargs['accumulate_grad_batches'] = 8
+        return trainer_kwargs
 
     def find_instance_mask(self, imgs, int_objects):
         '''

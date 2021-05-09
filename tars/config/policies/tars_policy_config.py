@@ -10,7 +10,7 @@ class TarsPolicyConfig(ModelConfig):
     # feature sizes
     context_size = 256
     vision_features_size = 128
-    raw_vision_features_size = 2048
+    raw_vision_features_size = 512
 
     # history
     past_actions_len = 10
