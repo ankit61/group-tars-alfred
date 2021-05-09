@@ -10,7 +10,7 @@ class TarsPolicyConfig(ModelConfig):
     # feature sizes
     context_size = 256
     vision_features_size = 128
-    raw_vision_features_size = 2048
+    raw_vision_features_size = 512
 
     # history
     past_actions_len = 10
@@ -25,28 +25,28 @@ class TarsPolicyConfig(ModelConfig):
     vision_object_emb_dim = 128
 
     # LSTMs
-    inst_hidden_size = 256
+    inst_hidden_size = 128
     goal_hidden_size = 128
 
     # context module
-    action_readout_path = '/data/best_models/action_history.ckpt'
-    int_object_readout_path = '/data/best_models/int_object_history.ckpt'
+    action_readout_path = '/projects/ogma2/users/andrewsi/group-tars-alfred/tars/checkpoints/best_models/action_history.ckpt'
+    int_object_readout_path = '/projects/ogma2/users/andrewsi/group-tars-alfred/tars/checkpoints/best_models/int_object_history.ckpt'
     action_readout_dropout = 0.3
     obj_readout_dropout = 0.3
 
     # vision module
     use_instance_seg = False
-    detection_model_path = '/data/best_models/multi_label_classifier.ckpt'
+    detection_model_path = '/projects/ogma2/users/andrewsi/group-tars-alfred/tars/checkpoints/best_models/multi_label_classifier.ckpt'
     max_img_objects = 10
-    vision_readout_dropout = 0.3
+    vision_readout_dropout = 0.1
 
     # readout transformer
     transformer_num_heads = 8
     transformer_num_layers = 2
 
     # action module
-    action_attn_heads = 4
-    inst_lstm_dropout = 0.3
+    action_attn_heads = 1
+    inst_lstm_dropout = 0.1
 
     # contextual embedding model
     context_emb_model_name_or_path = "albert-base-v2"
@@ -62,7 +62,7 @@ class TarsPolicyConfig(ModelConfig):
     # training tricks
 
     def get_optim(self, parameters):
-        return optim.SGD(parameters, lr=1e-3, momentum=0.9)
+        return optim.SGD(parameters, lr=1e-2, momentum=0.9)
 
     def get_lr_scheduler(self, opt):
         return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)

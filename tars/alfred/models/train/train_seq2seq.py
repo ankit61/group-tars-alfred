@@ -6,6 +6,7 @@ from tars.alfred.data.preprocess import Dataset
 from importlib import import_module
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from tars.alfred.models.utils.helper_utils import optimizer_to
+import numpy as np
 
 
 if __name__ == '__main__':
@@ -38,6 +39,11 @@ if __name__ == '__main__':
     parser.add_argument('--action_loss_wt', help='weight of action loss', default=1., type=float)
     parser.add_argument('--subgoal_aux_loss_wt', help='weight of subgoal completion predictor', default=0., type=float)
     parser.add_argument('--pm_aux_loss_wt', help='weight of progress monitor', default=0., type=float)
+
+    # TARS hyperparams
+    parser.add_argument('--readout_nlayers', help='Readout transformer num layers', default=2, type=int)
+    parser.add_argument('--readout_nheads', help='Readout transformer num heads', default=4, type=int)
+    parser.add_argument('--hist_max_len', help='Item history max length', default=10, type=int)
 
     # dropouts
     parser.add_argument('--zero_goal', help='zero out goal language', action='store_true')
@@ -100,5 +106,8 @@ if __name__ == '__main__':
         if not optimizer is None:
             optimizer_to(optimizer, torch.device('cuda'))
 
+    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    print(f"\n\ntrainable params: {params}\n\n")
     # start train loop
     model.run_train(splits, optimizer=optimizer)

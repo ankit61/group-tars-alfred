@@ -17,6 +17,8 @@ class ActionModule(Model):
 
         self.context_emb_model = ContextEmbeddingModel(conf.context_emb_model_name_or_path)
 
+        print(f"context emb hidden size: {self.context_emb_model.hidden_size}")
+
         self.multi_attn_insts = nn.MultiheadAttention(
                                     embed_dim=conf.vision_features_size + (0 if conf.remove_context else conf.context_size),
                                     num_heads=conf.action_attn_heads,
@@ -41,6 +43,8 @@ class ActionModule(Model):
                             2 * ((0 if self.remove_context else conf.context_size) + conf.vision_features_size),
                             conf.inst_hidden_size
                         )
+
+        # print(f"input size: {self.inst_lstm.input_size}\nhidden size: {self.inst_lstm.hidden_size}")
 
         self.inst_lstm_dropout = nn.Dropout(conf.inst_lstm_dropout)
 

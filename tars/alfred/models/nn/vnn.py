@@ -1,6 +1,8 @@
 import torch
 from torch import nn
 from torch.nn import functional as F
+from tars.alfred.models.nn.readout_transformer import ReadoutTransformer
+import pdb
 
 
 class SelfAttn(nn.Module):
@@ -192,7 +194,7 @@ class ConvFrameMaskDecoderProgressMonitor(nn.Module):
 
     def __init__(self, emb, dframe, dhid, pframe=300,
                  attn_dropout=0., hstate_dropout=0., actor_dropout=0., input_dropout=0.,
-                 teacher_forcing=False):
+                 teacher_forcing=False, readout_nlayers=2, readout_nheads=4, hist_max_len=10):
         super().__init__()
         demb = emb.weight.size(1)
 
@@ -214,6 +216,17 @@ class ConvFrameMaskDecoderProgressMonitor(nn.Module):
 
         self.subgoal = nn.Linear(dhid+dhid+dframe+demb, 1)
         self.progress = nn.Linear(dhid+dhid+dframe+demb, 1)
+
+        # TARS additions
+        self.hist_max_len = hist_max_len
+        self.readout_transformer = ReadoutTransformer(
+            in_features=demb,
+            out_features=demb,
+            nhead=readout_nheads,
+            num_layers=readout_nlayers,
+            max_len=10,
+            use_pe=True
+        )
 
         nn.init.uniform_(self.go, -0.1, 0.1)
 
@@ -249,6 +262,17 @@ class ConvFrameMaskDecoderProgressMonitor(nn.Module):
 
         return action_t, mask_t, state_t, lang_attn_t, subgoal_t, progress_t
 
+    def update_item_history(self, item_history, new_items):
+        batch_size = new_items.shape[0]
+        if item_history == None:
+            new_item_history = new_items.reshape(-1, 1)
+        elif item_history.shape[1] < self.hist_max_len:
+            new_item_history = torch.cat((item_history[:batch_size], new_items.reshape(-1, 1)), dim=1)
+        else:
+            new_item_history = torch.cat((item_history[:batch_size, 1:], new_items.reshape(-1, 1)), dim=1)
+
+        return new_item_history
+
     def forward(self, enc, frames, gold=None, max_decode=150, state_0=None):
         max_t = gold.size(1) if self.training else min(max_decode, frames.shape[1])
         batch = enc.size(0)
@@ -260,6 +284,7 @@ class ConvFrameMaskDecoderProgressMonitor(nn.Module):
         attn_scores = []
         subgoals = []
         progresses = []
+        action_hist = None
         for t in range(max_t):
             action_t, mask_t, state_t, attn_score_t, subgoal_t, progress_t = self.step(enc, frames[:, t], e_t, state_t)
             masks.append(mask_t)
@@ -273,8 +298,12 @@ class ConvFrameMaskDecoderProgressMonitor(nn.Module):
                 w_t = gold[:, t]
             else:
                 w_t = action_t.max(1)[1]
-            e_t = self.emb(w_t)
 
+            # TARS changes
+            action_hist = self.update_item_history(action_hist, w_t)
+            action_hist_emb = self.emb(action_hist).permute(1, 0, 2)
+            e_t = self.readout_transformer(action_hist_emb)
+           
         results = {
             'out_action_low': torch.stack(actions, dim=1),
             'out_action_low_mask': torch.stack(masks, dim=1),

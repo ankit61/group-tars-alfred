@@ -9,6 +9,7 @@ from torch.nn.utils.rnn import pad_sequence, pack_padded_sequence, pad_packed_se
 from tars.alfred.models.model.seq2seq import Module as Base
 from tars.alfred.models.utils.metric import compute_f1, compute_exact
 from tars.alfred.gen.utils.image_util import decompress_mask
+import pdb
 
 
 class Module(Base):
@@ -34,7 +35,10 @@ class Module(Base):
                            hstate_dropout=args.hstate_dropout,
                            actor_dropout=args.actor_dropout,
                            input_dropout=args.input_dropout,
-                           teacher_forcing=args.dec_teacher_forcing)
+                           teacher_forcing=args.dec_teacher_forcing,
+                           readout_nlayers=args.readout_nlayers,
+                           readout_nheads=args.readout_nheads,
+                           hist_max_len=args.hist_max_len)
 
         # dropouts
         self.vis_dropout = nn.Dropout(args.vis_dropout)
@@ -307,8 +311,13 @@ class Module(Base):
         '''
         losses = dict()
 
+        m_pred = self.extract_preds(out, batch, feat, clean_special_tokens=False)
+        m_pred = list(m_pred.values())[0]
+        # print(f"pred: {m_pred['action_low']}")
+
         # GT and predictions
         p_alow = out['out_action_low'].view(-1, len(self.vocab['action_low']))
+        
         l_alow = feat['action_low'].view(-1)
         p_alow_mask = out['out_action_low_mask']
         valid = feat['action_low_valid_interact']
