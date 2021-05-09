@@ -26,7 +26,7 @@ class MainConfig(Config):
         'check_val_every_n_epoch': 1,
         'num_sanity_val_steps': 4,
         'accumulate_grad_batches': 1,
-        'auto_lr_find': True,
+        #'auto_lr_find': True,
         'track_grad_norm': 2,
         'log_every_n_steps': 50,
         #'val_check_interval': 1000,

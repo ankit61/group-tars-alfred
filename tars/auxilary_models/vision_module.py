@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from torchvision.models import resnet18
+from torchvision import models
 from tars.base.model import Model
 from tars.auxilary_models import MultiLabelClassifier
 from tars.auxilary_models.embed_and_readout import EmbedAndReadout
@@ -14,12 +14,12 @@ class VisionModule(Model):
         self.object_na_idx = object_na_idx
         self.remove_vision_readout = conf.remove_vision_readout
 
-        self.vision_cnn = resnet18(pretrained=True)
+        self.vision_cnn = models.resnet50(pretrained=True)
         for n, p in self.vision_cnn.named_parameters():
-            if n.startswith('layer1') or n.startswith('layer2'):
+            if n.startswith('layer1') or n.startswith('layer2') or n.startswith('layer3'):
                 p.requires_grad = False
 
-        assert self.vision_cnn.fc.in_features == self.raw_vision_features_size
+        assert self.vision_cnn.fc.in_features == self.raw_vision_features_size, f'Vision output features ({self.vision_cnn.fc.in_features}) do not match fixed raw vision features size ({self.raw_vision_features_size})'
         self.vision_cnn.fc = nn.Sequential()
 
         if not self.remove_vision_readout:

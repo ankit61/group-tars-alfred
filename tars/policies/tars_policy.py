@@ -134,8 +134,8 @@ class TarsPolicy(Policy):
                                         mini_batch['goal_inst'],
                                         mini_batch['low_insts']
                                     )
-            pred_actions.append(action.argmax(1).float().mean())
-            pred_objects.append(int_object.argmax(1).float().mean())
+            pred_actions.append(action.argmax(1).float().mean().item())
+            pred_objects.append(int_object.argmax(1).float().mean().item())
             ac_loss += self.action_loss(action, mini_batch['expert_actions'])
             expert_objs = mini_batch['expert_int_objects']
             object_mask = (expert_objs != self.object_na_idx)
