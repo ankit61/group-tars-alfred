@@ -129,6 +129,8 @@ class TarsPolicy(Policy):
         pred_actions, pred_objects = [], []
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
+            # self.past_actions = mini_batch['expert_actions'].repeat_interleave(self.past_actions.shape[1]).reshape(self.past_actions.shape)
+            # self.past_objects = mini_batch['expert_int_objects'].repeat_interleave(self.past_objects.shape[1]).reshape(self.past_objects.shape)
             action, _, int_object = self(
                                         mini_batch['images'],
                                         mini_batch['goal_inst'],
@@ -142,6 +144,9 @@ class TarsPolicy(Policy):
             obj_loss += self.object_loss(int_object[object_mask], expert_objs[object_mask])
             ac_seq_len += batch_size
             obj_seq_len += object_mask.sum()
+
+        # print('Action: ', torch.tensor(pred_actions).unique(), torch.tensor(pred_actions).std())
+        # print('Object: ', torch.tensor(pred_objects).unique(), torch.tensor(pred_objects).std())
 
         return {
             'loss': ac_loss / ac_seq_len + obj_loss / obj_seq_len,
@@ -206,7 +211,7 @@ class TarsPolicy(Policy):
 
 
     def get_trainer_kwargs(self):
-        trainer_kwargs = self.conf.main.get_trainer_kwargs()
+        trainer_kwargs = self.conf.main.default_trainer_args
         trainer_kwargs['accumulate_grad_batches'] = 8
         return trainer_kwargs
 
