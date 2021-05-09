@@ -129,6 +129,8 @@ class TarsPolicy(Policy):
         pred_actions, pred_objects = [], []
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
+            # self.past_actions = mini_batch['expert_actions'].repeat_interleave(self.past_actions.shape[1]).reshape(self.past_actions.shape)
+            # self.past_objects = mini_batch['expert_int_objects'].repeat_interleave(self.past_objects.shape[1]).reshape(self.past_objects.shape)
             action, _, int_object = self(
                                         mini_batch['images'],
                                         mini_batch['goal_inst'],
@@ -143,6 +145,9 @@ class TarsPolicy(Policy):
             ac_seq_len += batch_size
             obj_seq_len += object_mask.sum()
 
+        # print('Action: ', torch.tensor(pred_actions).unique(), torch.tensor(pred_actions).std())
+        # print('Object: ', torch.tensor(pred_objects).unique(), torch.tensor(pred_objects).std())
+
         return {
             'loss': ac_loss / ac_seq_len + obj_loss / obj_seq_len,
             'action_loss': ac_loss.item() / ac_seq_len,
@@ -154,7 +159,7 @@ class TarsPolicy(Policy):
     def configure_optimizers(self):
         optim = self.conf.get_optim(self.parameters())
         scheduler = self.conf.get_lr_scheduler(optim)
-        return (optim if scheduler is None else [optim], [scheduler])
+        return (optim if scheduler is None else ([optim], [scheduler]))
 
     def training_step(self, batch, batch_idx):
         metrics = self.shared_step(batch)
@@ -203,6 +208,12 @@ class TarsPolicy(Policy):
                 collate_fn=self.datasets[type].collate, pin_memory=True,
                 num_workers=self.conf.main.num_threads, shuffle=(type == DatasetType.TRAIN)
             )
+
+
+    def get_trainer_kwargs(self):
+        trainer_kwargs = self.conf.main.default_trainer_args
+        trainer_kwargs['accumulate_grad_batches'] = 8
+        return trainer_kwargs
 
     def find_instance_mask(self, imgs, int_objects):
         '''
