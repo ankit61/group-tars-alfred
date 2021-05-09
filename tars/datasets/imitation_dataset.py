@@ -4,7 +4,6 @@ import functools
 import numpy as np
 import torch.nn.utils.rnn as rnn_utils
 from tars.base.dataset import Dataset
-import pdb
 
 
 class ImitationDataset(Dataset):
@@ -17,7 +16,6 @@ class ImitationDataset(Dataset):
 
     # @functools.lru_cache() # need a diff cache
     def __getitem__(self, task_idx):
-        # pdb.set_trace()
         try:
             task_dir, lang_idx = self.get_task(task_idx)
             feat = {}
