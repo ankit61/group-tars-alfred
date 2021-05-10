@@ -224,7 +224,7 @@ class ConvFrameMaskDecoderProgressMonitor(nn.Module):
             out_features=demb,
             nhead=readout_nheads,
             num_layers=readout_nlayers,
-            max_len=10,
+            max_len=hist_max_len,
             use_pe=True
         )
 
