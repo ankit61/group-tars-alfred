@@ -28,18 +28,31 @@ class Module(Base):
         self.subgoal_monitoring = (self.args.pm_aux_loss_wt > 0 or self.args.subgoal_aux_loss_wt > 0)
 
         # frame mask decoder
-        decoder = vnn.ConvFrameMaskDecoderProgressMonitor if self.subgoal_monitoring else vnn.ConvFrameMaskDecoder
-        self.dec = decoder(self.emb_action_low, args.dframe, 2*args.dhid,
-                           pframe=args.pframe,
-                           attn_dropout=args.attn_dropout,
-                           hstate_dropout=args.hstate_dropout,
-                           actor_dropout=args.actor_dropout,
-                           input_dropout=args.input_dropout,
-                           teacher_forcing=args.dec_teacher_forcing,
-                           readout_nlayers=args.readout_nlayers,
-                           readout_nheads=args.readout_nheads,
-                           hist_max_len=args.hist_max_len)
-
+        if args.tars:
+            self.dec = vnn.TarsConvFrameMaskDecoderProgressMonitor(
+                self.emb_action_low, args.dframe, 2*args.dhid,
+                pframe=args.pframe,
+                attn_dropout=args.attn_dropout,
+                hstate_dropout=args.hstate_dropout,
+                actor_dropout=args.actor_dropout,
+                input_dropout=args.input_dropout,
+                teacher_forcing=args.dec_teacher_forcing,
+                readout_nlayers=args.readout_nlayers,
+                readout_nheads=args.readout_nheads,
+                hist_max_len=args.hist_max_len
+            )
+        else:
+            decoder = vnn.ConvFrameMaskDecoderProgressMonitor if self.subgoal_monitoring else vnn.ConvFrameMaskDecoder
+            self.dec = decoder(
+                self.emb_action_low, args.dframe, 2*args.dhid,
+                pframe=args.pframe,
+                attn_dropout=args.attn_dropout,
+                hstate_dropout=args.hstate_dropout,
+                actor_dropout=args.actor_dropout,
+                input_dropout=args.input_dropout,
+                teacher_forcing=args.dec_teacher_forcing
+            )
+        
         # dropouts
         self.vis_dropout = nn.Dropout(args.vis_dropout)
         self.lang_dropout = nn.Dropout(args.lang_dropout, inplace=True)

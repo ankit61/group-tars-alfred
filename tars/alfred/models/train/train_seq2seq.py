@@ -41,6 +41,7 @@ if __name__ == '__main__':
     parser.add_argument('--pm_aux_loss_wt', help='weight of progress monitor', default=0., type=float)
 
     # TARS hyperparams
+    parser.add_argument('--tars', help='TARS version of baseline', action='store_true')
     parser.add_argument('--readout_nlayers', help='Readout transformer num layers', default=2, type=int)
     parser.add_argument('--readout_nheads', help='Readout transformer num heads', default=4, type=int)
     parser.add_argument('--hist_max_len', help='Item history max length', default=10, type=int)
