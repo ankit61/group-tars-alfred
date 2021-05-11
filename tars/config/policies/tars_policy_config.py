@@ -61,6 +61,9 @@ class TarsPolicyConfig(ModelConfig):
 
     # training
     activation = 'ReLU'
+    teacher_forcing_init = 1
+    teacher_forcing_curriculum = 0.9
+    teacher_forcing_step = 5000
 
     def get_optim(self, parameters):
         return optim.SGD(parameters, lr=1e-3, momentum=0.9)

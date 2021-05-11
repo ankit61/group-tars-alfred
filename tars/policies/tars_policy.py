@@ -1,4 +1,5 @@
 import itertools
+import random
 from torchvision.models.detection import maskrcnn_resnet50_fpn
 from torchvision.transforms.functional import to_tensor
 import torch
@@ -21,6 +22,7 @@ class TarsPolicy(Policy):
 
         self.num_objects = len(DatasetConfig.objects_list)
         self.object_na_idx = DatasetConfig.object_na_idx
+        self.teacher_prob = self.conf.teacher_forcing_init
 
         if self.conf.remove_context:
             assert self.conf.remove_goal_lstm, 'if there is no context, goal lstm cannot exist'
@@ -73,7 +75,7 @@ class TarsPolicy(Policy):
         else:
             self.goal_lstm_hidden, self.goal_lstm_cell = None, None
 
-    def forward(self, img, goal_inst, low_insts):
+    def forward(self, img, goal_inst, low_insts, gt_action=None, gt_int_object=None):
         '''
             All elements in one batch must be from different envs
             Args:
@@ -100,26 +102,33 @@ class TarsPolicy(Policy):
                 context
             )
 
-
         self.inst_lstm_hidden, self.inst_lstm_cell = inst_hidden_cell
         if not self.conf.remove_goal_lstm:
             self.goal_lstm_hidden, self.goal_lstm_cell = goal_hidden_cell
 
-        self.update_history(action, int_object)
+        self.update_history(action, int_object, gt_action, gt_int_object)
 
         int_mask = self.find_instance_mask(img, int_object) if self.conf.use_mask else None
 
         return action, int_mask, int_object
 
-    def update_history(self, action, int_object):
-        self.past_actions[:, next(self.actions_itr)] = action.argmax(1)
-        int_obj_idxs = int_object.argmax(1)
-        for i in range(int_obj_idxs.shape[0]):
-            if int_obj_idxs[i] != self.object_na_idx:
-                self.past_objects[i, next(self.objects_itr[i])] = int_obj_idxs[i]
+    def update_history(self, action, int_object, gt_action, gt_int_object):
+        if random.random() < self.teacher_prob and gt_action is not None and\
+            gt_int_object is not None:
+
+            self.past_actions[:, next(self.actions_itr)] = gt_action
+            for i in range(gt_int_object.shape[0]):
+                if gt_int_object[i] != self.object_na_idx:
+                    self.past_objects[i, next(self.objects_itr[i])] = gt_int_object[i]
+        else:
+            self.past_actions[:, next(self.actions_itr)] = action.argmax(1)
+            int_obj_idxs = int_object.argmax(1)
+            for i in range(int_obj_idxs.shape[0]):
+                if int_obj_idxs[i] != self.object_na_idx:
+                    self.past_objects[i, next(self.objects_itr[i])] = int_obj_idxs[i]
 
 
-    def shared_step(self, batch):
+    def shared_step(self, batch, test_time):
         # FIXME: Features needed:
         # gradient clipping, truncated BPTT, teacher forcing
         self.reset()
@@ -127,14 +136,27 @@ class TarsPolicy(Policy):
         ac_loss, obj_loss = 0, 0
         ac_seq_len, obj_seq_len = 0, 0
         pred_actions, pred_objects = [], []
+
+        if self.global_step % self.conf.teacher_forcing_step == 0:
+            self.teacher_prob *= self.conf.teacher_forcing_curriculum
+
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
             # self.past_actions = mini_batch['expert_actions'].repeat_interleave(self.past_actions.shape[1]).reshape(self.past_actions.shape)
             # self.past_objects = mini_batch['expert_int_objects'].repeat_interleave(self.past_objects.shape[1]).reshape(self.past_objects.shape)
-            action, _, int_object = self(
+            if test_time:
+                action, _, int_object = self(
                                         mini_batch['images'],
                                         mini_batch['goal_inst'],
                                         mini_batch['low_insts']
+                                    )
+            else:
+                action, _, int_object = self(
+                                        mini_batch['images'],
+                                        mini_batch['goal_inst'],
+                                        mini_batch['low_insts'],
+                                        mini_batch['expert_actions'],
+                                        mini_batch['expert_int_objects']
                                     )
             pred_actions.append(action.argmax(1).float().mean().item())
             pred_objects.append(int_object.argmax(1).float().mean().item())
@@ -162,14 +184,14 @@ class TarsPolicy(Policy):
         return (optim if scheduler is None else ([optim], [scheduler]))
 
     def training_step(self, batch, batch_idx):
-        metrics = self.shared_step(batch)
+        metrics = self.shared_step(batch, test_time=False)
         metrics = {f'train_{k}': metrics[k] for k in metrics}
         self.log_dict(metrics)
         metrics['loss'] = metrics.pop('train_loss')
         return metrics['loss']
 
     def validation_step(self, batch, batch_idx, dataloader_idx):
-        metrics = self.shared_step(batch)
+        metrics = self.shared_step(batch, test_time=True)
         metrics = {f'val_{k}': metrics[k] for k in metrics}
 
         self.log_dict(metrics)
