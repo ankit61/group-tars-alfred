@@ -59,7 +59,8 @@ class TarsPolicyConfig(ModelConfig):
     remove_vision_readout = False
     remove_goal_lstm = False
 
-    # training tricks
+    # training
+    activation = 'ReLU'
 
     def get_optim(self, parameters):
         return optim.SGD(parameters, lr=1e-3, momentum=0.9)

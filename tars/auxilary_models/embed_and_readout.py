@@ -42,6 +42,7 @@ class EmbedAndReadout(Model):
         )
 
         self.dropout = nn.Dropout(dropout)
+        self.activation = getattr(nn, policy_conf.activation)
 
         self.decoder = PretrainingDecoder(self.embed, out_dim)
 
@@ -56,7 +57,7 @@ class EmbedAndReadout(Model):
     def forward(self, items):
         items_embed = self.embed(items).permute(1, 0, 2)
         readout = self.readout_transformer(items_embed)
-        return self.dropout(readout)
+        return self.dropout(self.activaion(readout))
 
 
 # ======================== PRETRAINING CODE ========================

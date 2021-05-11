@@ -11,6 +11,7 @@ class ActionModule(Model):
         self.num_objects = obj_emb.num_embeddings
         self.remove_goal_lstm = conf.remove_goal_lstm
         self.remove_context = conf.remove_context
+        self.activation = getattr(nn, conf.activation)
 
         self.action_emb = action_emb
         self.obj_emb = obj_emb
@@ -68,7 +69,7 @@ class ActionModule(Model):
                             query=context_vision.unsqueeze(0), key=insts_embs,
                             value=insts_embs, need_weights=False
                         )
-        insts_attended = insts_attended.squeeze(0)
+        insts_attended = self.activation(insts_attended.squeeze(0))
 
         inst_lstm_in = torch.cat((insts_attended, context_vision), dim=1)
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
@@ -87,7 +88,7 @@ class ActionModule(Model):
                                 key=goal_embs, value=goal_embs,
                                 need_weights=False
                             )
-            goal_attended = goal_attended.squeeze(0)
+            goal_attended = self.activation(goal_attended.squeeze(0))
 
             action_emb = self.action_emb(action.argmax(1))
             obj_emb = self.obj_emb(obj.argmax(1))

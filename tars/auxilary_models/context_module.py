@@ -41,6 +41,7 @@ class ContextModule(Model):
             policy_conf.context_size
         )
 
+        self.activation = getattr(nn, policy_conf.activation)
 
     def forward(self, past_actions, past_objects, inst_lstm_cell, goal_lstm_cell):
         action_readout = self.action_embed_and_readout.forward(past_actions)
@@ -55,4 +56,4 @@ class ContextModule(Model):
         concated = torch.cat((explicit_context, implicit_context), dim=1)
         context = self.context_mixer(concated)
 
-        return context
+        return self.activaion(context)
