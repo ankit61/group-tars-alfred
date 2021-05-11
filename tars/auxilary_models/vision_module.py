@@ -41,7 +41,7 @@ class VisionModule(Model):
                             conf.raw_vision_features_size + (0 if self.remove_vision_readout else conf.vision_object_emb_dim),
                             conf.vision_features_size
                         )
-        self.activation = getattr(nn, conf.activation)
+        self.activation = getattr(nn, conf.activation)()
 
     def forward(self, img):
         # can run this on all images and cache on disk to save training/eval time
