@@ -2,16 +2,17 @@ import torch
 import torch.nn as nn
 from tars.base.model import Model
 from tars.auxilary_models.context_emb_model import ContextEmbeddingModel
+from tars.config.envs.alfred_env_config import AlfredEnvConfig
 
 
 class ActionModule(Model):
     def __init__(self, action_emb, obj_emb, conf):
         super(ActionModule, self).__init__()
-        self.num_actions = action_emb.num_embeddings
+        self.num_actions = len(AlfredEnvConfig.actions)
         self.num_objects = obj_emb.num_embeddings
         self.remove_goal_lstm = conf.remove_goal_lstm
         self.remove_context = conf.remove_context
-        self.activation = getattr(nn, conf.activation)
+        self.activation = getattr(nn, conf.activation)()
 
         self.action_emb = action_emb
         self.obj_emb = obj_emb
