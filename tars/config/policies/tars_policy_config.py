@@ -56,7 +56,7 @@ class TarsPolicyConfig(ModelConfig):
 
     # ablations
     remove_context = False
-    remove_vision_readout = False
+    remove_vision_readout = True
     remove_goal_lstm = False
 
     # training
