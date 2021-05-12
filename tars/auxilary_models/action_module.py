@@ -55,6 +55,7 @@ class ActionModule(Model):
 
         self.inst_attn_ln = nn.LayerNorm([context_vision_features])
         self.goal_attn_ln = nn.LayerNorm([conf.context_size])
+        self.inst_lstm_ln = nn.LayerNorm([conf.inst_hidden_size])
 
     def forward(
         self, goal_inst, low_insts, vision_features,
@@ -89,7 +90,9 @@ class ActionModule(Model):
         inst_lstm_in = torch.cat((insts_attended, context_vision, goal_cell), dim=1)
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
 
-        action_obj = self.predictor_fc(self.inst_lstm_dropout(inst_hidden_cell[0]))
+        print(inst_hidden_cell[0].mean().item(), inst_hidden_cell[0].std().item(), end='\r')
+        inst_lstm_out = self.inst_lstm_ln(inst_hidden_cell[0])
+        action_obj = self.predictor_fc(self.inst_lstm_dropout(inst_lstm_out))
 
         action = action_obj[:, :self.num_actions]
         obj = action_obj[:, self.num_actions:]
