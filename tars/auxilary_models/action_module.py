@@ -44,7 +44,7 @@ class ActionModule(Model):
 
         self.inst_lstm = nn.LSTMCell(
                             2 * context_vision_features +\
-                            0 if self.remove_goal_lstm else self.conf.goal_hidden_size,
+                            (0 if self.remove_goal_lstm else conf.goal_hidden_size),
                             conf.inst_hidden_size
                         )
 
@@ -90,7 +90,6 @@ class ActionModule(Model):
         inst_lstm_in = torch.cat((insts_attended, context_vision, goal_cell), dim=1)
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
 
-        print(inst_hidden_cell[0].mean().item(), inst_hidden_cell[0].std().item(), end='\r')
         inst_lstm_out = self.inst_lstm_ln(inst_hidden_cell[0])
         action_obj = self.predictor_fc(self.inst_lstm_dropout(inst_lstm_out))
 
