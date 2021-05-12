@@ -169,11 +169,13 @@ class TarsPolicy(Policy):
 
         # print('Action: ', torch.tensor(pred_actions).unique(), torch.tensor(pred_actions).std())
         # print('Object: ', torch.tensor(pred_objects).unique(), torch.tensor(pred_objects).std())
+        ac_loss = ac_loss / max(1e-5, ac_seq_len)
+        obj_loss = obj_loss / max(1e-5, obj_seq_len)
 
         return {
-            'loss': ac_loss / max(1e-5, ac_seq_len) + obj_loss / max(1e-5, obj_seq_len),
-            'action_loss': ac_loss.item() / ac_seq_len,
-            'object_loss': obj_loss.item() / obj_seq_len,
+            'loss': ac_loss + obj_loss,
+            'action_loss': ac_loss.item(),
+            'object_loss': obj_loss.item(),
             'pred_action_std': torch.tensor(pred_actions).std(),
             'pred_object_std': torch.tensor(pred_objects).std()
         }
