@@ -46,6 +46,8 @@ class ActionModule(Model):
 
         self.inst_lstm_dropout = nn.Dropout(conf.inst_lstm_dropout)
 
+        self.inst_lstm_norm = nn.LayerNorm([1, conf.inst_hidden_size])
+
         self.predictor_fc = nn.Linear(
                                 conf.inst_hidden_size,
                                 self.num_actions + self.num_objects
@@ -76,7 +78,9 @@ class ActionModule(Model):
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
 
         action_obj = self.predictor_fc(
-                        self.inst_lstm_dropout(inst_hidden_cell[0])
+                        self.inst_lstm_norm(
+                            self.inst_lstm_dropout(inst_hidden_cell[0])
+                        )
                     )
 
         action = action_obj[:, :self.num_actions]
