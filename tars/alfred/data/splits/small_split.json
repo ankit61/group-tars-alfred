@@ -3,14 +3,6 @@
         {
             "repeat_idx": 0,
             "task": "pick_two_obj_and_place-SoapBottle-None-Cabinet-406/trial_T20190909_145606_701162"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_heat_then_place_in_recep-TomatoSliced-None-SinkBasin-3/trial_T20190906_201144_948575"
-        },
-        {
-            "repeat_idx": 0,
-            "task": "pick_two_obj_and_place-SprayBottle-None-CounterTop-409/trial_T20190908_131755_202053"
         }
     ],
     "valid_seen": [
