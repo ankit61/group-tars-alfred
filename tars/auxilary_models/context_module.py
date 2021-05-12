@@ -41,6 +41,8 @@ class ContextModule(Model):
             policy_conf.context_size
         )
 
+        self.ln = nn.LayerNorm([policy_conf.context_size])s
+
         self.activation = getattr(nn, policy_conf.activation)()
 
     def forward(self, past_actions, past_objects, inst_lstm_cell, goal_lstm_cell):
@@ -56,4 +58,4 @@ class ContextModule(Model):
         concated = torch.cat((explicit_context, implicit_context), dim=1)
         context = self.context_mixer(concated)
 
-        return self.activation(context)
+        return self.activation(self.ln(context))

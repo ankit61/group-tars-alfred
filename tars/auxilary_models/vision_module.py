@@ -41,6 +41,7 @@ class VisionModule(Model):
                             conf.raw_vision_features_size + (0 if self.remove_vision_readout else conf.vision_object_emb_dim),
                             conf.vision_features_size
                         )
+        self.ln = nn.LayerNorm(conf.vision_features_size)
         self.activation = getattr(nn, conf.activation)()
 
     def forward(self, img):
@@ -66,7 +67,7 @@ class VisionModule(Model):
         else:
             out = self.vision_mixer(raw_vision_features)
 
-        return self.activation(out)
+        return self.activation(self.ln(out))
 
     def get_img_transforms(self):
         return MultiLabelClassifier.get_img_transforms()
