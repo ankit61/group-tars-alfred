@@ -80,9 +80,9 @@ class ActionModule(Model):
                         )
 
         if self.remove_goal_lstm:
-            goal_cell = torch.zeros(context_vision.shape[0], 0)
+            goal_cell = torch.zeros(context_vision.shape[0], 0, device=context_vision.device)
         elif goal_hidden_cell is None:
-            goal_cell = torch.zeros(context_vision.shape[0], self.goal_lstm.hidden_size)
+            goal_cell = torch.zeros(context_vision.shape[0], self.goal_lstm.hidden_size, device=context_vision.device)
         else:
             goal_cell = goal_hidden_cell[1]
 
