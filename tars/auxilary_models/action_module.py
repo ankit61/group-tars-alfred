@@ -36,14 +36,15 @@ class ActionModule(Model):
                                 )
 
             self.goal_lstm = nn.LSTMCell(
-                        conf.context_size + conf.action_emb_dim + conf.object_emb_dim,
+                        conf.context_size,
                         conf.goal_hidden_size
                     )
 
         self.inst_lstm_dropout = nn.Dropout(conf.inst_lstm_dropout)
 
         self.inst_lstm = nn.LSTMCell(
-                            2 * context_vision_features,
+                            2 * context_vision_features +\
+                            0 if self.remove_goal_lstm else self.conf.goal_hidden_size,
                             conf.inst_hidden_size
                         )
 
@@ -78,7 +79,14 @@ class ActionModule(Model):
                             self.inst_attn_ln(insts_attended.squeeze(0))
                         )
 
-        inst_lstm_in = torch.cat((insts_attended, context_vision), dim=1)
+        if self.remove_goal_lstm:
+            goal_cell = torch.zeros(context_vision.shape[0], 0)
+        elif goal_hidden_cell is None:
+            goal_cell = torch.zeros(context_vision.shape[0], self.goal_lstm.hidden_size)
+        else:
+            goal_cell = goal_hidden_cell[1]
+
+        inst_lstm_in = torch.cat((insts_attended, context_vision, goal_cell), dim=1)
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
 
         action_obj = self.predictor_fc(self.inst_lstm_dropout(inst_hidden_cell[0]))
@@ -99,11 +107,7 @@ class ActionModule(Model):
                                 )
                             )
 
-            action_emb = self.action_emb(action.argmax(1))
-            obj_emb = self.obj_emb(obj.argmax(1))
-
-            goal_lstm_in = torch.cat((goal_attended, action_emb, obj_emb), dim=1)
-            goal_hidden_cell = self.goal_lstm(goal_lstm_in, goal_hidden_cell)
+            goal_hidden_cell = self.goal_lstm(goal_attended, goal_hidden_cell)
         else:
             goal_hidden_cell = None, None
 
