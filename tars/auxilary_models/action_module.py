@@ -40,20 +40,20 @@ class ActionModule(Model):
                         conf.goal_hidden_size
                     )
 
+        self.inst_lstm_dropout = nn.Dropout(conf.inst_lstm_dropout)
+
         self.inst_lstm = nn.LSTMCell(
                             2 * context_vision_features,
                             conf.inst_hidden_size
                         )
-
-        self.inst_lstm_norm = nn.LayerNorm([1, conf.inst_hidden_size])
 
         self.predictor_fc = nn.Linear(
                                 conf.inst_hidden_size,
                                 self.num_actions + self.num_objects
                             )
 
-        self.inst_attn_ln = nn.LayerNorm([self.context_emb_model.hidden_size])
-        self.goal_attn_ln = nn.LayerNorm([self.context_emb_model.hidden_size])
+        self.inst_attn_ln = nn.LayerNorm([context_vision_features])
+        self.goal_attn_ln = nn.LayerNorm([conf.context_size])
 
     def forward(
         self, goal_inst, low_insts, vision_features,
