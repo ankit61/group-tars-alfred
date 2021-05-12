@@ -41,7 +41,7 @@ class ContextModule(Model):
             policy_conf.context_size
         )
 
-        self.ln = nn.LayerNorm([policy_conf.context_size])s
+        self.ln = nn.LayerNorm([policy_conf.context_size])
 
         self.activation = getattr(nn, policy_conf.activation)()
 
