@@ -1,5 +1,6 @@
 import itertools
 import random
+import numpy as np
 from torchvision.models.detection import maskrcnn_resnet50_fpn
 from torchvision.transforms.functional import to_tensor
 import torch
@@ -12,7 +13,6 @@ from tars.auxilary_models import ContextModule
 from tars.auxilary_models import ActionModule
 from tars.config.base.dataset_config import DatasetConfig
 from tars.base.policy import Policy
-import numpy as np
 import tars.alfred.gen.constants as constants
 
 
@@ -236,7 +236,7 @@ class TarsPolicy(Policy):
 
     def get_trainer_kwargs(self):
         trainer_kwargs = self.conf.main.default_trainer_args
-        # trainer_kwargs['accumulate_grad_batches'] = 8
+        trainer_kwargs['accumulate_grad_batches'] = 8
         return trainer_kwargs
 
     def find_instance_mask(self, imgs, int_objects):
