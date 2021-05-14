@@ -64,6 +64,7 @@ class TarsPolicyConfig(ModelConfig):
     teacher_forcing_init = 1
     teacher_forcing_curriculum = 0.9
     teacher_forcing_step = 5000
+    init_func = 'xavier_uniform_'
 
     def get_optim(self, parameters):
         return optim.SGD(parameters, lr=1e-3, momentum=0.9)

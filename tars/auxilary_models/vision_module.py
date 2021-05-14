@@ -41,7 +41,9 @@ class VisionModule(Model):
                             conf.raw_vision_features_size + (0 if self.remove_vision_readout else conf.vision_object_emb_dim),
                             conf.vision_features_size
                         )
-        nn.init.xavier_uniform_(self.vision_mixer.weight)
+        
+        self.init_func = getattr(nn.init, conf.init_func)
+        self.init_func(self.vision_mixer.weight)
 
         self.ln = nn.LayerNorm(conf.vision_features_size)
         self.activation = getattr(nn, conf.activation)()

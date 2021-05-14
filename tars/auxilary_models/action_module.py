@@ -13,6 +13,7 @@ class ActionModule(Model):
         self.remove_goal_lstm = conf.remove_goal_lstm
         self.remove_context = conf.remove_context
         self.activation = getattr(nn, conf.activation)()
+        
 
         self.action_emb = action_emb
         self.obj_emb = obj_emb
@@ -52,7 +53,9 @@ class ActionModule(Model):
                                 conf.inst_hidden_size,
                                 self.num_actions + self.num_objects
                             )
-        nn.init.xavier_uniform_(self.predictor_fc.weight)
+
+        self.init_func = getattr(nn.init, conf.init_func)
+        self.init_func(self.predictor_fc.weight)
 
         self.inst_attn_ln = nn.LayerNorm([context_vision_features])
         self.goal_attn_ln = nn.LayerNorm([conf.context_size])
