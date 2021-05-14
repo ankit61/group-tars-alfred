@@ -48,6 +48,8 @@ class TarsPolicyConfig(ModelConfig):
     # action module
     action_attn_heads = 4
     inst_lstm_dropout = 0.3
+    num_inst_lstm_layers = 3
+    num_goal_lstm_layers = 2
 
     # contextual embedding model
     context_emb_model_name_or_path = "albert-base-v2"

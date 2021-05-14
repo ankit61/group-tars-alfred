@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 from tars.base.model import Model
-from tars.auxilary_models.context_emb_model import ContextEmbeddingModel
+from tars.auxilary_models import StackedLSTMCell
+from tars.auxilary_models import ContextEmbeddingModel
 from tars.config.envs.alfred_env_config import AlfredEnvConfig
 
 
@@ -36,17 +37,19 @@ class ActionModule(Model):
                                     vdim=self.context_emb_model.hidden_size
                                 )
 
-            self.goal_lstm = nn.LSTMCell(
-                        conf.context_size,
-                        conf.goal_hidden_size
+            self.goal_lstm = StackedLSTMCell(
+                        conf.context_size + conf.action_emb_dim + conf.object_emb_dim,
+                        conf.goal_hidden_size, num_layers=conf.num_goal_lstm_layers
+
                     )
 
         self.inst_lstm_dropout = nn.Dropout(conf.inst_lstm_dropout)
 
-        self.inst_lstm = nn.LSTMCell(
+        self.inst_lstm = StackedLSTMCell(
                             2 * context_vision_features +\
-                            (0 if self.remove_goal_lstm else conf.goal_hidden_size),
-                            conf.inst_hidden_size
+                            0 if self.remove_goal_lstm else self.conf.goal_hidden_size,
+                            conf.inst_hidden_size,
+                            num_layers=conf.num_goal_lstm_layers
                         )
 
         self.predictor_fc = nn.Linear(
@@ -62,7 +65,7 @@ class ActionModule(Model):
 
     def forward(
         self, goal_inst, low_insts, vision_features,
-        context, inst_hidden_cell, goal_hidden_cell
+        context, last_inst_hidden_cell, last_goal_hidden_cell
     ):
         with torch.no_grad():
             if not self.remove_goal_lstm:
@@ -84,12 +87,12 @@ class ActionModule(Model):
                         )
 
         if self.remove_goal_lstm:
-            goal_cell = torch.zeros(context_vision.shape[0], 0, device=context_vision.device)
+            last_goal_cell = torch.zeros(context_vision.shape[0], 0, device=context_vision.device)
         else:
-            goal_cell = goal_hidden_cell[1]
+            last_goal_cell = last_goal_hidden_cell[1]
 
-        inst_lstm_in = torch.cat((insts_attended, context_vision, goal_cell), dim=1)
-        inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
+        inst_lstm_in = torch.cat((insts_attended, context_vision, last_goal_cell), dim=1)
+        inst_hidden_cell = self.inst_lstm(inst_lstm_in, last_inst_hidden_cell)
 
         inst_lstm_out = self.inst_lstm_ln(inst_hidden_cell[0])
         action_obj = self.predictor_fc(self.inst_lstm_dropout(inst_lstm_out))
@@ -110,7 +113,11 @@ class ActionModule(Model):
                                 )
                             )
 
-            goal_hidden_cell = self.goal_lstm(goal_attended, goal_hidden_cell)
+            action_emb = self.action_emb(action.argmax(1))
+            obj_emb = self.obj_emb(obj.argmax(1))
+
+            goal_lstm_in = torch.cat((goal_attended, action_emb, obj_emb), dim=1)
+            goal_hidden_cell = self.goal_lstm(goal_lstm_in, last_goal_hidden_cell)
         else:
             goal_hidden_cell = None, None
 

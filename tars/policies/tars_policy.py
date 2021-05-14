@@ -66,14 +66,26 @@ class TarsPolicy(Policy):
         self.actions_itr = itertools.cycle(range(self.past_actions.shape[1]))
         self.objects_itr = [itertools.cycle(range(self.past_objects.shape[1]))] * self.conf.batch_size
 
-        self.inst_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size, device=self.conf.main.device)
-        self.inst_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.inst_hidden_size, device=self.conf.main.device)
+        self.inst_lstm_hiddens_cells = [
+                                (torch.zeros(
+                                    self.conf.batch_size,
+                                    self.conf.inst_hidden_size,
+                                    device=self.conf.main.device
+                                ), ) * 2
+                                for _ in range(self.conf.num_inst_lstm_layers)
+                            ]
 
         if not self.conf.remove_goal_lstm:
-            self.goal_lstm_hidden = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
-            self.goal_lstm_cell = torch.zeros(self.conf.batch_size, self.conf.goal_hidden_size, device=self.conf.main.device)
+            self.goal_lstm_hiddens_cells = [
+                                    (torch.zeros(
+                                        self.conf.batch_size,
+                                        self.conf.goal_hidden_size,
+                                        device=self.conf.main.device
+                                    ), ) * 2
+                                    for _ in range(self.conf.num_goal_lstm_layers)
+                                ]
         else:
-            self.goal_lstm_hidden, self.goal_lstm_cell = None, None
+            self.goal_lstm_hiddens_cells = None
 
     def forward(self, img, goal_inst, low_insts, gt_action=None, gt_int_object=None):
         '''
@@ -88,25 +100,21 @@ class TarsPolicy(Policy):
             context = self.context_module(
                         self.past_actions.clone(),
                         self.past_objects.clone(),
-                        self.inst_lstm_cell,
-                        self.goal_lstm_cell
+                        self.inst_lstm_hiddens_cells[-1][1],
+                        self.goal_lstm_hiddens_cells[-1][1]
                     )
 
         vision_features = self.vision_module(img)
 
-        action, int_object, inst_hidden_cell, goal_hidden_cell =\
+        action, int_object, self.inst_lstm_hiddens_cells, self.goal_lstm_hiddens_cells =\
             self.action_module(
                 goal_inst,
                 low_insts,
                 vision_features,
                 context,
-                (self.inst_lstm_hidden, self.inst_lstm_cell),
-                (self.goal_lstm_hidden, self.goal_lstm_cell),
+                self.inst_lstm_hiddens_cells,
+                self.goal_lstm_hiddens_cells,
             )
-
-        self.inst_lstm_hidden, self.inst_lstm_cell = inst_hidden_cell
-        if not self.conf.remove_goal_lstm:
-            self.goal_lstm_hidden, self.goal_lstm_cell = goal_hidden_cell
 
         self.update_history(action, int_object, gt_action, gt_int_object)
 
@@ -204,12 +212,22 @@ class TarsPolicy(Policy):
         self.past_actions = self.past_actions[:batch_size]
         self.past_objects = self.past_objects[:batch_size]
 
-        self.inst_lstm_hidden = self.inst_lstm_hidden[:batch_size]
-        self.inst_lstm_cell = self.inst_lstm_cell[:batch_size]
+        self.inst_lstm_hiddens_cells = [
+            (
+                self.inst_lstm_hiddens_cells[i][0][:batch_size],
+                self.inst_lstm_hiddens_cells[i][1][:batch_size]
+            )
+            for i in range(len(self.inst_lstm_hiddens_cells))
+        ]
 
         if not self.conf.remove_goal_lstm:
-            self.goal_lstm_hidden = self.goal_lstm_hidden[:batch_size]
-            self.goal_lstm_cell = self.goal_lstm_cell[:batch_size]
+            self.inst_lstm_hiddens_cells = [
+            (
+                self.goal_lstm_hiddens_cells[i][0][:batch_size],
+                self.goal_lstm_hiddens_cells[i][1][:batch_size]
+            )
+            for i in range(len(self.inst_lstm_hiddens_cells))
+        ]
 
     ### data stuff
 
