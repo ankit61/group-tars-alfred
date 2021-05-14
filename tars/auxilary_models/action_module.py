@@ -52,6 +52,7 @@ class ActionModule(Model):
                                 conf.inst_hidden_size,
                                 self.num_actions + self.num_objects
                             )
+        nn.init.xavier_uniform_(self.predictor_fc.weight)
 
         self.inst_attn_ln = nn.LayerNorm([context_vision_features])
         self.goal_attn_ln = nn.LayerNorm([conf.context_size])

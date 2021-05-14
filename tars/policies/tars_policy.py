@@ -236,7 +236,7 @@ class TarsPolicy(Policy):
 
     def get_trainer_kwargs(self):
         trainer_kwargs = self.conf.main.default_trainer_args
-        trainer_kwargs['accumulate_grad_batches'] = 8
+        trainer_kwargs['accumulate_grad_batches'] = 1
         return trainer_kwargs
 
     def find_instance_mask(self, imgs, int_objects):

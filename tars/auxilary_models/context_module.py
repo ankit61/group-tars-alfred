@@ -40,6 +40,7 @@ class ContextModule(Model):
                 (0 if self.remove_goal_lstm else policy_conf.goal_hidden_size),
             policy_conf.context_size
         )
+        nn.init.xavier_uniform_(self.context_mixer.weight)
 
         self.ln = nn.LayerNorm([policy_conf.context_size])
 
