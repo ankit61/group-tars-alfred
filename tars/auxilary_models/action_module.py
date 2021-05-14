@@ -62,7 +62,7 @@ class ActionModule(Model):
 
     def forward(
         self, goal_inst, low_insts, vision_features,
-        context, inst_hidden_cell=None, goal_hidden_cell=None
+        context, inst_hidden_cell, goal_hidden_cell
     ):
         with torch.no_grad():
             if not self.remove_goal_lstm:
@@ -85,8 +85,6 @@ class ActionModule(Model):
 
         if self.remove_goal_lstm:
             goal_cell = torch.zeros(context_vision.shape[0], 0, device=context_vision.device)
-        elif goal_hidden_cell is None:
-            goal_cell = torch.zeros(context_vision.shape[0], self.goal_lstm.hidden_size, device=context_vision.device)
         else:
             goal_cell = goal_hidden_cell[1]
 

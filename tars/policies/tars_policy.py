@@ -99,7 +99,9 @@ class TarsPolicy(Policy):
                 goal_inst,
                 low_insts,
                 vision_features,
-                context
+                context,
+                (self.inst_lstm_hidden, self.inst_lstm_cell),
+                (self.goal_lstm_hidden, self.goal_lstm_cell),
             )
 
         self.inst_lstm_hidden, self.inst_lstm_cell = inst_hidden_cell
