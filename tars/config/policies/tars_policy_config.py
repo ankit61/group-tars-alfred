@@ -84,9 +84,9 @@ class TarsPolicyConfig(ModelConfig):
         else:
             init_func = self.init_func
             weights = [layer.weight]
-         
+
         init_nonlinearity = 'leaky_relu' if self.activation == 'LeakyReLU' else 'relu' 
-        
+
         if 'kaiming' in init_func:
             for w in weights:
                 getattr(nn.init, init_func)(w, nonlinearity=init_nonlinearity)
@@ -96,4 +96,3 @@ class TarsPolicyConfig(ModelConfig):
         else:
             for w in weights:
                 getattr(nn.init, init_func)(w)
-
