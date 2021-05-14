@@ -47,7 +47,7 @@ class ActionModule(Model):
 
         self.inst_lstm = StackedLSTMCell(
                             2 * context_vision_features +\
-                            0 if self.remove_goal_lstm else self.conf.goal_hidden_size,
+                            0 if self.remove_goal_lstm else conf.goal_hidden_size,
                             conf.inst_hidden_size,
                             num_layers=conf.num_goal_lstm_layers
                         )

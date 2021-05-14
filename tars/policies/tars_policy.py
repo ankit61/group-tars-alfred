@@ -221,12 +221,12 @@ class TarsPolicy(Policy):
         ]
 
         if not self.conf.remove_goal_lstm:
-            self.inst_lstm_hiddens_cells = [
+            self.goal_lstm_hiddens_cells = [
             (
                 self.goal_lstm_hiddens_cells[i][0][:batch_size],
                 self.goal_lstm_hiddens_cells[i][1][:batch_size]
             )
-            for i in range(len(self.inst_lstm_hiddens_cells))
+            for i in range(len(self.goal_lstm_hiddens_cells))
         ]
 
     ### data stuff
