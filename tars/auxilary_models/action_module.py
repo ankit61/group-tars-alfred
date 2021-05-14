@@ -36,6 +36,7 @@ class ActionModule(Model):
                         conf.context_size,
                         conf.goal_hidden_size
                     )
+            conf.initialize_weights(self.goal_lstm)
 
         self.inst_lstm_dropout = nn.Dropout(conf.inst_lstm_dropout)
 
@@ -44,13 +45,14 @@ class ActionModule(Model):
                             (0 if self.remove_goal_lstm else conf.goal_hidden_size),
                             conf.inst_hidden_size
                         )
+        conf.initialize_weights(self.inst_lstm)
 
         self.predictor_fc = nn.Linear(
                                 conf.inst_hidden_size,
                                 self.num_actions + self.num_objects
                             )
-
-        conf.initialize_weights(self.predictor_fc.weight)
+        conf.initialize_weights(self.predictor_fc)
+        
 
         self.inst_attn_ln = nn.LayerNorm([context_vision_features])
         self.goal_attn_ln = nn.LayerNorm([conf.context_size])

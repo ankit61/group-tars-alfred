@@ -40,8 +40,7 @@ class ContextModule(Model):
                 (0 if self.remove_goal_lstm else policy_conf.goal_hidden_size),
             policy_conf.context_size
         )
-
-        policy_conf.initialize_weights(self.context_mixer.weight)
+        policy_conf.initialize_weights(self.context_mixer)
         
         self.ln = nn.LayerNorm([policy_conf.context_size])
 
