@@ -67,7 +67,7 @@ class TarsPolicyConfig(ModelConfig):
     teacher_forcing_step = 5000
 
     # initialization
-    init_func = 'xavier_uniform_'
+    init_func = 'kaiming_normal_'
     
 
     def get_optim(self, parameters):
@@ -84,5 +84,4 @@ class TarsPolicyConfig(ModelConfig):
             return getattr(nn.init, self.init_func)(w, gain=nn.init.calculate_gain(init_nonlinearity))
         else:
             return getattr(nn.init, self.init_func)(w)
-        
-        
+
