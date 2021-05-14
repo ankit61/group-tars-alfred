@@ -1,39 +1,35 @@
 import torch
 import torch.nn as nn
 from tars.base.model import Model
-from tars.auxilary_models.context_emb_model import ContextEmbeddingModel
 from tars.config.envs.alfred_env_config import AlfredEnvConfig
 
 
 class ActionModule(Model):
-    def __init__(self, action_emb, obj_emb, conf):
+    def __init__(self, action_emb, obj_emb, context_emb_size, conf):
         super(ActionModule, self).__init__()
         self.num_actions = len(AlfredEnvConfig.actions)
         self.num_objects = obj_emb.num_embeddings
         self.remove_goal_lstm = conf.remove_goal_lstm
         self.remove_context = conf.remove_context
         self.activation = getattr(nn, conf.activation)()
-        
 
         self.action_emb = action_emb
         self.obj_emb = obj_emb
-
-        self.context_emb_model = ContextEmbeddingModel(conf.context_emb_model_name_or_path)
 
         context_vision_features = (0 if self.remove_context else conf.context_size) + conf.vision_features_size
         self.multi_attn_insts = nn.MultiheadAttention(
                                     embed_dim=context_vision_features,
                                     num_heads=conf.action_attn_heads,
-                                    kdim=self.context_emb_model.hidden_size,
-                                    vdim=self.context_emb_model.hidden_size
+                                    kdim=context_emb_size,
+                                    vdim=context_emb_size
                                 )
 
         if not self.remove_goal_lstm:
             self.multi_attn_goal = nn.MultiheadAttention(
                                     embed_dim=conf.context_size,
                                     num_heads=conf.action_attn_heads,
-                                    kdim=self.context_emb_model.hidden_size,
-                                    vdim=self.context_emb_model.hidden_size
+                                    kdim=context_emb_size,
+                                    vdim=context_emb_size
                                 )
 
             self.goal_lstm = nn.LSTMCell(
@@ -61,14 +57,9 @@ class ActionModule(Model):
         self.inst_lstm_ln = nn.LayerNorm([conf.inst_hidden_size])
 
     def forward(
-        self, goal_inst, low_insts, vision_features,
+        self, goal_embs, insts_embs, vision_features,
         context, inst_hidden_cell, goal_hidden_cell
     ):
-        with torch.no_grad():
-            if not self.remove_goal_lstm:
-                goal_embs = self.context_emb_model(goal_inst)
-            insts_embs = self.context_emb_model(low_insts)
-
         # inst LSTM
         if self.remove_context:
             context_vision = vision_features
