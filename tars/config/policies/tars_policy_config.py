@@ -1,3 +1,4 @@
+import torch.nn as nn
 import torch.optim as optim
 from tars.config.base.model_config import ModelConfig
 from tars.config.policies.moca_policy_config import MocaPolicyConfig
@@ -65,8 +66,22 @@ class TarsPolicyConfig(ModelConfig):
     teacher_forcing_curriculum = 0.9
     teacher_forcing_step = 5000
 
+    # initialization
+    init_func = 'kaiming_normal_'
+    
+
     def get_optim(self, parameters):
         return optim.SGD(parameters, lr=1e-3, momentum=0.9)
 
     def get_lr_scheduler(self, opt):
         return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)
+
+    def initialize_weights(self, w):
+        init_nonlinearity = 'leaky_relu' if self.activation == 'LeakyReLU' else 'relu' 
+        if 'kaiming' in self.init_func:
+            return getattr(nn.init, self.init_func)(w, nonlinearity=init_nonlinearity)
+        elif 'xavier' in self.init_func or 'orthogonal' in self.init_func:
+            return getattr(nn.init, self.init_func)(w, gain=nn.init.calculate_gain(init_nonlinearity))
+        else:
+            return getattr(nn.init, self.init_func)(w)
+

@@ -9,8 +9,8 @@ class ContextModule(Model):
     def __init__(self, num_actions, num_objects, object_na_idx, policy_conf):
         super(ContextModule, self).__init__()
         self.remove_goal_lstm = policy_conf.remove_goal_lstm
-
         self.padding_action_idx = num_actions
+        
 
         self.action_embed_and_readout = EmbedAndReadout.load_from_checkpoint(
             policy_conf.action_readout_path,
@@ -41,6 +41,8 @@ class ContextModule(Model):
             policy_conf.context_size
         )
 
+        policy_conf.initialize_weights(self.context_mixer.weight)
+        
         self.ln = nn.LayerNorm([policy_conf.context_size])
 
         self.activation = getattr(nn, policy_conf.activation)()

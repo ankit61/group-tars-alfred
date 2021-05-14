@@ -1,5 +1,6 @@
 import itertools
 import random
+import numpy as np
 from torchvision.models.detection import maskrcnn_resnet50_fpn
 from torchvision.transforms.functional import to_tensor
 import torch
@@ -12,7 +13,6 @@ from tars.auxilary_models import ContextModule
 from tars.auxilary_models import ActionModule
 from tars.config.base.dataset_config import DatasetConfig
 from tars.base.policy import Policy
-import numpy as np
 import tars.alfred.gen.constants as constants
 
 
@@ -99,7 +99,9 @@ class TarsPolicy(Policy):
                 goal_inst,
                 low_insts,
                 vision_features,
-                context
+                context,
+                (self.inst_lstm_hidden, self.inst_lstm_cell),
+                (self.goal_lstm_hidden, self.goal_lstm_cell),
             )
 
         self.inst_lstm_hidden, self.inst_lstm_cell = inst_hidden_cell
@@ -169,11 +171,13 @@ class TarsPolicy(Policy):
 
         # print('Action: ', torch.tensor(pred_actions).unique(), torch.tensor(pred_actions).std())
         # print('Object: ', torch.tensor(pred_objects).unique(), torch.tensor(pred_objects).std())
+        ac_loss = ac_loss / max(1e-5, ac_seq_len)
+        obj_loss = obj_loss / max(1e-5, obj_seq_len)
 
         return {
-            'loss': ac_loss / ac_seq_len + obj_loss / obj_seq_len,
-            'action_loss': ac_loss.item() / ac_seq_len,
-            'object_loss': obj_loss.item() / obj_seq_len,
+            'loss': ac_loss + obj_loss,
+            'action_loss': ac_loss.item(),
+            'object_loss': obj_loss.item(),
             'pred_action_std': torch.tensor(pred_actions).std(),
             'pred_object_std': torch.tensor(pred_objects).std()
         }
@@ -234,7 +238,7 @@ class TarsPolicy(Policy):
 
     def get_trainer_kwargs(self):
         trainer_kwargs = self.conf.main.default_trainer_args
-        # trainer_kwargs['accumulate_grad_batches'] = 8
+        trainer_kwargs['accumulate_grad_batches'] = 1
         return trainer_kwargs
 
     def find_instance_mask(self, imgs, int_objects):
