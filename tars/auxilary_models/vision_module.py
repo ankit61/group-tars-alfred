@@ -42,8 +42,7 @@ class VisionModule(Model):
                             conf.vision_features_size
                         )
         
-        self.init_func = getattr(nn.init, conf.init_func)
-        self.init_func(self.vision_mixer.weight)
+        conf.initialize_weights(self.vision_mixer.weight)
 
         self.ln = nn.LayerNorm(conf.vision_features_size)
         self.activation = getattr(nn, conf.activation)()

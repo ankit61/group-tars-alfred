@@ -41,8 +41,7 @@ class ContextModule(Model):
             policy_conf.context_size
         )
 
-        self.init_func = getattr(nn.init, policy_conf.init_func)
-        self.init_func(self.context_mixer.weight)
+        policy_conf.initialize_weights(self.context_mixer.weight)
         
         self.ln = nn.LayerNorm([policy_conf.context_size])
 

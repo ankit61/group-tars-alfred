@@ -54,8 +54,7 @@ class ActionModule(Model):
                                 self.num_actions + self.num_objects
                             )
 
-        self.init_func = getattr(nn.init, conf.init_func)
-        self.init_func(self.predictor_fc.weight)
+        conf.initialize_weights(self.predictor_fc.weight)
 
         self.inst_attn_ln = nn.LayerNorm([context_vision_features])
         self.goal_attn_ln = nn.LayerNorm([conf.context_size])
