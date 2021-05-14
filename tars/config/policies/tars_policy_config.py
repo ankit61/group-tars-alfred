@@ -78,12 +78,15 @@ class TarsPolicyConfig(ModelConfig):
         return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)
 
     def initialize_weights(self, layer):
-        if 'LSTM' in layer._get_name():
+        assert layer.__class__.__name__ in ['LSTMCell', 'Linear', 'MultiheadAttention']
+        if layer.__class__.__name__ == 'LSTMCell':
             init_func = self.lstm_init_func
             weights = [layer.weight_hh, layer.weight_ih]
-        else:
+        elif layer.__class__.__name__ == 'Linear':
             init_func = self.init_func
             weights = [layer.weight]
+        elif layer.__class__.__name__ == 'MultiheadAttention':
+            raise NotImplementedError
 
         init_nonlinearity = 'leaky_relu' if self.activation == 'LeakyReLU' else 'relu' 
 
