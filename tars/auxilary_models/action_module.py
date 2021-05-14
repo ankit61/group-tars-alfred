@@ -89,12 +89,12 @@ class ActionModule(Model):
         if self.remove_goal_lstm:
             last_goal_cell = torch.zeros(context_vision.shape[0], 0, device=context_vision.device)
         else:
-            last_goal_cell = last_goal_hidden_cell[1]
+            last_goal_cell = last_goal_hidden_cell[-1][1]
 
         inst_lstm_in = torch.cat((insts_attended, context_vision, last_goal_cell), dim=1)
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, last_inst_hidden_cell)
 
-        inst_lstm_out = self.inst_lstm_ln(inst_hidden_cell[0])
+        inst_lstm_out = self.inst_lstm_ln(inst_hidden_cell[-1][0])
         action_obj = self.predictor_fc(self.inst_lstm_dropout(inst_lstm_out))
 
         action = action_obj[:, :self.num_actions]
@@ -119,6 +119,6 @@ class ActionModule(Model):
             goal_lstm_in = torch.cat((goal_attended, action_emb, obj_emb), dim=1)
             goal_hidden_cell = self.goal_lstm(goal_lstm_in, last_goal_hidden_cell)
         else:
-            goal_hidden_cell = None, None
+            goal_hidden_cell = None
 
         return action, obj, inst_hidden_cell, goal_hidden_cell
