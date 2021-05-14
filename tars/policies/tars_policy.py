@@ -223,14 +223,14 @@ class TarsPolicy(Policy):
                                     type=type,
                                     img_transforms=self.get_img_transforms(),
                                     text_transforms=self.text_transform,
-                                    text_collate=self.action_module.context_emb_model.text_collate
+                                    text_collate=self.context_emb_model.text_collate
                                 )
 
     def get_img_transforms(self):
         return self.vision_module.get_img_transforms()
 
     def text_transform(self, sents, is_goal):
-        return self.action_module.context_emb_model.text_transforms(sents, is_goal)
+        return self.context_emb_model.text_transforms(sents, is_goal)
 
     def shared_dataloader(self, type):
         return DataLoader(
