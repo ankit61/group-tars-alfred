@@ -68,6 +68,7 @@ class TarsPolicyConfig(ModelConfig):
 
     # initialization
     init_func = 'kaiming_normal_'
+    lstm_init_func = 'kaiming_normal_'
     
 
     def get_optim(self, parameters):
@@ -76,12 +77,23 @@ class TarsPolicyConfig(ModelConfig):
     def get_lr_scheduler(self, opt):
         return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)
 
-    def initialize_weights(self, w):
-        init_nonlinearity = 'leaky_relu' if self.activation == 'LeakyReLU' else 'relu' 
-        if 'kaiming' in self.init_func:
-            return getattr(nn.init, self.init_func)(w, nonlinearity=init_nonlinearity)
-        elif 'xavier' in self.init_func or 'orthogonal' in self.init_func:
-            return getattr(nn.init, self.init_func)(w, gain=nn.init.calculate_gain(init_nonlinearity))
+    def initialize_weights(self, layer):
+        if 'LSTM' in layer._get_name():
+            init_func = self.lstm_init_func
+            weights = [layer.weight_hh, layer.weight_ih]
         else:
-            return getattr(nn.init, self.init_func)(w)
+            init_func = self.init_func
+            weights = [layer.weight]
+         
+        init_nonlinearity = 'leaky_relu' if self.activation == 'LeakyReLU' else 'relu' 
+        
+        if 'kaiming' in init_func:
+            for w in weights:
+                getattr(nn.init, init_func)(w, nonlinearity=init_nonlinearity)
+        elif 'xavier' in init_func or 'orthogonal' in init_func:
+            for w in weights:
+                getattr(nn.init, init_func)(w, gain=nn.init.calculate_gain(init_nonlinearity))
+        else:
+            for w in weights:
+                getattr(nn.init, init_func)(w)
 

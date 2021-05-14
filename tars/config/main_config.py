@@ -30,7 +30,7 @@ class MainConfig(Config):
         'track_grad_norm': 2,
         'log_every_n_steps': 1,
         #'val_check_interval': 1000,
-        # 'max_epochs': 250
+        'max_epochs': 500
     }
 
     # basic dirs
