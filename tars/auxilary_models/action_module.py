@@ -23,6 +23,7 @@ class ActionModule(Model):
                                     kdim=context_emb_size,
                                     vdim=context_emb_size
                                 )
+        conf.initialize_weights(self.multi_attn_insts)
 
         if not self.remove_goal_lstm:
             self.multi_attn_goal = nn.MultiheadAttention(
@@ -31,6 +32,7 @@ class ActionModule(Model):
                                     kdim=context_emb_size,
                                     vdim=context_emb_size
                                 )
+            conf.initialize_weights(self.multi_attn_goal)
 
             self.goal_lstm = nn.LSTMCell(
                         conf.context_size,
@@ -52,7 +54,6 @@ class ActionModule(Model):
                                 self.num_actions + self.num_objects
                             )
         conf.initialize_weights(self.predictor_fc)
-        
 
         self.inst_attn_ln = nn.LayerNorm([context_vision_features])
         self.goal_attn_ln = nn.LayerNorm([conf.context_size])

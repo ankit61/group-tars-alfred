@@ -68,8 +68,6 @@ class TarsPolicyConfig(ModelConfig):
 
     # initialization
     init_func = 'kaiming_normal_'
-    lstm_init_func = 'kaiming_normal_'
-    
 
     def get_optim(self, parameters):
         return optim.SGD(parameters, lr=1e-3, momentum=0.9)
@@ -79,23 +77,22 @@ class TarsPolicyConfig(ModelConfig):
 
     def initialize_weights(self, layer):
         assert layer.__class__.__name__ in ['LSTMCell', 'Linear', 'MultiheadAttention']
+        assert self.activation in ['LeakyReLU', 'ReLU']
         if layer.__class__.__name__ == 'LSTMCell':
-            init_func = self.lstm_init_func
             weights = [layer.weight_hh, layer.weight_ih]
         elif layer.__class__.__name__ == 'Linear':
-            init_func = self.init_func
             weights = [layer.weight]
         elif layer.__class__.__name__ == 'MultiheadAttention':
-            raise NotImplementedError
+            weights = [p for n, p in layer.named_parameters() if 'weight' in n]
 
-        init_nonlinearity = 'leaky_relu' if self.activation == 'LeakyReLU' else 'relu' 
+        init_nonlinearity = 'leaky_relu' if self.activation == 'LeakyReLU' else 'relu'
 
-        if 'kaiming' in init_func:
+        if 'kaiming' in self.init_func:
             for w in weights:
-                getattr(nn.init, init_func)(w, nonlinearity=init_nonlinearity)
-        elif 'xavier' in init_func or 'orthogonal' in init_func:
+                getattr(nn.init, self.init_func)(w, nonlinearity=init_nonlinearity)
+        elif 'xavier' in self.init_func or 'orthogonal' in self.init_func:
             for w in weights:
-                getattr(nn.init, init_func)(w, gain=nn.init.calculate_gain(init_nonlinearity))
+                getattr(nn.init, self.init_func)(w, gain=nn.init.calculate_gain(init_nonlinearity))
         else:
             for w in weights:
-                getattr(nn.init, init_func)(w)
+                getattr(nn.init, self.init_func)(w)
