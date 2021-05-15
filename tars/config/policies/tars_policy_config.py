@@ -8,12 +8,12 @@ from tars.config.base.dataset_config import DatasetConfig
 class TarsPolicyConfig(ModelConfig):
     use_mask = False
     batch_size = 1
-    acc_grad_batches = 1 if 'small' in DatasetConfig().splits_file else 8
+    acc_grad_batches = 1 if 'small' in DatasetConfig().splits_file else 16
     # effective batch size = acc_grad_batches * batch_size
 
     # feature sizes
-    context_size = 256
-    vision_features_size = 128
+    context_size = 1024
+    vision_features_size = 512
     raw_vision_features_size = 512
 
     # history
@@ -21,16 +21,16 @@ class TarsPolicyConfig(ModelConfig):
     past_objects_len = 10
 
     # embeddings
-    action_emb_dim = 64
-    object_emb_dim = 64
-    action_hist_emb_dim = 256
-    int_hist_emb_dim = 256
+    action_emb_dim = 128
+    object_emb_dim = 128
+    action_hist_emb_dim = 512
+    int_hist_emb_dim = 512
     # word_emb_dim = 128
     vision_object_emb_dim = 128
 
     # LSTMs
-    inst_hidden_size = 256
-    goal_hidden_size = 128
+    inst_hidden_size = 512
+    goal_hidden_size = 512
 
     # context module
     action_readout_path = '/data/best_models/action_history.ckpt'
@@ -46,7 +46,7 @@ class TarsPolicyConfig(ModelConfig):
 
     # readout transformer
     transformer_num_heads = 8
-    transformer_num_layers = 2
+    transformer_num_layers = 4
 
     # action module
     action_attn_heads = 4
@@ -70,13 +70,13 @@ class TarsPolicyConfig(ModelConfig):
     teacher_forcing_init = 1
     teacher_forcing_curriculum = 0.9
     teacher_forcing_step = 5000
-    use_pretraining = True
+    use_pretraining = False
 
     # initialization
     init_func = 'kaiming_normal_'
 
     def get_optim(self, parameters):
-        return optim.SGD(parameters, lr=1e-3, momentum=0.9)
+        return optim.Adam(parameters, lr=1e-4)
 
     def get_lr_scheduler(self, opt):
         return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)
