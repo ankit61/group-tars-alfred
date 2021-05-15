@@ -29,9 +29,9 @@ class MainConfig(Config):
         'accumulate_grad_batches': 1,
         #'auto_lr_find': True,
         'track_grad_norm': 2,
-        'log_every_n_steps': 1,
+        'log_every_n_steps': 5,
         #'val_check_interval': 1000,
-        'max_epochs': 500
+        'max_epochs': 1000
     }
 
     # basic dirs

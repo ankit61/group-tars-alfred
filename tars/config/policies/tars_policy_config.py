@@ -7,7 +7,7 @@ from tars.config.policies.moca_policy_config import MocaPolicyConfig
 class TarsPolicyConfig(ModelConfig):
     use_mask = False
     batch_size = 1
-    acc_grad_batches = 16
+    acc_grad_batches = 8
     # effective batch size = acc_grad_batches * batch_size
 
     # feature sizes
@@ -52,7 +52,7 @@ class TarsPolicyConfig(ModelConfig):
     inst_lstm_dropout = 0.3
 
     # contextual embedding model
-    context_emb_model_name_or_path = "albert-base-v2"
+    context_emb_model_name_or_path = "google/bert_uncased_L-2_H-128_A-2"
 
     # mask rcnn
     mask_rcnn_path = MocaPolicyConfig.mask_rcnn_path
