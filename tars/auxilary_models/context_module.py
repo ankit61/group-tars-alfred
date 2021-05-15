@@ -41,8 +41,9 @@ class ContextModule(Model):
             policy_conf.context_size
         )
         policy_conf.initialize_weights(self.context_mixer)
-        
-        self.ln = nn.LayerNorm([policy_conf.context_size])
+
+        self.context_in_ln = nn.LayerNorm([self.context_mixer.in_features])
+        self.final_ln = nn.LayerNorm([policy_conf.context_size])
 
         self.activation = getattr(nn, policy_conf.activation)()
 
@@ -57,6 +58,6 @@ class ContextModule(Model):
             implicit_context = torch.cat((inst_lstm_cell, goal_lstm_cell), dim=1)
 
         concated = torch.cat((explicit_context, implicit_context), dim=1)
-        context = self.context_mixer(concated)
+        context = self.context_mixer(self.context_in_ln(concated))
 
-        return self.activation(self.ln(context))
+        return self.activation(self.final_ln(context))
