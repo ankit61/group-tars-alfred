@@ -10,7 +10,6 @@ class ContextModule(Model):
         super(ContextModule, self).__init__()
         self.remove_goal_lstm = policy_conf.remove_goal_lstm
         self.padding_action_idx = num_actions
-        
 
         self.action_embed_and_readout = EmbedAndReadout.load_from_checkpoint(
             policy_conf.action_readout_path,
@@ -42,7 +41,6 @@ class ContextModule(Model):
         )
         policy_conf.initialize_weights(self.context_mixer)
 
-        self.context_in_ln = nn.LayerNorm([self.context_mixer.in_features])
         self.final_ln = nn.LayerNorm([policy_conf.context_size])
 
         self.activation = getattr(nn, policy_conf.activation)()
@@ -58,6 +56,6 @@ class ContextModule(Model):
             implicit_context = torch.cat((inst_lstm_cell, goal_lstm_cell), dim=1)
 
         concated = torch.cat((explicit_context, implicit_context), dim=1)
-        context = self.context_mixer(self.context_in_ln(concated))
+        context = self.context_mixer(concated)
 
         return self.activation(self.final_ln(context)), action_readout
