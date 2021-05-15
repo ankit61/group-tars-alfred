@@ -60,4 +60,4 @@ class ContextModule(Model):
         concated = torch.cat((explicit_context, implicit_context), dim=1)
         context = self.context_mixer(self.context_in_ln(concated))
 
-        return self.activation(self.final_ln(context))
+        return self.activation(self.final_ln(context)), action_readout

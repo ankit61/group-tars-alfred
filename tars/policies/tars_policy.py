@@ -86,9 +86,9 @@ class TarsPolicy(Policy):
                 goal_inst: [S, N]
                 low_inst: [S', N]
         '''
-        context = None
+        context, action_readout = None, None
         if not self.conf.remove_context:
-            context = self.context_module(
+            context, action_readout = self.context_module(
                         self.past_actions.clone(),
                         self.past_objects.clone(),
                         self.inst_lstm_cell,
@@ -99,7 +99,7 @@ class TarsPolicy(Policy):
 
         action, int_object, inst_hidden_cell, goal_hidden_cell =\
             self.action_module(
-                goal_embs, insts_embs, vision_features, context,
+                goal_embs, insts_embs, vision_features, context, action_readout,
                 (self.inst_lstm_hidden, self.inst_lstm_cell),
                 (self.goal_lstm_hidden, self.goal_lstm_cell),
             )

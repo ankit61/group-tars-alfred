@@ -44,6 +44,7 @@ class ActionModule(Model):
 
         self.inst_lstm = nn.LSTMCell(
                             2 * context_vision_features +\
+                            (0 if self.remove_context else conf.action_hist_emb_dim) +\
                             (0 if self.remove_goal_lstm else conf.goal_hidden_size),
                             conf.inst_hidden_size
                         )
@@ -61,11 +62,12 @@ class ActionModule(Model):
 
     def forward(
         self, goal_embs, insts_embs, vision_features,
-        context, inst_hidden_cell, goal_hidden_cell
+        context, action_readout, inst_hidden_cell, goal_hidden_cell
     ):
         # inst LSTM
         if self.remove_context:
             context_vision = vision_features
+            action_readout = torch.zeros(vision_features.shape[0], 0)
         else:
             context_vision = torch.cat((context, vision_features), dim=1)
 
@@ -82,7 +84,7 @@ class ActionModule(Model):
         else:
             goal_cell = goal_hidden_cell[1]
 
-        inst_lstm_in = torch.cat((insts_attended, context_vision, goal_cell), dim=1)
+        inst_lstm_in = torch.cat((insts_attended, context_vision, action_readout, goal_cell), dim=1)
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, inst_hidden_cell)
 
         inst_lstm_out = self.inst_lstm_ln(inst_hidden_cell[0])
