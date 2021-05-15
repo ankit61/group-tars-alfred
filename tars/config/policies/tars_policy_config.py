@@ -2,12 +2,13 @@ import torch.nn as nn
 import torch.optim as optim
 from tars.config.base.model_config import ModelConfig
 from tars.config.policies.moca_policy_config import MocaPolicyConfig
+from tars.config.base.dataset_config import DatasetConfig
 
 
 class TarsPolicyConfig(ModelConfig):
     use_mask = False
     batch_size = 1
-    acc_grad_batches = 8
+    acc_grad_batches = 1 if 'small' in DatasetConfig().splits_file else 8
     # effective batch size = acc_grad_batches * batch_size
 
     # feature sizes
