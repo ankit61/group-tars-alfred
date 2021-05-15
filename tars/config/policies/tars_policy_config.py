@@ -67,6 +67,7 @@ class TarsPolicyConfig(ModelConfig):
     teacher_forcing_init = 1
     teacher_forcing_curriculum = 0.9
     teacher_forcing_step = 5000
+    use_pretraining = True
 
     # initialization
     init_func = 'kaiming_normal_'
