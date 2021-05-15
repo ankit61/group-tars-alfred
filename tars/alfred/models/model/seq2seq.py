@@ -319,6 +319,7 @@ class Module(nn.Module):
         load pth model from disk
         '''
         save = torch.load(fsave, map_location=device)
+        save['args'].tars = False
         model = cls(save['args'], save['vocab'])
         model.load_state_dict(save['model'])
         optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)

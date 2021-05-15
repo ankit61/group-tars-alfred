@@ -2,79 +2,74 @@ import torch
 import torch.nn as nn
 from tars.base.model import Model
 from tars.auxilary_models import StackedLSTMCell
-from tars.auxilary_models import ContextEmbeddingModel
 from tars.config.envs.alfred_env_config import AlfredEnvConfig
 
 
 class ActionModule(Model):
-    def __init__(self, action_emb, obj_emb, conf):
+    def __init__(self, action_emb, obj_emb, context_emb_size, conf):
         super(ActionModule, self).__init__()
         self.num_actions = len(AlfredEnvConfig.actions)
         self.num_objects = obj_emb.num_embeddings
         self.remove_goal_lstm = conf.remove_goal_lstm
         self.remove_context = conf.remove_context
         self.activation = getattr(nn, conf.activation)()
-        
 
         self.action_emb = action_emb
         self.obj_emb = obj_emb
-
-        self.context_emb_model = ContextEmbeddingModel(conf.context_emb_model_name_or_path)
 
         context_vision_features = (0 if self.remove_context else conf.context_size) + conf.vision_features_size
         self.multi_attn_insts = nn.MultiheadAttention(
                                     embed_dim=context_vision_features,
                                     num_heads=conf.action_attn_heads,
-                                    kdim=self.context_emb_model.hidden_size,
-                                    vdim=self.context_emb_model.hidden_size
+                                    kdim=context_emb_size,
+                                    vdim=context_emb_size
                                 )
+        conf.initialize_weights(self.multi_attn_insts)
 
         if not self.remove_goal_lstm:
             self.multi_attn_goal = nn.MultiheadAttention(
                                     embed_dim=conf.context_size,
                                     num_heads=conf.action_attn_heads,
-                                    kdim=self.context_emb_model.hidden_size,
-                                    vdim=self.context_emb_model.hidden_size
+                                    kdim=context_emb_size,
+                                    vdim=context_emb_size
                                 )
+            conf.initialize_weights(self.multi_attn_goal)
 
             self.goal_lstm = StackedLSTMCell(
-                        conf.context_size + conf.action_emb_dim + conf.object_emb_dim,
+                        conf.context_size + self.action_emb.embedding_dim,
                         conf.goal_hidden_size, num_layers=conf.num_goal_lstm_layers
-
                     )
+            conf.initialize_weights(self.goal_lstm)
 
         self.inst_lstm_dropout = nn.Dropout(conf.inst_lstm_dropout)
 
         self.inst_lstm = StackedLSTMCell(
                             2 * context_vision_features +\
+                            (0 if self.remove_context else conf.action_hist_emb_dim) +\
                             (0 if self.remove_goal_lstm else conf.goal_hidden_size),
                             conf.inst_hidden_size,
                             num_layers=conf.num_goal_lstm_layers
                         )
+        conf.initialize_weights(self.inst_lstm)
 
         self.predictor_fc = nn.Linear(
                                 conf.inst_hidden_size,
                                 self.num_actions + self.num_objects
                             )
-
-        conf.initialize_weights(self.predictor_fc.weight)
+        conf.initialize_weights(self.predictor_fc)
 
         self.inst_attn_ln = nn.LayerNorm([context_vision_features])
         self.goal_attn_ln = nn.LayerNorm([conf.context_size])
         self.inst_lstm_ln = nn.LayerNorm([conf.inst_hidden_size])
 
     def forward(
-        self, goal_inst, low_insts, vision_features,
-        context, last_inst_hidden_cell, last_goal_hidden_cell
+        self, goal_embs, insts_embs, vision_features,
+        context, action_readout, last_inst_hidden_cell, last_goal_hidden_cell
     ):
-        with torch.no_grad():
-            if not self.remove_goal_lstm:
-                goal_embs = self.context_emb_model(goal_inst)
-            insts_embs = self.context_emb_model(low_insts)
-
         # inst LSTM
         if self.remove_context:
             context_vision = vision_features
+            action_readout = torch.zeros(vision_features.shape[0], 0)
         else:
             context_vision = torch.cat((context, vision_features), dim=1)
 
@@ -91,7 +86,7 @@ class ActionModule(Model):
         else:
             last_goal_cell = last_goal_hidden_cell[-1][1]
 
-        inst_lstm_in = torch.cat((insts_attended, context_vision, last_goal_cell), dim=1)
+        inst_lstm_in = torch.cat((insts_attended, context_vision, action_readout, last_goal_cell), dim=1)
         inst_hidden_cell = self.inst_lstm(inst_lstm_in, last_inst_hidden_cell)
 
         inst_lstm_out = self.inst_lstm_ln(inst_hidden_cell[-1][0])
@@ -113,10 +108,9 @@ class ActionModule(Model):
                                 )
                             )
 
-            action_emb = self.action_emb(action.argmax(1))
-            obj_emb = self.obj_emb(obj.argmax(1))
+            pred_action = self.action_emb(action.argmax(1))
 
-            goal_lstm_in = torch.cat((goal_attended, action_emb, obj_emb), dim=1)
+            goal_lstm_in = torch.cat([goal_attended, pred_action], dim=1)
             goal_hidden_cell = self.goal_lstm(goal_lstm_in, last_goal_hidden_cell)
         else:
             goal_hidden_cell = None

@@ -6,6 +6,7 @@ from tars.base.dataset import DatasetType
 from tars.base.configurable import Configurable
 import os
 import datetime
+from torchinfo import summary
 
 
 class Model(Configurable, LightningModule):
@@ -44,3 +45,6 @@ class Model(Configurable, LightningModule):
 
     def shared_dataloader(self, type: DatasetType):
         raise NotImplementedError
+
+    def print_summary(self, **kwargs):
+        summary(self, **kwargs)

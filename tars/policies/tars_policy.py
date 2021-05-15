@@ -11,6 +11,7 @@ from tars.datasets.imitation_dataset import ImitationDataset
 from tars.auxilary_models import VisionModule
 from tars.auxilary_models import ContextModule
 from tars.auxilary_models import ActionModule
+from tars.auxilary_models import ContextEmbeddingModel
 from tars.config.base.dataset_config import DatasetConfig
 from tars.base.policy import Policy
 import tars.alfred.gen.constants as constants
@@ -27,6 +28,7 @@ class TarsPolicy(Policy):
         if self.conf.remove_context:
             assert self.conf.remove_goal_lstm, 'if there is no context, goal lstm cannot exist'
 
+        self.context_emb_model = ContextEmbeddingModel(self.conf.context_emb_model_name_or_path)
         self.context_module = ContextModule(
                                 self.num_actions, self.num_objects,
                                 self.object_na_idx, self.conf
@@ -35,6 +37,7 @@ class TarsPolicy(Policy):
         self.action_module = ActionModule(
                                 self.context_module.action_embed_and_readout.embed,
                                 self.context_module.int_object_embed_and_readout.embed,
+                                self.context_emb_model.hidden_size,
                                 self.conf
                             )
 
@@ -87,7 +90,7 @@ class TarsPolicy(Policy):
         else:
             self.goal_lstm_hiddens_cells = None
 
-    def forward(self, img, goal_inst, low_insts, gt_action=None, gt_int_object=None):
+    def forward(self, img, goal_embs, insts_embs, gt_action=None, gt_int_object=None):
         '''
             All elements in one batch must be from different envs
             Args:
@@ -95,9 +98,9 @@ class TarsPolicy(Policy):
                 goal_inst: [S, N]
                 low_inst: [S', N]
         '''
-        context = None
+        context, action_readout = None, None
         if not self.conf.remove_context:
-            context = self.context_module(
+            context, action_readout = self.context_module(
                         self.past_actions.clone(),
                         self.past_objects.clone(),
                         self.inst_lstm_hiddens_cells[-1][1],
@@ -108,10 +111,7 @@ class TarsPolicy(Policy):
 
         action, int_object, self.inst_lstm_hiddens_cells, self.goal_lstm_hiddens_cells =\
             self.action_module(
-                goal_inst,
-                low_insts,
-                vision_features,
-                context,
+                goal_embs, insts_embs, vision_features, context, action_readout,
                 self.inst_lstm_hiddens_cells,
                 self.goal_lstm_hiddens_cells,
             )
@@ -150,6 +150,10 @@ class TarsPolicy(Policy):
         if self.global_step % self.conf.teacher_forcing_step == 0:
             self.teacher_prob *= self.conf.teacher_forcing_curriculum
 
+        with torch.no_grad():
+            goal_embs = None if self.conf.remove_goal_lstm else self.context_emb_model(batch['goal_inst'])
+            insts_embs = self.context_emb_model(batch['low_insts'])
+
         for mini_batch, batch_size in ImitationDataset.mini_batches(batch):
             self.trim_history(batch_size)
             # self.past_actions = mini_batch['expert_actions'].repeat_interleave(self.past_actions.shape[1]).reshape(self.past_actions.shape)
@@ -157,14 +161,14 @@ class TarsPolicy(Policy):
             if test_time:
                 action, _, int_object = self(
                                         mini_batch['images'],
-                                        mini_batch['goal_inst'],
-                                        mini_batch['low_insts']
+                                        goal_embs,
+                                        insts_embs
                                     )
             else:
                 action, _, int_object = self(
                                         mini_batch['images'],
-                                        mini_batch['goal_inst'],
-                                        mini_batch['low_insts'],
+                                        goal_embs,
+                                        insts_embs,
                                         mini_batch['expert_actions'],
                                         mini_batch['expert_int_objects']
                                     )
@@ -237,14 +241,14 @@ class TarsPolicy(Policy):
                                     type=type,
                                     img_transforms=self.get_img_transforms(),
                                     text_transforms=self.text_transform,
-                                    text_collate=self.action_module.context_emb_model.text_collate
+                                    text_collate=self.context_emb_model.text_collate
                                 )
 
     def get_img_transforms(self):
         return self.vision_module.get_img_transforms()
 
     def text_transform(self, sents, is_goal):
-        return self.action_module.context_emb_model.text_transforms(sents, is_goal)
+        return self.context_emb_model.text_transforms(sents, is_goal)
 
     def shared_dataloader(self, type):
         return DataLoader(
@@ -256,7 +260,7 @@ class TarsPolicy(Policy):
 
     def get_trainer_kwargs(self):
         trainer_kwargs = self.conf.main.default_trainer_args
-        trainer_kwargs['accumulate_grad_batches'] = 1
+        trainer_kwargs['accumulate_grad_batches'] = self.conf.acc_grad_batches
         return trainer_kwargs
 
     def find_instance_mask(self, imgs, int_objects):
