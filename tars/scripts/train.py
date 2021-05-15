@@ -11,6 +11,7 @@ from torch.cuda import is_available
 from tars.auxilary_models import *
 from tars.policies import *
 from tars.config.main_config import MainConfig
+from torchinfo import summary
 
 def get_args():
     parser = argparse.ArgumentParser(allow_abbrev=False)
