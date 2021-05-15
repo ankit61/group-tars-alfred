@@ -47,4 +47,4 @@ class Model(Configurable, LightningModule):
         raise NotImplementedError
 
     def print_summary(self, **kwargs):
-        print(summary(self, **kwargs))
+        summary(self, **kwargs)
