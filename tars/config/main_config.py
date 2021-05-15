@@ -24,14 +24,14 @@ class MainConfig(Config):
     # general training
     default_trainer_args = {
         'gpus': 1 if use_gpu else 0,
-        'check_val_every_n_epoch': 1000 if 'small_split' in DatasetConfig().splits_file else 1,
+        'check_val_every_n_epoch': 1000 if 'small' in DatasetConfig().splits_file else 1,
         'num_sanity_val_steps': 4,
         'accumulate_grad_batches': 1,
         #'auto_lr_find': True,
         'track_grad_norm': 2,
-        'log_every_n_steps': 1,
+        'log_every_n_steps': 1 if 'small' in DatasetConfig().splits_file else 5,
         #'val_check_interval': 1000,
-        'max_epochs': 500
+        'max_epochs': 1000
     }
 
     # basic dirs

@@ -42,8 +42,8 @@ class ContextEmbeddingModel(Model):
         if is_goal:
             input_str = sents[0]
         else:
-            input_str = " ".join(sents)
-        result = self.tokenizer(input_str)
+            input_str = "; ".join(sents)
+        result = self.tokenizer(input_str.lower())
         return result
 
 
