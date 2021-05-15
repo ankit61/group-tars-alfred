@@ -1,13 +1,14 @@
 import os
+from pathlib import Path
 from tars.base.config import Config
-from tars.config.main_config import MainConfig
 from tars.alfred.gen.constants import OBJECTS
 from vocab import Vocab
 
 
 class DatasetConfig(Config):
-    data_base_dir = '/data/json_2.1.0' if os.path.exists('/data/json_2.1.0') else os.path.join(MainConfig.alfred_dir, 'data/json_2.1.0')
-    splits_file = os.path.join(MainConfig.alfred_dir, 'data/splits/oct21.json')
+    alfred_dir = os.path.join(Path(__file__).parents[2], 'alfred/')
+    data_base_dir = '/data/json_2.1.0' if os.path.exists('/data/json_2.1.0') else os.path.join(alfred_dir, 'data/json_2.1.0')
+    splits_file = os.path.join(alfred_dir, 'data/splits/oct21.json')
 
     object_na = 0
     objects_list = [object_na] + OBJECTS + ['AppleSliced', 'ShowerCurtain', 'TomatoSliced', 'LettuceSliced', 'Lamp', 'ShowerHead', 'EggCracked', 'BreadSliced', 'PotatoSliced', 'Faucet']

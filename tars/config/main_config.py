@@ -6,6 +6,7 @@ from datetime import datetime
 import multiprocessing as mp
 import torch
 from tars.base.config import Config
+from tars.config.base.dataset_config import DatasetConfig
 
 
 class MainConfig(Config):
@@ -23,7 +24,7 @@ class MainConfig(Config):
     # general training
     default_trainer_args = {
         'gpus': 1 if use_gpu else 0,
-        'check_val_every_n_epoch': 1000,
+        'check_val_every_n_epoch': 1000 if 'small_split' in DatasetConfig().splits_file else 1,
         'num_sanity_val_steps': 4,
         'accumulate_grad_batches': 1,
         #'auto_lr_find': True,
@@ -34,7 +35,6 @@ class MainConfig(Config):
     }
 
     # basic dirs
-    alfred_dir = os.path.join(Path(__file__).parents[1], 'alfred/')
     save_dir = os.path.join(Path(__file__).parents[1], 'gen/')
 
     @classmethod
