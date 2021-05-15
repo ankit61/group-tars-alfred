@@ -35,7 +35,7 @@ class ActionModule(Model):
             conf.initialize_weights(self.multi_attn_goal)
 
             self.goal_lstm = nn.LSTMCell(
-                        conf.context_size,
+                        conf.context_size + self.action_emb.embedding_dim,
                         conf.goal_hidden_size
                     )
             conf.initialize_weights(self.goal_lstm)
@@ -104,7 +104,10 @@ class ActionModule(Model):
                                 )
                             )
 
-            goal_hidden_cell = self.goal_lstm(goal_attended, goal_hidden_cell)
+            pred_action = self.action_emb(action.argmax(1))
+
+            goal_lstm_in = torch.cat([goal_attended, pred_action], dim=1)
+            goal_hidden_cell = self.goal_lstm(goal_lstm_in, goal_hidden_cell)
         else:
             goal_hidden_cell = None, None
 
