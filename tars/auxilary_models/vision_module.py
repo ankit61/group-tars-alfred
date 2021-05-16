@@ -75,6 +75,6 @@ class VisionModule(Model):
 
     def get_img_transforms(self):
         return transforms.Compose([
-                transforms.Resize(224, 224),
+                transforms.Resize([224, 224]),
                 MultiLabelClassifier.get_img_transforms()
             ])
