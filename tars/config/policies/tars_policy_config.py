@@ -79,7 +79,7 @@ class TarsPolicyConfig(ModelConfig):
         return optim.Adam(parameters, lr=1e-4)
 
     def get_lr_scheduler(self, opt):
-        return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)
+        return optim.lr_scheduler.StepLR(opt, step_size=1, gamma=0.9)
 
     def initialize_weights(self, layer):
         if sum([p.numel() for p in layer.parameters()]) == 0:
