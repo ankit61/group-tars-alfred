@@ -76,7 +76,7 @@ class TarsPolicyConfig(ModelConfig):
     init_func = 'kaiming_normal_'
 
     def get_optim(self, parameters):
-        return optim.Adam(parameters, lr=1e-4)
+        return optim.Adam(parameters, lr=1e-4, weight_decay=5e-4)
 
     def get_lr_scheduler(self, opt):
         return optim.lr_scheduler.StepLR(opt, step_size=1, gamma=0.9)
