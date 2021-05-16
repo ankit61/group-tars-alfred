@@ -56,6 +56,8 @@ class Dataset(Configurable, data.Dataset):
                 objects.append(obj)
         if self.conf.max_seq_len:
             return actions[:self.conf.max_seq_len], objects[:self.conf.max_seq_len]
+        else:
+            return actions, objects
 
     def get_all_imgs(self, task_dir, img_dir):
         files = sorted(os.listdir(os.path.join(task_dir, img_dir)))
