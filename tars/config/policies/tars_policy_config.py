@@ -69,7 +69,7 @@ class TarsPolicyConfig(ModelConfig):
     activation = 'ReLU'
     teacher_forcing_init = 1
     teacher_forcing_curriculum = 0.9
-    teacher_forcing_step = 500
+    teacher_forcing_step = 200
     use_pretraining = False
 
     # initialization
