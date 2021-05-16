@@ -54,7 +54,8 @@ class Dataset(Configurable, data.Dataset):
             actions.append(ac)
             if (obj != self.conf.object_na_idx) or not int_obj_only:
                 objects.append(obj)
-        return actions, objects
+        if self.conf.max_seq_len:
+            return actions[:self.conf.max_seq_len], objects[:self.conf.max_seq_len]
 
     def get_all_imgs(self, task_dir, img_dir):
         files = sorted(os.listdir(os.path.join(task_dir, img_dir)))

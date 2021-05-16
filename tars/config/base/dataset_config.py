@@ -24,3 +24,5 @@ class DatasetConfig(Config):
 
     start_idx = 0 # start dataset from this index, inclusive
     end_idx = None # end dataset at this index, exclusive
+
+    max_seq_len = None
