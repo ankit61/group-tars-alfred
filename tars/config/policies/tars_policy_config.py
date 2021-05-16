@@ -82,7 +82,10 @@ class TarsPolicyConfig(ModelConfig):
         return optim.lr_scheduler.StepLR(opt, step_size=10, gamma=0.9)
 
     def initialize_weights(self, layer):
-        assert layer.__class__.__name__ in ['LSTMCell', 'StackedLSTMCell', 'Linear', 'MultiheadAttention', 'TransformerEncoder', 'Embedding']
+        if sum([p.numel() for p in layer.parameters()]) == 0:
+            return # no params to init
+
+        assert layer.__class__.__name__ in ['LSTMCell', 'StackedLSTMCell', 'Linear', 'MultiheadAttention', 'TransformerEncoder', 'Embedding', 'Conv2d', 'Sequential']
         assert self.activation in ['LeakyReLU', 'ReLU']
 
         if layer.__class__.__name__ == 'StackedLSTMCell':
@@ -98,6 +101,12 @@ class TarsPolicyConfig(ModelConfig):
             weights = [p for n, p in layer.named_parameters() if 'weight' in n and 'norm' not in n]
         elif layer.__class__.__name__ == 'Embedding':
             weights = [layer.weight]
+        elif layer.__class__.__name__ == 'Conv2d':
+            weights = [layer.weight]
+        elif layer.__class__.__name__ == 'Sequential':
+            for l in layer:
+                self.initialize_weights(l)
+            return
 
         init_nonlinearity = 'leaky_relu' if self.activation == 'LeakyReLU' else 'relu'
 

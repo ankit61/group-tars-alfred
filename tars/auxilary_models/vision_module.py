@@ -25,6 +25,7 @@ class VisionModule(Model):
                                     nn.Conv2d(256, 64, kernel_size=1),
                                     nn.Flatten()
                                 )
+        conf.initialize_weights(self.vision_cnn_post_proc)
         raw_features_size = 64 * 7 * 7
 
         if not self.remove_vision_readout:
