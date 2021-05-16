@@ -40,6 +40,7 @@ class EmbedAndReadout(Model):
             max_len=history_max_len,
             use_pe=use_pe
         )
+        policy_conf.initialize_weights(self.readout_transformer.position_encoding.pe)
         policy_conf.initialize_weights(self.readout_transformer.transformer)
         policy_conf.initialize_weights(self.readout_transformer.linear)
 

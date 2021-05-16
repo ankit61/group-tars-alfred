@@ -14,7 +14,7 @@ class PositionalEncoding(Model):
         self.pe = nn.Embedding(max_len, d_model)
 
     def forward(self, x):
-        x = x + self.pe[:x.size(0), :]
+        x = x + self.pe.weight[:x.size(0), :].unsqueeze(1)
         return self.dropout(x)
 
 
