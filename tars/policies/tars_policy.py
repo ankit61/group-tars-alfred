@@ -1,11 +1,13 @@
 import itertools
 import random
+from copy import deepcopy
 import numpy as np
-from torchvision.models.detection import maskrcnn_resnet50_fpn
-from torchvision.transforms.functional import to_tensor
 import torch
 import torch.nn as nn
 from torch.utils.data.dataloader import DataLoader
+from torchvision.models.detection import maskrcnn_resnet50_fpn
+from torchvision.transforms.functional import to_tensor
+import tars.alfred.gen.constants as constants
 from tars.base.dataset import DatasetType
 from tars.datasets.imitation_dataset import ImitationDataset
 from tars.auxilary_models import VisionModule
@@ -14,7 +16,6 @@ from tars.auxilary_models import ActionModule
 from tars.auxilary_models import ContextEmbeddingModel
 from tars.config.base.dataset_config import DatasetConfig
 from tars.base.policy import Policy
-import tars.alfred.gen.constants as constants
 
 
 class TarsPolicy(Policy):
@@ -69,7 +70,7 @@ class TarsPolicy(Policy):
         self.actions_itr = itertools.cycle(range(self.past_actions.shape[1]))
         self.objects_itr = [itertools.cycle(range(self.past_objects.shape[1]))] * self.conf.batch_size
 
-        self.inst_lstm_hiddens_cells = [
+        self.action_lstm_hiddens_cells = [
                                 (torch.zeros(
                                     self.conf.batch_size,
                                     self.conf.inst_hidden_size,
@@ -77,6 +78,8 @@ class TarsPolicy(Policy):
                                 ), ) * 2
                                 for _ in range(self.conf.num_inst_lstm_layers)
                             ]
+
+        self.obj_lstm_hiddens_cells = deepcopy(self.action_lstm_hiddens_cells)
 
         if not self.conf.remove_goal_lstm:
             self.goal_lstm_hiddens_cells = [
@@ -103,16 +106,20 @@ class TarsPolicy(Policy):
             context, action_readout = self.context_module(
                         self.past_actions.clone(),
                         self.past_objects.clone(),
-                        self.inst_lstm_hiddens_cells[-1][1],
+                        torch.cat([
+                            self.action_lstm_hiddens_cells[-1][1],
+                            self.obj_lstm_hiddens_cells[-1][1]
+                        ], dim=1),
                         self.goal_lstm_hiddens_cells[-1][1]
                     )
 
         vision_features = self.vision_module(img)
 
-        action, int_object, self.inst_lstm_hiddens_cells, self.goal_lstm_hiddens_cells =\
+        action, int_object, self.action_lstm_hiddens_cells, self.goal_lstm_hiddens_cells, self.goal_lstm_hiddens_cells =\
             self.action_module(
                 goal_embs, insts_embs, vision_features, context, action_readout,
-                self.inst_lstm_hiddens_cells,
+                self.action_lstm_hiddens_cells,
+                self.obj_lstm_hiddens_cells,
                 self.goal_lstm_hiddens_cells,
             )
 
@@ -216,12 +223,20 @@ class TarsPolicy(Policy):
         self.past_actions = self.past_actions[:batch_size]
         self.past_objects = self.past_objects[:batch_size]
 
-        self.inst_lstm_hiddens_cells = [
+        self.action_lstm_hiddens_cells = [
             (
-                self.inst_lstm_hiddens_cells[i][0][:batch_size],
-                self.inst_lstm_hiddens_cells[i][1][:batch_size]
+                self.action_lstm_hiddens_cells[i][0][:batch_size],
+                self.action_lstm_hiddens_cells[i][1][:batch_size]
             )
-            for i in range(len(self.inst_lstm_hiddens_cells))
+            for i in range(len(self.action_lstm_hiddens_cells))
+        ]
+
+        self.obj_lstm_hiddens_cells = [
+            (
+                self.obj_lstm_hiddens_cells[i][0][:batch_size],
+                self.obj_lstm_hiddens_cells[i][1][:batch_size]
+            )
+            for i in range(len(self.obj_lstm_hiddens_cells))
         ]
 
         if not self.conf.remove_goal_lstm:
@@ -256,7 +271,6 @@ class TarsPolicy(Policy):
                 collate_fn=self.datasets[type].collate, pin_memory=True,
                 num_workers=self.conf.main.num_threads, shuffle=(type == DatasetType.TRAIN)
             )
-
 
     def get_trainer_kwargs(self):
         trainer_kwargs = self.conf.main.default_trainer_args
