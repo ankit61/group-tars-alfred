@@ -124,10 +124,10 @@ class ActionModule(Model):
         # goal LSTM
         if not self.remove_goal_lstm:
             goal_hidden_cell = self.goal_lstm_forward(
-                                goal_embs,
-                                context,
-                                last_goal_hidden_cell,
-                                action_emb
+                                goal_embs=goal_embs,
+                                context=context,
+                                action_emb=action_emb,
+                                last_goal_hidden_cell=last_goal_hidden_cell,
                             )
         else:
             goal_hidden_cell = None
