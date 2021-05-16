@@ -51,8 +51,8 @@ class TarsPolicyConfig(ModelConfig):
     # action module
     action_attn_heads = 4
     inst_lstm_dropout = 0.3
-    num_inst_lstm_layers = 3
-    num_goal_lstm_layers = 2
+    num_inst_lstm_layers = 1
+    num_goal_lstm_layers = 1
 
     # contextual embedding model
     context_emb_model_name_or_path = "google/bert_uncased_L-2_H-128_A-2"
