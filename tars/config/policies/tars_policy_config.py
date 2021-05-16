@@ -8,7 +8,7 @@ from tars.config.base.dataset_config import DatasetConfig
 class TarsPolicyConfig(ModelConfig):
     use_mask = False
     batch_size = 1
-    acc_grad_batches = 1 if 'small' in DatasetConfig().splits_file else 16
+    acc_grad_batches = 1 if 'small' in DatasetConfig().splits_file else 32
     # effective batch size = acc_grad_batches * batch_size
 
     # feature sizes
