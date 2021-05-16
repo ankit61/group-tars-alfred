@@ -56,7 +56,7 @@ class ContextModule(Model):
 
         self.context_mixer = nn.Linear(
             policy_conf.action_hist_emb_dim + policy_conf.int_hist_emb_dim +\
-                policy_conf.inst_hidden_size +\
+                (2 * policy_conf.inst_hidden_size) +\
                 (0 if self.remove_goal_lstm else policy_conf.goal_hidden_size),
             policy_conf.context_size
         )
