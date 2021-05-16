@@ -93,6 +93,9 @@ class TarsPolicy(Policy):
         else:
             self.goal_lstm_hiddens_cells = None
 
+        self.im_prev_class = 0
+        self.im_prev_center = torch.zeros(2)
+
     def forward(self, img, goal_embs, insts_embs, gt_action=None, gt_int_object=None):
         '''
             All elements in one batch must be from different envs
@@ -277,7 +280,7 @@ class TarsPolicy(Policy):
         trainer_kwargs['accumulate_grad_batches'] = self.conf.acc_grad_batches
         return trainer_kwargs
 
-    def find_instance_mask(self, imgs, int_objects):
+    def find_instance_mask(self, img, int_object):
         '''
             Args:
                 img: [N, C, H, W]
@@ -291,42 +294,35 @@ class TarsPolicy(Policy):
         # keep only mask over int_object
         # identify which instance to use using MOCA's style
         # return img with seg map over predicted instance only
-        prev_class = 0
-        prev_center = torch.zeros(2)
 
-        predicted_masks = [] # size N list containing mask
+        pred_class = np.argmax(int_object.cpu())
 
-        for img, int_object in zip(imgs, int_objects):
+        # mask generation
+        with torch.no_grad():
+            out = self.maskrcnn(img)[0]
+            for k in out:
+                out[k] = out[k].detach().cpu()
 
-            pred_class = int_object
+        if sum(out['labels'] == pred_class) == 0:
+            mask = np.zeros((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
 
-            # mask generation
-            with torch.no_grad():
-                out = self.maskrcnn([to_tensor(img).to('cuda' if self.conf.main.use_gpu else 'cpu')])[0]
-                for k in out:
-                    out[k] = out[k].detach().cpu()
+        else:
+            masks = out['masks'][out['labels'] == pred_class].detach().cpu()
+            scores = out['scores'][out['labels'] == pred_class].detach().cpu()
 
-            if sum(out['labels'] == pred_class) == 0:
-                mask = np.zeros((constants.SCREEN_WIDTH,constants.SCREEN_HEIGHT))
-
+            # Instance selection based on the minimum distance between the prev. and cur. instance of a same class.
+            if self.im_prev_class != pred_class:
+                scores, indices = scores.sort(descending=True)
+                masks = masks[indices]
+                self.im_prev_class = pred_class
+                self.im_prev_center = masks[0].squeeze(dim=0).nonzero().double().mean(dim=0)
             else:
-                masks = out['masks'][out['labels'] == pred_class].detach().cpu()
-                scores = out['scores'][out['labels'] == pred_class].detach().cpu()
+                cur_centers = torch.stack([m.nonzero().double().mean(dim=0) for m in masks.squeeze(dim=1)])
+                distances = ((cur_centers - self.im_prev_class) ** 2).sum(dim=1)
+                distances, indices = distances.sort()
+                masks = masks[indices]
+                self.im_prev_center = cur_centers[0]
 
-                # Instance selection based on the minimum distance between the prev. and cur. instance of a same class.
-                if prev_class != pred_class:
-                    scores, indices = scores.sort(descending=True)
-                    masks = masks[indices]
-                    prev_class = pred_class
-                    prev_center = masks[0].squeeze(dim=0).nonzero().double().mean(dim=0)
-                else:
-                    cur_centers = torch.stack([m.nonzero().double().mean(dim=0) for m in masks.squeeze(dim=1)])
-                    distances = ((cur_centers - prev_center) ** 2).sum(dim=1)
-                    distances, indices = distances.sort()
-                    masks = masks[indices]
-                    prev_center = cur_centers[0]
+            mask = np.squeeze(masks[0].numpy(), axis=0)
 
-                mask = np.squeeze(masks[0].numpy(), axis=0)
-            predicted_masks.append(mask)
-
-        return predicted_masks
+        return mask
