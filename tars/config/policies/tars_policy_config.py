@@ -12,7 +12,7 @@ class TarsPolicyConfig(ModelConfig):
     # effective batch size = acc_grad_batches * batch_size
 
     # feature sizes
-    context_size = 1024
+    context_size = 512
     vision_features_size = 512
     # raw_vision_features_size = 512
 
@@ -23,14 +23,14 @@ class TarsPolicyConfig(ModelConfig):
     # embeddings
     action_emb_dim = 128
     object_emb_dim = 128
-    action_hist_emb_dim = 512
-    int_hist_emb_dim = 512
+    action_hist_emb_dim = 256
+    int_hist_emb_dim = 256
     # word_emb_dim = 128
     vision_object_emb_dim = 128
 
     # LSTMs
     inst_hidden_size = 512
-    goal_hidden_size = 512
+    goal_hidden_size = 256
 
     # context module
     action_readout_path = '/data/best_models/action_history.ckpt'
