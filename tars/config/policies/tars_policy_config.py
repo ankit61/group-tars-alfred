@@ -21,8 +21,8 @@ class TarsPolicyConfig(ModelConfig):
     past_objects_len = 10
 
     # embeddings
-    action_emb_dim = 128
-    object_emb_dim = 128
+    action_emb_dim = 64
+    object_emb_dim = 64
     action_hist_emb_dim = 256
     int_hist_emb_dim = 256
     # word_emb_dim = 128
@@ -35,8 +35,8 @@ class TarsPolicyConfig(ModelConfig):
     # context module
     action_readout_path = '/data/best_models/action_history.ckpt'
     int_object_readout_path = '/data/best_models/int_object_history.ckpt'
-    action_readout_dropout = 0.3
-    obj_readout_dropout = 0.3
+    action_readout_dropout = 0.4
+    obj_readout_dropout = 0.4
 
     # vision module
     use_instance_seg = False
@@ -46,7 +46,7 @@ class TarsPolicyConfig(ModelConfig):
 
     # readout transformer
     transformer_num_heads = 8
-    transformer_num_layers = 4
+    transformer_num_layers = 3
 
     # action module
     action_attn_heads = 4
@@ -76,7 +76,7 @@ class TarsPolicyConfig(ModelConfig):
     init_func = 'kaiming_normal_'
 
     def get_optim(self, parameters):
-        return optim.Adam(parameters, lr=1e-4, weight_decay=5e-4)
+        return optim.Adam(parameters, lr=1e-4, weight_decay=5e-3)
 
     def get_lr_scheduler(self, opt):
         return optim.lr_scheduler.StepLR(opt, step_size=1, gamma=0.9)
