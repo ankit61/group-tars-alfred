@@ -1,0 +1,5 @@
+- designed and coded the overall model
+- designed a highly robust machine learning pipeline/library for the task to keep things very clean
+- ran 225+ experiments with many different ideas, architectural changes, tuning, bug fixing, etc
+- Wrote abstract, intro, experiments section
+- reviewed and edited the the overall report
