@@ -1,0 +1,4 @@
+- Implemented embedding + readout transformer module and pretraining procedure
+- Implemented contextual embedding module
+- Helped with model tuning and running experiments
+- Added pretraining section to final report and helped with general revisions and organization
