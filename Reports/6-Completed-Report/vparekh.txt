@@ -1,0 +1,3 @@
+- Ran experiments with different parameters
+- worked on layer normalization
+- assited in abstract and intro sections and revised related works and task definition sections
