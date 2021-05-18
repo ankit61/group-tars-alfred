@@ -157,8 +157,6 @@ class TarsPolicy(Policy):
         ac_seq_len, obj_seq_len = 0, 0
         pred_actions, pred_objects = [], []
 
-        if self.global_step % self.conf.teacher_forcing_step == 0:
-            self.teacher_prob *= self.conf.teacher_forcing_curriculum
 
         with torch.no_grad():
             goal_embs = None if self.conf.remove_goal_lstm else self.context_emb_model(batch['goal_inst'])
@@ -210,6 +208,9 @@ class TarsPolicy(Policy):
         return (optim if scheduler is None else ([optim], [scheduler]))
 
     def training_step(self, batch, batch_idx):
+        if self.global_step % self.conf.teacher_forcing_step == 0:
+            self.teacher_prob *= self.conf.teacher_forcing_curriculum
+
         metrics = self.shared_step(batch, test_time=False)
         metrics = {f'train_{k}': metrics[k] for k in metrics}
         self.log_dict(metrics)
